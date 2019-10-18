@@ -4,7 +4,10 @@ const isLocal = process.env.REACT_APP_LOCAL === 'local'
 
 const instance = axios.create({
   //   baseURL: 'http://192.168.2.110:32012/api/',
-  baseURL: 'http://192.168.0.128:18001/api/',
+  baseURL:
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_PROD,
   params: {},
   headers: { 'Access-Control-Allow-Origin': '*' }
 })

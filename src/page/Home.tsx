@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { PaginationConfig, SorterResult, ColumnProps } from 'antd/es/table'
-import styled from 'styled-components'
+import { ColumnProps } from 'antd/es/table'
+import { Skeleton } from 'antd'
 
 import { getClusters } from '../apis/clusters'
 import TableContainer from '../components/TableContainer'
-import Item from 'antd/lib/list/Item'
 
 interface clustersData {
   id: string
@@ -14,6 +13,7 @@ interface clustersData {
 function Home() {
   const [clustersData, setClustersData] = useState(undefined)
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchClusters = async () => {
@@ -22,6 +22,8 @@ function Home() {
         setClustersData(response.data)
       } catch (error) {
         setError(error)
+      } finally {
+        setLoading(false)
       }
     }
     fetchClusters()
@@ -42,11 +44,15 @@ function Home() {
 
   return (
     <>
-      <TableContainer
-        title={'Clusters List'}
-        columns={clustersColumns}
-        data={clustersData}
-      />
+      {loading ? (
+        <Skeleton active />
+      ) : (
+        <TableContainer
+          title={'Clusters List'}
+          columns={clustersColumns}
+          data={clustersData}
+        />
+      )}
     </>
   )
 }
