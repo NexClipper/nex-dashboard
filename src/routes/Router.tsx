@@ -35,7 +35,7 @@ const Router: React.FC = () => {
           <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
             <Logo>
               {collapsed ? (
-                <img src="/cropped-logo4_정사각형-270x270.png" alt="logo" />
+                <img src="/cropped-logo4-270x270.png" alt="logo" />
               ) : (
                 <img src="/logo1_blackwall2.png" alt="logo" />
               )}

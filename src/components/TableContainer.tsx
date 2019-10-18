@@ -1,6 +1,11 @@
 import React from 'react'
 import { Typography, Table } from 'antd'
-import { PaginationConfig, SorterResult } from 'antd/es/table'
+import {
+  PaginationConfig,
+  SorterResult,
+  ColumnProps,
+  TableCurrentDataSource
+} from 'antd/es/table'
 import styled from 'styled-components'
 
 const { Title } = Typography
@@ -20,12 +25,13 @@ const TableContent = styled.div`
 
 interface IProps {
   title: string
-  columns: any
-  data: any
-  handleChange: (
+  data: any[] | undefined
+  columns: ColumnProps<any>[] | undefined
+  handleChange?: (
     pagination: PaginationConfig,
-    filters: Record<any, string[]>,
-    sorter: SorterResult<any>
+    filters: Record<string | number | symbol, string[]>,
+    sorter: SorterResult<any>,
+    extra: TableCurrentDataSource<any>
   ) => void
 }
 
@@ -39,7 +45,12 @@ const TableContainer: React.FC<IProps> = ({
     <TableBackground>
       <TitleText level={3}>{title}</TitleText>
       <TableContent>
-        <Table columns={columns} dataSource={data} onChange={handleChange} />
+        <Table
+          rowKey={data => data.id}
+          columns={columns}
+          dataSource={data}
+          onChange={handleChange}
+        />
       </TableContent>
     </TableBackground>
   )
