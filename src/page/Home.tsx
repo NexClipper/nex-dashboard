@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from 'react'
 import { ColumnProps } from 'antd/es/table'
-import { Skeleton } from 'antd'
+import { Skeleton, Tag } from 'antd'
 
-import { getClusters } from '../apis/clusters'
+import { getAgents } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
 
-interface clustersData {
-  id: string
-  name: string
+interface agentsData {
+  id: number
+  ip: string
+  online: boolean
+  version: string
 }
 
 function Home() {
-  const [clustersData, setClustersData] = useState(undefined)
+  const [data, setData] = useState({})
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchClusters = async () => {
       try {
-        let response = await getClusters()
-        setClustersData(response.data)
+        let response = await getAgents()
+        setData(response.data)
       } catch (error) {
         setError(error)
       } finally {
@@ -29,16 +31,35 @@ function Home() {
     fetchClusters()
   }, [])
 
-  const clustersColumns: ColumnProps<clustersData>[] = [
+  const agentsColumns: ColumnProps<agentsData>[] = [
     {
       title: 'Id',
       dataIndex: 'id',
       key: 'id'
     },
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name'
+      title: 'Ip',
+      dataIndex: 'ip',
+      key: 'ip'
+    },
+    {
+      title: 'Online',
+      dataIndex: 'online',
+      key: 'online',
+      render: online => (
+        <span>
+          {online ? (
+            <Tag color="green">Online</Tag>
+          ) : (
+            <Tag color="black">Offline</Tag>
+          )}
+        </span>
+      )
+    },
+    {
+      title: 'Version',
+      dataIndex: 'version',
+      key: 'version'
     }
   ]
 
@@ -47,11 +68,17 @@ function Home() {
       {loading ? (
         <Skeleton active />
       ) : (
-        <TableContainer
-          title={'Clusters List'}
-          columns={clustersColumns}
-          data={clustersData}
-        />
+        <div>
+          {Object.entries(data).map(([title, value]: [string, any]) => {
+            return (
+              <TableContainer
+                title={title}
+                columns={agentsColumns}
+                data={value}
+              />
+            )
+          })}
+        </div>
       )}
     </>
   )
