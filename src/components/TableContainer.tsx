@@ -21,6 +21,14 @@ const TitleText = styled(Title)`
 
 const TableContent = styled.div`
   padding: 16px;
+  
+  .ant-table-tbody > tr {
+     //background-color: #e74c3c;
+     //color: #fff;
+     &:hover {
+      // background-color: #c0392b;
+     }
+  }
 `
 
 type IProps = {

@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
-import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
+import { Route, Switch, BrowserRouter, Redirect, Link } from 'react-router-dom'
 import { Layout, Menu, Icon } from 'antd'
 import styled from 'styled-components'
 import Home from '../page/Home'
+import Cluster from '../page/Cluster'
+import Node from '../page/Node'
+import PrometheusExporters from '../page/PrometheusExporters'
 
 const { Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
@@ -25,6 +28,10 @@ const MainContent = styled(Content)`
   padding: 32px 16px 16px;
 `
 
+const SubMenuText = styled(Link)`
+  color: #fff;
+`;
+
 function Router() {
   const [collapsed, setCollapsed] = useState<boolean>(true)
   const onCollapse = (value: boolean) => setCollapsed(value)
@@ -34,13 +41,34 @@ function Router() {
         <Layout>
           <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
             <Logo>
+              <Link to="/">
               {collapsed ? (
                 <img src="/cropped-logo4-270x270.png" alt="logo" />
               ) : (
                 <img src="/logo1_blackwall2.png" alt="logo" />
               )}
+              </Link>
             </Logo>
-            <Menu theme="dark"></Menu>
+            <Menu theme="dark">
+                <Menu.Item key="1">
+                  <Link to="/cluster">
+                    <Icon type="hdd" />
+                    <span>Cluster</span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="2">
+                  <Link to="/node">
+                    <Icon type="deployment-unit" />
+                    <span>Node</span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="3">
+                  <Link to="/prometheusExporters">
+                    <Icon type="export" />
+                    <span>Prometheus Exporters</span>
+                  </Link>
+                </Menu.Item>
+            </Menu>
           </Sider>
           <Layout>
             <MainContent>
@@ -59,7 +87,10 @@ const RouteList = () => {
   return (
     <>
       <Route exact path="/" component={Home} />
-      <Redirect from="*" to="/" />
+      <Route path="/cluster" component={Cluster} />
+      <Route path="/node" component={Node} />
+      <Route path="/prometheusExporters" component={PrometheusExporters}  />
+      {/* <Redirect from="*" to="/" /> */}
     </>
   )
 }
