@@ -25,7 +25,7 @@ const MainContent = styled(Content)`
   padding: 32px 16px 16px;
 `
 
-const Router: React.FC = () => {
+function Router() {
   const [collapsed, setCollapsed] = useState<boolean>(true)
   const onCollapse = (value: boolean) => setCollapsed(value)
   return (

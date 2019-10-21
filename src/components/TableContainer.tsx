@@ -23,7 +23,7 @@ const TableContent = styled.div`
   padding: 16px;
 `
 
-interface IProps {
+type IProps = {
   title: string
   data: any[] | undefined
   columns: ColumnProps<any>[] | undefined
@@ -35,12 +35,12 @@ interface IProps {
   ) => void
 }
 
-const TableContainer: React.FC<IProps> = ({
+function TableContainer ({
   title,
   columns,
   data,
   handleChange
-}) => {
+}: IProps) {
   return (
     <TableBackground>
       <TitleText level={3}>{title}</TitleText>

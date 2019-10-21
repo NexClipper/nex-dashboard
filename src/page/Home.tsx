@@ -1,27 +1,44 @@
 import React, { useState, useEffect } from 'react'
 import { ColumnProps } from 'antd/es/table'
-import { Skeleton, Tag } from 'antd'
+import { Skeleton, Tag, Typography } from 'antd'
 
 import { getAgents } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
+import { getNodes } from '../apis/nodes'
 
-interface agentsData {
+const { Title } = Typography
+
+type agentsData = {
   id: number
   ip: string
   online: boolean
   version: string
 }
 
+type nodesData = {
+  id: number
+  host: string
+  ip: string
+  os: string
+  platform: string
+  platform_family: string
+  platform_version: string
+  agent_id: number
+}
+
 function Home() {
-  const [data, setData] = useState({})
+  const [agentsData, setAgentsData] = useState({})
+  const [nodesData, setNodesData] = useState({});
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchClusters = async () => {
       try {
-        let response = await getAgents()
-        setData(response.data)
+        const agentsResponse = await getAgents()
+        const nodesResponse = await getNodes()
+        setAgentsData(agentsResponse.data)
+        setNodesData(nodesResponse.data)
       } catch (error) {
         setError(error)
       } finally {
@@ -63,22 +80,78 @@ function Home() {
     }
   ]
 
+  const nodesColumns: ColumnProps<nodesData>[] = [
+    {
+      title: 'Id',
+      dataIndex: 'id',
+      key: 'id'
+    },
+    {
+      title: 'Host',
+      dataIndex: 'host',
+      key: 'host'
+    },
+    {
+      title: 'Ip',
+      dataIndex: 'ip',
+      key: 'ip'
+    },
+    {
+      title: 'OS',
+      dataIndex: 'os',
+      key: 'os'
+    },
+    {
+      title: 'Platform',
+      dataIndex: 'platform',
+      key: 'platform'
+    },
+    {
+      title: 'Platform Family',
+      dataIndex: 'platform_family',
+      key: 'platform_family'
+    },
+    {
+      title: 'Platform Version',
+      dataIndex: 'platform_version',
+      key: 'platform_version'
+    },
+    {
+      title: 'Agent ID',
+      dataIndex: 'agent_id',
+      key: 'agent_id'
+    }
+  ]
+
   return (
     <>
       {loading ? (
         <Skeleton active />
       ) : (
-        <div>
-          {Object.entries(data).map(([title, value]: [string, any]) => {
+        <>
+          <Title level={2}>Agent List</Title>
+          {Object.entries(agentsData).map(([title, value]: [string, any]) => {
             return (
               <TableContainer
+                key={value}
                 title={title}
                 columns={agentsColumns}
                 data={value}
               />
             )
           })}
-        </div>
+          <Title level={2}>Node list</Title>
+          {Object.entries(nodesData).map(([title, value]: [string, any]) => {
+            return (
+              <TableContainer
+                key={value}
+                title={title}
+                columns={nodesColumns}
+                data={value}
+              />
+              )
+          })}
+        </>
       )}
     </>
   )
