@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ColumnProps } from 'antd/es/table'
 import { Skeleton, Tag, Typography } from 'antd'
 
@@ -46,8 +46,12 @@ function Home() {
     }
   }
 
-  useInterval(() => {
+  useEffect(() => {
     fetchClusters()
+  }, [])
+
+  useInterval(() => {
+    !loading ? fetchClusters() : console.log('loading')
   }, 1000)
 
   const agentsColumns: ColumnProps<agentsData>[] = [
