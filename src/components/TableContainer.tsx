@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography, Table } from 'antd'
+import { Table, Card } from 'antd'
 import {
   PaginationConfig,
   SorterResult,
@@ -8,26 +8,17 @@ import {
 } from 'antd/es/table'
 import styled from 'styled-components'
 
-const { Title } = Typography
+const TableContent = styled(Card)`
+  &.ant-card {
+    margin-bottom: 16px;
+  }
 
-const TableBackground = styled.div`
-  background-color: white;
-`
-
-const TitleText = styled(Title)`
-  border-bottom: 1px solid #333;
-  padding: 16px;
-`
-
-const TableContent = styled.div`
-  padding: 16px;
-  
   .ant-table-tbody > tr {
-     //background-color: #e74c3c;
-     //color: #fff;
-     &:hover {
+    //background-color: #e74c3c;
+    //color: #fff;
+    &:hover {
       // background-color: #c0392b;
-     }
+    }
   }
 `
 
@@ -43,24 +34,16 @@ type IProps = {
   ) => void
 }
 
-function TableContainer ({
-  title,
-  columns,
-  data,
-  handleChange
-}: IProps) {
+function TableContainer({ title, columns, data, handleChange }: IProps) {
   return (
-    <TableBackground>
-      <TitleText level={3}>{title}</TitleText>
-      <TableContent>
-        <Table
-          rowKey={data => data.id}
-          columns={columns}
-          dataSource={data}
-          onChange={handleChange}
-        />
-      </TableContent>
-    </TableBackground>
+    <TableContent title={title} bordered={false}>
+      <Table
+        rowKey={data => data.id}
+        columns={columns}
+        dataSource={data}
+        onChange={handleChange}
+      />
+    </TableContent>
   )
 }
 

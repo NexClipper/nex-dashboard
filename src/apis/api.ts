@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const isLocal = process.env.REACT_APP_LOCAL === 'local'
+// const isLocal = process.env.REACT_APP_LOCAL === 'local'
 
 const instance = axios.create({
   //   baseURL: 'http://192.168.2.110:32012/api/',

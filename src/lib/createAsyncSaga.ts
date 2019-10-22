@@ -8,7 +8,6 @@ type PromiseCreatorFunction<P, T> =
 function isPayloadAction<P>(action: any): action is PayloadAction<string, P> {
   return action.payload !== undefined
 }
-
 export default function createAsyncSaga<T1, P1, T2, P2, T3, P3>(
   asyncActionCreator: AsyncActionCreator<[T1, P1], [T2, P2], [T3, P3]>,
   promiseCreator: PromiseCreatorFunction<P1, P2>

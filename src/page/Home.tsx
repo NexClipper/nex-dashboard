@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { ColumnProps } from 'antd/es/table'
 import { Skeleton, Tag, Typography } from 'antd'
 
 import { getAgents } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
 import { getNodes } from '../apis/nodes'
+import useInterval from '../utils/useInterval'
 
 const { Title } = Typography
 
@@ -28,25 +29,26 @@ type nodesData = {
 
 function Home() {
   const [agentsData, setAgentsData] = useState({})
-  const [nodesData, setNodesData] = useState({});
+  const [nodesData, setNodesData] = useState({})
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchClusters = async () => {
-      try {
-        const agentsResponse = await getAgents()
-        const nodesResponse = await getNodes()
-        setAgentsData(agentsResponse.data)
-        setNodesData(nodesResponse.data)
-      } catch (error) {
-        setError(error)
-      } finally {
-        setLoading(false)
-      }
+  const fetchClusters = async () => {
+    try {
+      const agentsResponse = await getAgents()
+      const nodesResponse = await getNodes()
+      setAgentsData(agentsResponse.data)
+      setNodesData(nodesResponse.data)
+    } catch (error) {
+      setError(error)
+    } finally {
+      setLoading(false)
     }
+  }
+
+  useInterval(() => {
     fetchClusters()
-  }, [])
+  }, 1000)
 
   const agentsColumns: ColumnProps<agentsData>[] = [
     {
@@ -149,7 +151,7 @@ function Home() {
                 columns={nodesColumns}
                 data={value}
               />
-              )
+            )
           })}
         </>
       )}
