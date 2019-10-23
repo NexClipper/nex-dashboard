@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { ColumnProps } from 'antd/es/table'
-import { Skeleton, Tag, Typography } from 'antd'
+import { Skeleton, Tag, Typography, Empty } from 'antd'
 
 import { getAgents } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
@@ -8,24 +8,6 @@ import { getNodes } from '../apis/nodes'
 import useInterval from '../utils/useInterval'
 
 const { Title } = Typography
-
-type agentsData = {
-  id: number
-  ip: string
-  online: boolean
-  version: string
-}
-
-type nodesData = {
-  id: number
-  host: string
-  ip: string
-  os: string
-  platform: string
-  platform_family: string
-  platform_version: string
-  agent_id: number
-}
 
 function Home() {
   const [agentsData, setAgentsData] = useState({})
@@ -51,15 +33,10 @@ function Home() {
   }, [])
 
   useInterval(() => {
-    !loading ? fetchClusters() : console.log('loading')
+    !loading && !error ? fetchClusters() : console.log('loading failure')
   }, 1000)
 
-  const agentsColumns: ColumnProps<agentsData>[] = [
-    {
-      title: 'Id',
-      dataIndex: 'id',
-      key: 'id'
-    },
+  const agentsColumns: ColumnProps<IagentListData>[] = [
     {
       title: 'Ip',
       dataIndex: 'ip',
@@ -72,9 +49,9 @@ function Home() {
       render: online => (
         <span>
           {online ? (
-            <Tag color="green">Online</Tag>
+            <Tag color="#2ecc71">Online</Tag>
           ) : (
-            <Tag color="black">Offline</Tag>
+            <Tag color="#e67e22">Offline</Tag>
           )}
         </span>
       )
@@ -86,12 +63,7 @@ function Home() {
     }
   ]
 
-  const nodesColumns: ColumnProps<nodesData>[] = [
-    {
-      title: 'Id',
-      dataIndex: 'id',
-      key: 'id'
-    },
+  const nodesColumns: ColumnProps<InodelistData>[] = [
     {
       title: 'Host',
       dataIndex: 'host',
@@ -136,27 +108,35 @@ function Home() {
       ) : (
         <>
           <Title level={2}>Agent List</Title>
-          {Object.entries(agentsData).map(([title, value]: [string, any]) => {
-            return (
-              <TableContainer
-                key={value}
-                title={title}
-                columns={agentsColumns}
-                data={value}
-              />
-            )
-          })}
+          {Object.keys(agentsData).length !== 0 ? (
+            Object.entries(agentsData).map(([title, value]: [string, any]) => {
+              return (
+                <TableContainer
+                  key={value}
+                  title={title}
+                  columns={agentsColumns}
+                  data={value}
+                />
+              )
+            })
+          ) : (
+            <Empty />
+          )}
           <Title level={2}>Node list</Title>
-          {Object.entries(nodesData).map(([title, value]: [string, any]) => {
-            return (
-              <TableContainer
-                key={value}
-                title={title}
-                columns={nodesColumns}
-                data={value}
-              />
-            )
-          })}
+          {Object.keys(nodesData).length !== 0 ? (
+            Object.entries(nodesData).map(([title, value]: [string, any]) => {
+              return (
+                <TableContainer
+                  key={value}
+                  title={title}
+                  columns={nodesColumns}
+                  data={value}
+                />
+              )
+            })
+          ) : (
+            <Empty />
+          )}
         </>
       )}
     </>

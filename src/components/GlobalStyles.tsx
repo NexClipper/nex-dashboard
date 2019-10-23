@@ -1,4 +1,5 @@
-import 'antd/dist/antd.css'
+import '../styles/antdDark.less'
+import 'highcharts/css/themes/dark-unica.css'
 import {
   createGlobalStyle,
   GlobalStyleComponent,

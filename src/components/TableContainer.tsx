@@ -32,9 +32,16 @@ type IProps = {
     sorter: SorterResult<any>,
     extra: TableCurrentDataSource<any>
   ) => void
+  loading?: boolean
 }
 
-function TableContainer({ title, columns, data, handleChange }: IProps) {
+function TableContainer({
+  title,
+  columns,
+  data,
+  handleChange,
+  loading
+}: IProps) {
   return (
     <TableContent title={title} bordered={false}>
       <Table
@@ -42,6 +49,7 @@ function TableContainer({ title, columns, data, handleChange }: IProps) {
         columns={columns}
         dataSource={data}
         onChange={handleChange}
+        loading={loading}
       />
     </TableContent>
   )

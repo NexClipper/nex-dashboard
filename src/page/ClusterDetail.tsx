@@ -1,8 +1,10 @@
 import React from 'react'
-import { Typography, Row, Col, Card, Table, List } from 'antd'
+import { Typography, Row, Col, Card, Table, List, Breadcrumb } from 'antd'
 import styled, { css } from 'styled-components'
-import ReactHighcharts from 'react-highcharts'
 import dayjs from 'dayjs'
+import * as Highcharts from 'highcharts'
+import { Link } from 'react-router-dom'
+import Highchart from '../components/Highchart'
 import { cpuTotalData } from '../apis/fakeData/cpuTotalData'
 import { cpuUsedData } from '../apis/fakeData/cpuUsedData'
 import { memoryTotalData } from '../apis/fakeData/memoryTotalData'
@@ -89,30 +91,30 @@ const RightDateText = styled.span`
   text-align: center;
 `
 
-const columns = [
+const columns: ItableColumns[] = [
   {
-    title: 'resource',
+    title: 'Resource',
     dataIndex: 'resource',
     key: 'resource'
   },
   {
-    title: 'total',
+    title: 'Total',
     dataIndex: 'total',
     key: 'total'
   },
   {
-    title: 'usage',
+    title: 'Usage',
     dataIndex: 'usage',
     key: 'usage'
   },
   {
-    title: 'usagePercent',
+    title: 'UsagePercent',
     dataIndex: 'usagePercent',
     key: 'usagePercent'
   }
 ]
 
-const clusterUsageData = [
+const clusterUsageData: IclusterUsageData[] = [
   {
     resource: 'CPU',
     total: 16,
@@ -133,16 +135,13 @@ const clusterUsageData = [
   }
 ]
 
-const cpuConfig = {
+const cpuConfig: Highcharts.Options = {
   title: {
     text: ''
   },
   xAxis: {
     type: 'datetime',
     categories: cpuTotalData.map(item => dayjs(item.time).format('H:m:s'))
-  },
-  legend: {
-    align: 'center'
   },
   plotOptions: {
     line: {
@@ -161,16 +160,13 @@ const cpuConfig = {
   ]
 }
 
-const memoryConfig = {
+const memoryConfig: Highcharts.Options = {
   title: {
     text: ''
   },
   xAxis: {
     type: 'datetime',
     categories: memoryTotalData.map(item => dayjs(item.time).format('H:m:s'))
-  },
-  legend: {
-    align: 'center'
   },
   plotOptions: {
     line: {
@@ -189,16 +185,13 @@ const memoryConfig = {
   ]
 }
 
-const podConfig = {
+const podConfig: Highcharts.Options = {
   title: {
     text: ''
   },
   xAxis: {
     type: 'datetime',
     categories: podTotalData.map(item => dayjs(item.time).format('H:m:s'))
-  },
-  legend: {
-    align: 'center'
   },
   plotOptions: {
     line: {
@@ -217,7 +210,7 @@ const podConfig = {
   ]
 }
 
-const NamespacesData = [
+const NamespacesData: InamespacesData[] = [
   {
     name: 'default',
     phase: 'Active',
@@ -250,7 +243,7 @@ const NamespacesData = [
   }
 ]
 
-const DaemonSetsData = [
+const DaemonSetsData: IdaemonSetsData[] = [
   {
     name: 'kube-flannel-ds',
     namespace: 'kube-system',
@@ -293,7 +286,7 @@ const DaemonSetsData = [
   }
 ]
 
-const DeploymentsData = [
+const DeploymentsData: IdeploymentsData[] = [
   {
     name: 'terrifying-eel-nginx-ingress-controller',
     namespace: 'default',
@@ -327,6 +320,15 @@ const DeploymentsData = [
 function Cluster() {
   return (
     <>
+      <Breadcrumb>
+        <Breadcrumb.Item>
+          <Link to="/">Home</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to="/cluster">Cluster List</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>Clutser Name</Breadcrumb.Item>
+      </Breadcrumb>
       <Title level={2}>Cluster</Title>
       <Row gutter={16}>
         <Col span={12}>
@@ -358,6 +360,7 @@ function Cluster() {
         <Col span={12}>
           <Card title="Cluster Usage" bordered={false}>
             <Table
+              key="ClusterUsage"
               columns={columns}
               dataSource={clusterUsageData}
               pagination={false}
@@ -368,17 +371,17 @@ function Cluster() {
       <PaddingRow gutter={16}>
         <Col span={8}>
           <Card title="CPU (Core)" bordered={false}>
-            <ReactHighcharts config={cpuConfig} />
+            <Highchart config={cpuConfig} />
           </Card>
         </Col>
         <Col span={8}>
           <Card title="Memory (GB)" bordered={false}>
-            <ReactHighcharts config={memoryConfig} />
+            <Highchart config={memoryConfig} />
           </Card>
         </Col>
         <Col span={8}>
           <Card title="Pod (Count)" bordered={false}>
-            <ReactHighcharts config={podConfig} />
+            <Highchart config={podConfig} />
           </Card>
         </Col>
       </PaddingRow>
