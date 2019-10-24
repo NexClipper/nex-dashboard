@@ -38,6 +38,12 @@ interface Idata {
 
 const columns: ColumnProps<ItableColumns>[] = [
   {
+    title: 'id',
+    dataIndex: 'id',
+    key: 'id',
+    render: id => <Link to={`/node/${id}`}>{id}</Link>
+  },
+  {
     title: 'Name',
     dataIndex: 'name',
     key: 'name'

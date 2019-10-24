@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components'
 import dayjs from 'dayjs'
 import * as Highcharts from 'highcharts'
 import { Link } from 'react-router-dom'
+import InfoContaier from '../components/InfoContainer'
 import Highchart from '../components/Highchart'
 import { cpuTotalData } from '../apis/fakeData/cpuTotalData'
 import { cpuUsedData } from '../apis/fakeData/cpuUsedData'
@@ -18,27 +19,9 @@ interface StateCircularProps {
   readonly active: boolean
 }
 
-const ClusterInfoContainer = styled.ul`
-  display: flex;
-  margin: 0;
-  flex-wrap: wrap;
-  height: 216px;
-  li {
-    width: 50%;
-    margin-top: 16px;
-    &:nth-child(1),
-    :nth-child(2) {
-      margin: 0;
-    }
-  }
-  p {
-    margin: 0;
-  }
-`
-
-const BlodText = styled.p`
-  font-weight: 700;
-  font-size: 1.25rem;
+const FixedBox = styled.div`
+  height: 231px;
+  overflow-y: auto;
 `
 
 const PaddingRow = styled(Row)`
@@ -333,38 +316,42 @@ function Cluster() {
       <Row gutter={16}>
         <Col span={12}>
           <Card title="Cluster" bordered={false}>
-            <ClusterInfoContainer>
-              <li>
-                <BlodText>gitVersion</BlodText>
-                <p>v1.13.5-5+270f968ee96a91</p>
-              </li>
-              <li>
-                <BlodText>goVersion</BlodText>
-                <p>go1.11.5</p>
-              </li>
-              <li>
-                <BlodText>gitCommit</BlodText>
-                <p>270f968ee96a9166c3dee050b3f45d213e49a1d5</p>
-              </li>
-              <li>
-                <BlodText>Platform</BlodText>
-                <p>linux/amd64</p>
-              </li>
-              <li>
-                <BlodText>Built</BlodText>
-                <p>2019-07-25</p>
-              </li>
-            </ClusterInfoContainer>
+            <FixedBox>
+              <InfoContaier>
+                <li>
+                  <p className="title">gitVersion</p>
+                  <p>v1.13.5-5+270f968ee96a91</p>
+                </li>
+                <li>
+                  <p className="title">goVersion</p>
+                  <p>go1.11.5</p>
+                </li>
+                <li>
+                  <p className="title">gitCommit</p>
+                  <p>270f968ee96a9166c3dee050b3f45d213e49a1d5</p>
+                </li>
+                <li>
+                  <p className="title">Platform</p>
+                  <p>linux/amd64</p>
+                </li>
+                <li>
+                  <p className="title">Built</p>
+                  <p>2019-07-25</p>
+                </li>
+              </InfoContaier>
+            </FixedBox>
           </Card>
         </Col>
         <Col span={12}>
           <Card title="Cluster Usage" bordered={false}>
-            <Table
-              key="ClusterUsage"
-              columns={columns}
-              dataSource={clusterUsageData}
-              pagination={false}
-            />
+            <FixedBox>
+              <Table
+                key="ClusterUsage"
+                columns={columns}
+                dataSource={clusterUsageData}
+                pagination={false}
+              />
+            </FixedBox>
           </Card>
         </Col>
       </Row>

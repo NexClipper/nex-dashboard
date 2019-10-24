@@ -7,6 +7,7 @@ import ClusterList from '../page/ClusterList'
 import ClusterDetail from '../page/ClusterDetail'
 import NodeList from '../page/NodeList'
 import PrometheusExporters from '../page/PrometheusExporters'
+import NodeDetail from '../page/NodeDetail'
 
 const { Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
@@ -90,7 +91,8 @@ const RouteList = () => {
       <Route exact path="/" component={Home} />
       <Route exact path="/cluster" component={ClusterList} />
       <Route path="/cluster/:clusterId" component={ClusterDetail} />
-      <Route path="/node" component={NodeList} />
+      <Route exact path="/node" component={NodeList} />
+      <Route path="/node/:nodeId" component={NodeDetail} />
       <Route path="/prometheusExporters" component={PrometheusExporters} />
       {/* <Redirect from="*" to="/" /> */}
     </>

@@ -135,7 +135,7 @@ function Highchart({ config }: HighchartProps) {
 
   useEffect(() => {
     setDefaultTheme({
-      colors: defaultTheme.colors,
+      colors: config.colors ? config.colors : defaultTheme.colors,
       chart: defaultTheme.chart,
       title: {
         ...JSON.parse(JSON.stringify(config.title)),
@@ -146,7 +146,10 @@ function Highchart({ config }: HighchartProps) {
         ...JSON.parse(JSON.stringify(config.xAxis)),
         ...JSON.parse(JSON.stringify(defaultTheme.xAxis))
       },
-      yAxis: defaultTheme.yAxis,
+      yAxis: {
+        ...config.yAxis,
+        ...JSON.parse(JSON.stringify(defaultTheme.yAxis))
+      },
       tooltip: defaultTheme.tooltip,
       plotOptions: {
         ...JSON.parse(JSON.stringify(config.plotOptions)),
@@ -159,7 +162,8 @@ function Highchart({ config }: HighchartProps) {
       navigation: defaultTheme.navigation,
       series: config.series
     })
-  }, [setDefaultTheme])
+    // eslint-disable-next-line
+  }, [])
   return <ReactHighcharts config={defaultTheme} />
 }
 
