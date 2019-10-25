@@ -1,5 +1,14 @@
 import React from 'react'
-import { Breadcrumb, Typography, Row, Col, Card, Tag, Progress } from 'antd'
+import {
+  Breadcrumb,
+  Typography,
+  Row,
+  Col,
+  Card,
+  Tag,
+  Progress,
+  Input
+} from 'antd'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
@@ -12,6 +21,7 @@ import { cpuUsedData } from '../apis/fakeData/cpuUsedData'
 import { memoryUsedData } from '../apis/fakeData/memoryUsedData'
 
 const { Title } = Typography
+const { Search } = Input
 
 const CropTag = styled(Tag)`
   &.ant-tag {
@@ -126,13 +136,15 @@ const columns: ColumnProps<ItableColumns>[] = [
     title: 'CPU(%)',
     dataIndex: 'resource.used_percent.cpu',
     key: 'resource.used_percent.cpu',
-    render: cpu => <Progress size="small" percent={cpu} />
+    render: cpu => <Progress size="small" percent={Math.floor(Number(cpu))} />
   },
   {
     title: 'Memory(%)',
     dataIndex: 'resource.used_percent.memory',
     key: 'resource.used_percent.memory',
-    render: memory => <Progress size="small" percent={memory} />
+    render: memory => (
+      <Progress size="small" percent={Math.floor(Number(memory))} />
+    )
   }
 ]
 
@@ -365,14 +377,17 @@ function NodeDetail() {
       </MarginRow>
       <MarginRow gutter={16}>
         <Col span={24}>
-          <Card title="Pod List" bordered={false}>
-            <TableContainer
-              key="PodList"
-              title={''}
-              columns={columns}
-              data={NodePodListData}
-            />
-          </Card>
+          {/* <Search
+            placeholder="Seach for ..."
+            onSearch={value => console.log(value)}
+            style={{ width: 200 }}
+          /> */}
+          <TableContainer
+            key="PodList"
+            title={'Pod List'}
+            columns={columns}
+            data={NodePodListData}
+          />
         </Col>
       </MarginRow>
     </>

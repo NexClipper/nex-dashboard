@@ -1,5 +1,5 @@
-import '../styles/antdDark.less'
-import 'highcharts/css/themes/dark-unica.css'
+import 'antd/dist/antd.css'
+// import '../styles/antdDark.less'
 import {
   createGlobalStyle,
   GlobalStyleComponent,
@@ -9,8 +9,21 @@ import reset from 'styled-reset'
 
 const globalStyles: GlobalStyleComponent<{}, DefaultTheme> = createGlobalStyle`
     ${reset};
-    body {
-      background-color: #e5e5e5;
+    body.dark {
+      color: rgba(255, 255, 255, 0.65);
+      background-color: #30303d;
+      .ant-layout {
+        color: rgba(255, 255, 255, 0.65) !important;
+        background-color: #30303d !important;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        color: rgba(255, 255, 255, 0.85);
+      }
     }
 `
 

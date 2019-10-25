@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/aliyun-theme": "^0.0.4",
+    "@ant-design/dark-theme": "^1.0.3",
     "@types/axios": "^0.14.0",
     "@types/highcharts": "^5.0.44",
     "@types/jest": "24.0.18",

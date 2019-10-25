@@ -2,12 +2,15 @@ import React, { useState } from 'react'
 import { Route, Switch, BrowserRouter, Redirect, Link } from 'react-router-dom'
 import { Layout, Menu, Icon } from 'antd'
 import styled from 'styled-components'
+import { useSelector } from 'react-redux'
+import { RootState } from '../modules'
 import Home from '../page/Home'
 import ClusterList from '../page/ClusterList'
 import ClusterDetail from '../page/ClusterDetail'
 import NodeList from '../page/NodeList'
 import PrometheusExporters from '../page/PrometheusExporters'
 import NodeDetail from '../page/NodeDetail'
+import ThemeToggle from '../components/ThemeToggle'
 
 const { Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
@@ -35,13 +38,19 @@ const SubMenuText = styled(Link)`
 `
 
 function Router() {
+  const dark = useSelector((state: RootState) => state.theme.dark)
   const [collapsed, setCollapsed] = useState<boolean>(true)
   const onCollapse = (value: boolean) => setCollapsed(value)
   return (
     <BrowserRouter>
       <FullLayout>
         <Layout>
-          <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
+          <Sider
+            theme={dark ? 'dark' : 'light'}
+            collapsible
+            collapsed={collapsed}
+            onCollapse={onCollapse}
+          >
             <Logo>
               <Link to="/">
                 {collapsed ? (
@@ -51,7 +60,7 @@ function Router() {
                 )}
               </Link>
             </Logo>
-            <Menu theme="dark">
+            <Menu theme={dark ? 'dark' : 'light'}>
               <Menu.Item key="1">
                 <Link to="/cluster">
                   <Icon type="hdd" />
@@ -74,6 +83,7 @@ function Router() {
           </Sider>
           <Layout>
             <MainContent>
+              <ThemeToggle />
               <Switch>
                 <RouteList />
               </Switch>

@@ -28,6 +28,10 @@ const StatusBox = styled(Card)`
   }
 `
 
+const MarginRow = styled(Row)`
+  margin-bottom: 16px;
+`
+
 interface Idata {
   id: number
   name: string
@@ -178,7 +182,7 @@ function NodeList() {
         <Breadcrumb.Item>Node List</Breadcrumb.Item>
       </Breadcrumb>
       <Title level={2}>Node</Title>
-      <Row gutter={16}>
+      <MarginRow gutter={16}>
         <Col span={4}>
           <StatusBox>
             <p className="title">Disk Pressure</p>
@@ -215,7 +219,7 @@ function NodeList() {
             <p className="number">0</p>
           </StatusBox>
         </Col>
-      </Row>
+      </MarginRow>
       <TableContainer
         key="id"
         title={'Node List'}

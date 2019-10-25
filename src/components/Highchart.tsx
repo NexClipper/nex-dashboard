@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import ReactHighcharts from 'react-highcharts'
 import * as Highcharts from 'highcharts'
+import { useSelector } from 'react-redux'
+import { RootState } from '../modules'
 
 interface HighchartProps {
   config: Highcharts.Options
 }
 
 function Highchart({ config }: HighchartProps) {
-  const [defaultTheme, setDefaultTheme] = useState<Highcharts.Options>({
+  const dark = useSelector((state: RootState) => state.theme.dark)
+  const [defaultTheme, setDefaultTheme] = useState<Highcharts.Options>({})
+  const [darkTheme, setDarkTheme] = useState<Highcharts.Options>({
     colors: [
       '#a6f0ff',
       '#70d49e',
@@ -134,36 +138,67 @@ function Highchart({ config }: HighchartProps) {
   })
 
   useEffect(() => {
-    setDefaultTheme({
-      colors: config.colors ? config.colors : defaultTheme.colors,
-      chart: defaultTheme.chart,
-      title: {
-        ...JSON.parse(JSON.stringify(config.title)),
-        ...JSON.parse(JSON.stringify(defaultTheme.title))
-      },
-      subtitle: defaultTheme.subtitle,
-      xAxis: {
-        ...JSON.parse(JSON.stringify(config.xAxis)),
-        ...JSON.parse(JSON.stringify(defaultTheme.xAxis))
-      },
-      yAxis: {
-        ...config.yAxis,
-        ...JSON.parse(JSON.stringify(defaultTheme.yAxis))
-      },
-      tooltip: defaultTheme.tooltip,
-      plotOptions: {
-        ...JSON.parse(JSON.stringify(config.plotOptions)),
-        ...JSON.parse(JSON.stringify(defaultTheme.plotOptions))
-      },
-      legend: defaultTheme.legend,
-      credits: defaultTheme.credits,
-      labels: defaultTheme.labels,
-      drilldown: defaultTheme.drilldown,
-      navigation: defaultTheme.navigation,
-      series: config.series
-    })
+    console.log('dark:', dark)
+    if (!dark) {
+      setDefaultTheme({
+        colors: [
+          '#5f98cf',
+          '#434348',
+          '#49a65e',
+          '#f45b5b',
+          '#708090',
+          '#b68c51',
+          '#397550',
+          '#c0493d',
+          '#4f4a7a',
+          '#b381b3'
+        ],
+        chart: {},
+        title: config.title,
+        subtitle: {},
+        xAxis: config.xAxis,
+        yAxis: config.yAxis,
+        tooltip: {},
+        plotOptions: config.plotOptions,
+        legend: {},
+        credits: {},
+        labels: {},
+        drilldown: {},
+        navigation: {},
+        series: config.series
+      })
+    } else {
+      setDefaultTheme({
+        colors: config.colors ? config.colors : darkTheme.colors,
+        chart: darkTheme.chart,
+        title: {
+          ...JSON.parse(JSON.stringify(config.title)),
+          ...JSON.parse(JSON.stringify(darkTheme.title))
+        },
+        subtitle: darkTheme.subtitle,
+        xAxis: {
+          ...JSON.parse(JSON.stringify(config.xAxis)),
+          ...JSON.parse(JSON.stringify(darkTheme.xAxis))
+        },
+        yAxis: {
+          ...config.yAxis,
+          ...darkTheme.yAxis
+        },
+        tooltip: darkTheme.tooltip,
+        plotOptions: {
+          ...JSON.parse(JSON.stringify(config.plotOptions)),
+          ...JSON.parse(JSON.stringify(darkTheme.plotOptions))
+        },
+        legend: darkTheme.legend,
+        credits: darkTheme.credits,
+        labels: darkTheme.labels,
+        drilldown: darkTheme.drilldown,
+        navigation: darkTheme.navigation,
+        series: config.series
+      })
+    }
     // eslint-disable-next-line
-  }, [])
+  }, [dark])
   return <ReactHighcharts config={defaultTheme} />
 }
 
