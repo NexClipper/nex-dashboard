@@ -45,12 +45,7 @@ function Router() {
     <BrowserRouter>
       <FullLayout>
         <Layout>
-          <Sider
-            theme={dark ? 'dark' : 'light'}
-            collapsible
-            collapsed={collapsed}
-            onCollapse={onCollapse}
-          >
+          <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
             <Logo>
               <Link to="/">
                 {collapsed ? (
@@ -60,7 +55,7 @@ function Router() {
                 )}
               </Link>
             </Logo>
-            <Menu theme={dark ? 'dark' : 'light'}>
+            <Menu>
               <Menu.Item key="1">
                 <Link to="/cluster">
                   <Icon type="hdd" />
