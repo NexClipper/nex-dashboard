@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { ColumnProps } from 'antd/es/table'
-import { Skeleton, Tag, Typography, Empty } from 'antd'
+import { Skeleton, Tag, Typography, Empty, Breadcrumb } from 'antd'
 
 import { getAgents } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
@@ -33,7 +33,7 @@ function Home() {
   }, [])
 
   useInterval(() => {
-    !loading && !error ? fetchClusters() : console.log('loading failure')
+    !loading && !error ? fetchClusters() : console.log('')
   }, 1000)
 
   const agentsColumns: ColumnProps<IagentListData>[] = [
@@ -107,6 +107,9 @@ function Home() {
         <Skeleton active />
       ) : (
         <>
+          <Breadcrumb>
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+          </Breadcrumb>
           <Title level={2}>Agent List</Title>
           {Object.keys(agentsData).length !== 0 ? (
             Object.entries(agentsData).map(([title, value]: [string, any]) => {

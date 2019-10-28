@@ -8,7 +8,7 @@ import TableContainer from '../components/TableContainer'
 const { Title } = Typography
 
 const StatusBox = styled(Card)`
-  &.ant-card {
+  &.ant-card.statusBox {
     height: 300px;
     box-sizing: border-box;
     color: #fff;
@@ -184,37 +184,37 @@ function NodeList() {
       <Title level={2}>Node</Title>
       <MarginRow gutter={16}>
         <Col span={4}>
-          <StatusBox>
+          <StatusBox className="statusBox">
             <p className="title">Disk Pressure</p>
             <p className="number">0</p>
           </StatusBox>
         </Col>
         <Col span={4}>
-          <StatusBox>
+          <StatusBox className="statusBox">
             <p className="title">Memory Pressure</p>
             <p className="number">0</p>
           </StatusBox>
         </Col>
         <Col span={4}>
-          <StatusBox>
+          <StatusBox className="statusBox">
             <p className="title">PID Pressure</p>
             <p className="number">0</p>
           </StatusBox>
         </Col>
         <Col span={4}>
-          <StatusBox>
+          <StatusBox className="statusBox">
             <p className="title">Unschedulable</p>
             <p className="number">0</p>
           </StatusBox>
         </Col>
         <Col span={4}>
-          <StatusBox color="#FB8C00">
+          <StatusBox color="#FB8C00" className="statusBox">
             <p className="title">Out of Disk</p>
             <p className="number">0</p>
           </StatusBox>
         </Col>
         <Col span={4}>
-          <StatusBox color="#9b59b6">
+          <StatusBox color="#9b59b6" className="statusBox">
             <p className="title">Network Unavilable</p>
             <p className="number">0</p>
           </StatusBox>
