@@ -14,10 +14,10 @@ const ThemeSwitchContainer = styled.div`
     right: 16px;
     top: 52px;
     margin-bottom: 16px;
-    background-color: #ecf0f1;
+    background-color: #ecf0f1 !important;
   }
   .ant-switch-checked {
-    background-color: #34495e;
+    background-color: #34495e !important;
   }
 `
 

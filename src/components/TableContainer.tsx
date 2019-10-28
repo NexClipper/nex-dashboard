@@ -10,7 +10,7 @@ import styled from 'styled-components'
 
 const TableContent = styled(Card)`
   &.ant-card {
-    margin-bottom: 16px;
+    margin-bottom: 16px !important;
   }
 
   .ant-table-tbody > tr {

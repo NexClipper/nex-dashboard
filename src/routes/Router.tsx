@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 import { Route, Switch, BrowserRouter, Redirect, Link } from 'react-router-dom'
 import { Layout, Menu, Icon } from 'antd'
 import styled from 'styled-components'
-import { useSelector } from 'react-redux'
-import { RootState } from '../modules'
 import Home from '../page/Home'
 import ClusterList from '../page/ClusterList'
 import ClusterDetail from '../page/ClusterDetail'
@@ -17,7 +15,7 @@ const { SubMenu } = Menu
 
 const FullLayout = styled.div`
   > .ant-layout {
-    min-height: 100vh;
+    min-height: 100vh !important;
   }
 `
 const Logo = styled.div`
@@ -38,7 +36,6 @@ const SubMenuText = styled(Link)`
 `
 
 function Router() {
-  const dark = useSelector((state: RootState) => state.theme.dark)
   const [collapsed, setCollapsed] = useState<boolean>(true)
   const onCollapse = (value: boolean) => setCollapsed(value)
   return (
