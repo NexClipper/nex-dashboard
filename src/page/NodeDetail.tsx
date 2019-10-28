@@ -9,7 +9,7 @@ import {
   Progress,
   Input
 } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, useRouteMatch } from 'react-router-dom'
 import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
@@ -227,7 +227,15 @@ const NodePodListData: IpodListData[] = [
   }
 ]
 
-function NodeDetail() {
+interface Iparams {
+  clusterId: string | undefined
+  nodeId: string | undefined
+}
+
+const NodeDetail = () => {
+  const match = useRouteMatch<Iparams>('/clusters/:clusterId/nodes/:nodeId')
+  if (match) console.log(match.params.clusterId)
+  if (match) console.log(match.params.nodeId)
   return (
     <>
       <Breadcrumb>

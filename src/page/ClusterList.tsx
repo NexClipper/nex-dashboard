@@ -18,7 +18,7 @@ interface IclustersData {
   name: string
 }
 
-function ClusterList() {
+const ClusterList = () => {
   const [clustersData, setClustersData] = useState<IclustersData[]>([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -60,7 +60,7 @@ function ClusterList() {
             dataSource={clustersData}
             renderItem={item => (
               <List.Item>
-                <FullLink to={`cluster/${item.id}`}>{item.name}</FullLink>
+                <FullLink to={`clusters/${item.id}`}>{item.name}</FullLink>
               </List.Item>
             )}
           />

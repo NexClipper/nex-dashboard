@@ -3,7 +3,7 @@ import { Typography, Row, Col, Card, Table, List, Breadcrumb } from 'antd'
 import styled, { css } from 'styled-components'
 import dayjs from 'dayjs'
 import * as Highcharts from 'highcharts'
-import { Link } from 'react-router-dom'
+import { Link, useRouteMatch } from 'react-router-dom'
 import InfoContaier from '../components/InfoContainer'
 import Highchart from '../components/Highchart'
 import { cpuTotalData } from '../apis/fakeData/cpuTotalData'
@@ -300,7 +300,13 @@ const DeploymentsData: IdeploymentsData[] = [
   }
 ]
 
-function Cluster() {
+interface Iparams {
+  clusterId: string | undefined
+}
+
+const ClusterDetail = () => {
+  const match = useRouteMatch<Iparams>('/clusters/:clusterId')
+  if (match) console.log(match.params.clusterId)
   return (
     <>
       <Breadcrumb>
@@ -308,7 +314,7 @@ function Cluster() {
           <Link to="/">Home</Link>
         </Breadcrumb.Item>
         <Breadcrumb.Item>
-          <Link to="/cluster">Cluster List</Link>
+          <Link to="/clusters">Cluster List</Link>
         </Breadcrumb.Item>
         <Breadcrumb.Item>Clutser Name</Breadcrumb.Item>
       </Breadcrumb>
@@ -449,4 +455,4 @@ function Cluster() {
   )
 }
 
-export default Cluster
+export default ClusterDetail

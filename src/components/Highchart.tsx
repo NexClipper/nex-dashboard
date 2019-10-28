@@ -138,7 +138,6 @@ function Highchart({ config }: HighchartProps) {
   })
 
   useEffect(() => {
-    console.log('dark:', dark)
     if (!dark) {
       setDefaultTheme({
         colors: [

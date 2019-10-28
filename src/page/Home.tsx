@@ -9,7 +9,7 @@ import useInterval from '../utils/useInterval'
 
 const { Title } = Typography
 
-function Home() {
+const Home = () => {
   const [agentsData, setAgentsData] = useState({})
   const [nodesData, setNodesData] = useState({})
   const [error, setError] = useState(null)

@@ -98,7 +98,7 @@ const data: Idata[] = [
   }
 ]
 
-function PrometheusExporters() {
+const PrometheusExporters = () => {
   return (
     <>
       <Breadcrumb>

@@ -54,18 +54,12 @@ function Router() {
             </Logo>
             <Menu>
               <Menu.Item key="1">
-                <Link to="/cluster">
+                <Link to="/clusters">
                   <Icon type="hdd" />
                   <span>Cluster</span>
                 </Link>
               </Menu.Item>
               <Menu.Item key="2">
-                <Link to="/node">
-                  <Icon type="deployment-unit" />
-                  <span>Node</span>
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="3">
                 <Link to="/prometheusExporters">
                   <Icon type="export" />
                   <span>Prometheus Exporters</span>
@@ -91,10 +85,14 @@ const RouteList = () => {
   return (
     <>
       <Route exact path="/" component={Home} />
-      <Route exact path="/cluster" component={ClusterList} />
-      <Route path="/cluster/:clusterId" component={ClusterDetail} />
-      <Route exact path="/node" component={NodeList} />
-      <Route path="/node/:nodeId" component={NodeDetail} />
+      <Route exact path="/clusters" component={ClusterList} />
+      <Route exact path="/clusters/:clusterId" component={ClusterDetail} />
+      <Route exact path="/clusters/:clusterId/nodes" component={NodeList} />
+      <Route
+        exact
+        path="/clusters/:clusterId/nodes/:nodeId"
+        component={NodeDetail}
+      />
       <Route path="/prometheusExporters" component={PrometheusExporters} />
       {/* <Redirect from="*" to="/" /> */}
     </>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Typography, Row, Col, Card, Tag, Breadcrumb } from 'antd'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
+import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
 
@@ -39,59 +39,6 @@ interface Idata {
   status: object
   conditions: object
 }
-
-const columns: ColumnProps<ItableColumns>[] = [
-  {
-    title: 'id',
-    dataIndex: 'id',
-    key: 'id',
-    render: id => <Link to={`/node/${id}`}>{id}</Link>
-  },
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name'
-  },
-  {
-    title: 'Status',
-    dataIndex: 'conditions.type',
-    key: 'conditions.type',
-    render: ready => (
-      <span>
-        {ready === 'Ready' ? (
-          <Tag color="#2ecc71">Ready</Tag>
-        ) : (
-          <Tag color="#e67e22">Not Ready</Tag>
-        )}
-      </span>
-    )
-  },
-  {
-    title: 'Node Ip',
-    dataIndex: 'node_ip',
-    key: 'node_ip'
-  },
-  {
-    title: 'Allocatable CPU',
-    dataIndex: 'status.allocatable.cpu',
-    key: 'status.allocatable.cpu'
-  },
-  {
-    title: 'Allocatable Memory',
-    dataIndex: 'status.allocatable.memory',
-    key: 'status.allocatable.memory'
-  },
-  {
-    title: 'Capacity CPU',
-    dataIndex: 'status.capacity.cpu',
-    key: 'status.capacity.cpu'
-  },
-  {
-    title: 'Capacity Memory',
-    dataIndex: 'status.capacity.memory',
-    key: 'status.capacity.memory'
-  }
-]
 
 const data: Idata[] = [
   {
@@ -172,17 +119,87 @@ const data: Idata[] = [
   }
 ]
 
-function NodeList() {
+interface Iparams {
+  clusterId: string | undefined
+}
+
+const NodeList = () => {
+  const match = useRouteMatch<Iparams>('/clusters/:clusterId/nodes')
+  const columns: ColumnProps<ItableColumns>[] = [
+    {
+      title: 'id',
+      dataIndex: 'id',
+      key: 'id',
+      render: id =>
+        match ? (
+          <Link to={`/clusters/${match.params.clusterId}/nodes/${id}`}>
+            {id}
+          </Link>
+        ) : null
+    },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name'
+    },
+    {
+      title: 'Status',
+      dataIndex: 'conditions.type',
+      key: 'conditions.type',
+      render: ready => (
+        <span>
+          {ready === 'Ready' ? (
+            <Tag color="#2ecc71">Ready</Tag>
+          ) : (
+            <Tag color="#e67e22">Not Ready</Tag>
+          )}
+        </span>
+      )
+    },
+    {
+      title: 'Node Ip',
+      dataIndex: 'node_ip',
+      key: 'node_ip'
+    },
+    {
+      title: 'Allocatable CPU',
+      dataIndex: 'status.allocatable.cpu',
+      key: 'status.allocatable.cpu'
+    },
+    {
+      title: 'Allocatable Memory',
+      dataIndex: 'status.allocatable.memory',
+      key: 'status.allocatable.memory'
+    },
+    {
+      title: 'Capacity CPU',
+      dataIndex: 'status.capacity.cpu',
+      key: 'status.capacity.cpu'
+    },
+    {
+      title: 'Capacity Memory',
+      dataIndex: 'status.capacity.memory',
+      key: 'status.capacity.memory'
+    }
+  ]
   return (
     <>
       <Breadcrumb>
         <Breadcrumb.Item>
           <Link to="/">Home</Link>
         </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to="/clusters">Cluster List</Link>
+        </Breadcrumb.Item>
+        {match ? (
+          <Breadcrumb.Item>
+            <Link to={`/clusters/${match.params.clusterId}`}>Clutser Name</Link>
+          </Breadcrumb.Item>
+        ) : null}
         <Breadcrumb.Item>Node List</Breadcrumb.Item>
       </Breadcrumb>
       <Title level={2}>Node</Title>
-      <MarginRow gutter={16}>
+      {/* <MarginRow gutter={16}>
         <Col span={4}>
           <StatusBox className="statusBox">
             <p className="title">Disk Pressure</p>
@@ -219,7 +236,7 @@ function NodeList() {
             <p className="number">0</p>
           </StatusBox>
         </Col>
-      </MarginRow>
+      </MarginRow> */}
       <TableContainer
         key="id"
         title={'Node List'}
