@@ -26,7 +26,7 @@ interface IinfoContainer {
   children: ReactNode[] | ReactChild
 }
 
-function InfoContainer({ children }: IinfoContainer) {
+const InfoContainer = ({ children }: IinfoContainer) => {
   return <InfoContainerBox>{children}</InfoContainerBox>
 }
 

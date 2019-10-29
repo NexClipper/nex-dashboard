@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import ReactHighcharts from 'react-highcharts'
 import * as Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
 import { useSelector } from 'react-redux'
 import { RootState } from '../modules'
 
@@ -8,10 +8,10 @@ interface HighchartProps {
   config: Highcharts.Options
 }
 
-function Highchart({ config }: HighchartProps) {
+const LineChart = ({ config }: HighchartProps) => {
   const dark = useSelector((state: RootState) => state.theme.dark)
   const [defaultTheme, setDefaultTheme] = useState<Highcharts.Options>({})
-  const [darkTheme, setDarkTheme] = useState<Highcharts.Options>({
+  const darkTheme: Highcharts.Options = {
     colors: [
       '#a6f0ff',
       '#70d49e',
@@ -31,7 +31,8 @@ function Highchart({ config }: HighchartProps) {
     title: {
       style: {
         color: '#F0F0F3'
-      }
+      },
+      text: ''
     },
     subtitle: {
       style: {
@@ -77,6 +78,9 @@ function Highchart({ config }: HighchartProps) {
       }
     },
     plotOptions: {
+      line: {
+        animation: false
+      },
       series: {
         dataLabels: {
           color: '#F0F0F3'
@@ -114,11 +118,6 @@ function Highchart({ config }: HighchartProps) {
         color: '#F0F0F3'
       }
     },
-    labels: {
-      style: {
-        color: '#707073'
-      }
-    },
     drilldown: {
       activeAxisLabelStyle: {
         color: '#F0F0F3'
@@ -135,10 +134,11 @@ function Highchart({ config }: HighchartProps) {
         }
       }
     }
-  })
+  }
 
   useEffect(() => {
     if (!dark) {
+      console.log('dark false', dark)
       setDefaultTheme({
         colors: [
           '#5f98cf',
@@ -152,45 +152,123 @@ function Highchart({ config }: HighchartProps) {
           '#4f4a7a',
           '#b381b3'
         ],
-        chart: {},
-        title: config.title,
+        chart: {
+          backgroundColor: '#fff',
+          plotBorderColor: '#335cad'
+        },
+        title: {
+          text: ''
+        },
         subtitle: {},
-        xAxis: config.xAxis,
-        yAxis: config.yAxis,
-        tooltip: {},
-        plotOptions: config.plotOptions,
-        legend: {},
+        xAxis: {
+          ...config.xAxis,
+          gridLineColor: '#e6e6e6',
+          labels: {
+            style: {
+              color: '#333'
+            }
+          },
+          lineColor: '#e6e6e6',
+          minorGridLineColor: '#f2f2f2',
+          tickColor: '#f2f2f2',
+          title: {
+            style: {
+              color: '#666'
+            }
+          }
+        },
+        yAxis: {
+          ...config.yAxis,
+          gridLineColor: '#e6e6e6',
+          labels: {
+            style: {
+              color: '#666'
+            }
+          },
+          lineColor: '#e6e6e6',
+          minorGridLineColor: '#f2f2f2',
+          tickColor: '#ccebe6',
+          title: {
+            style: {
+              color: '#666'
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: '#F0F0F3',
+          style: {
+            color: '#rgba(0, 0, 0, 0.85)'
+          }
+        },
+        plotOptions: {
+          line: {
+            animation: false
+          }
+        },
+        legend: {
+          itemStyle: {
+            color: '#666'
+          },
+          itemHoverStyle: {
+            color: '#222'
+          },
+          itemHiddenStyle: {
+            color: '#e6e6e6'
+          },
+          title: {
+            style: {
+              color: '#666'
+            }
+          }
+        },
         credits: {},
-        labels: {},
         drilldown: {},
         navigation: {},
         series: config.series
       })
     } else {
+      console.log('dark true', dark)
       setDefaultTheme({
         colors: config.colors ? config.colors : darkTheme.colors,
-        chart: darkTheme.chart,
-        title: {
-          ...JSON.parse(JSON.stringify(config.title)),
-          ...JSON.parse(JSON.stringify(darkTheme.title))
-        },
+        chart: config.chart
+          ? {
+              ...JSON.parse(JSON.stringify(config.chart)),
+              ...JSON.parse(JSON.stringify(darkTheme.chart))
+            }
+          : darkTheme.chart,
+        title: config.title
+          ? {
+              ...JSON.parse(JSON.stringify(config.title)),
+              ...JSON.parse(JSON.stringify(darkTheme.title))
+            }
+          : darkTheme.title,
         subtitle: darkTheme.subtitle,
-        xAxis: {
-          ...JSON.parse(JSON.stringify(config.xAxis)),
-          ...JSON.parse(JSON.stringify(darkTheme.xAxis))
-        },
-        yAxis: {
-          ...config.yAxis,
-          ...darkTheme.yAxis
-        },
-        tooltip: darkTheme.tooltip,
-        plotOptions: {
-          ...JSON.parse(JSON.stringify(config.plotOptions)),
-          ...JSON.parse(JSON.stringify(darkTheme.plotOptions))
-        },
+        xAxis: config.xAxis
+          ? {
+              ...JSON.parse(JSON.stringify(config.xAxis)),
+              ...JSON.parse(JSON.stringify(darkTheme.xAxis))
+            }
+          : darkTheme.xAxis,
+        yAxis: config.yAxis
+          ? {
+              ...config.yAxis,
+              ...darkTheme.yAxis
+            }
+          : darkTheme.yAxis,
+        tooltip: config.tooltip
+          ? {
+              ...JSON.parse(JSON.stringify(config.tooltip)),
+              ...JSON.parse(JSON.stringify(darkTheme.tooltip))
+            }
+          : darkTheme.tooltip,
+        plotOptions: config.plotOptions
+          ? {
+              ...JSON.parse(JSON.stringify(config.plotOptions)),
+              ...JSON.parse(JSON.stringify(darkTheme.plotOptions))
+            }
+          : darkTheme.plotOptions,
         legend: darkTheme.legend,
         credits: darkTheme.credits,
-        labels: darkTheme.labels,
         drilldown: darkTheme.drilldown,
         navigation: darkTheme.navigation,
         series: config.series
@@ -198,7 +276,7 @@ function Highchart({ config }: HighchartProps) {
     }
     // eslint-disable-next-line
   }, [dark])
-  return <ReactHighcharts config={defaultTheme} />
+  return <HighchartsReact highcharts={Highcharts} options={defaultTheme} />
 }
 
-export default Highchart
+export default LineChart

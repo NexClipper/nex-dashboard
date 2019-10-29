@@ -14,7 +14,7 @@ import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
 import { ColumnProps } from 'antd/es/table'
-import Highchart from '../components/Highchart'
+import LineChart from '../components/LineChart'
 import InfoContainer from '../components/InfoContainer'
 import TableContainer from '../components/TableContainer'
 import { cpuUsedData } from '../apis/fakeData/cpuUsedData'
@@ -49,9 +49,6 @@ interface IpodListData {
 }
 
 const cpuConfig: Highcharts.Options = {
-  title: {
-    text: ''
-  },
   xAxis: {
     type: 'datetime',
     categories: cpuUsedData.map(item => dayjs(item.time).format('H:m:s'))
@@ -59,13 +56,9 @@ const cpuConfig: Highcharts.Options = {
   yAxis: {
     max: 100
   },
-  plotOptions: {
-    line: {
-      animation: false
-    }
-  },
   series: [
     {
+      type: 'line',
       name: 'CPU Used',
       data: cpuUsedData.map(item => item.cpuUsed)
     }
@@ -74,9 +67,6 @@ const cpuConfig: Highcharts.Options = {
 
 const memoryConfig: Highcharts.Options = {
   colors: ['#1e824c'],
-  title: {
-    text: ''
-  },
   yAxis: {
     max: 100
   },
@@ -84,13 +74,9 @@ const memoryConfig: Highcharts.Options = {
     type: 'datetime',
     categories: memoryUsedData.map(item => dayjs(item.time).format('H:m:s'))
   },
-  plotOptions: {
-    line: {
-      animation: false
-    }
-  },
   series: [
     {
+      type: 'line',
       name: 'Memory Used',
       data: memoryUsedData.map(item => item.memoryUsed)
     }
@@ -372,14 +358,14 @@ const NodeDetail = () => {
       <MarginRow gutter={16}>
         <Col span={24}>
           <Card title="CPU" bordered={false}>
-            <Highchart config={cpuConfig} />
+            <LineChart config={cpuConfig} />
           </Card>
         </Col>
       </MarginRow>
       <MarginRow gutter={16}>
         <Col span={24}>
           <Card title="Memory" bordered={false}>
-            <Highchart config={memoryConfig} />
+            <LineChart config={memoryConfig} />
           </Card>
         </Col>
       </MarginRow>

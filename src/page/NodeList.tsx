@@ -127,20 +127,17 @@ const NodeList = () => {
   const match = useRouteMatch<Iparams>('/clusters/:clusterId/nodes')
   const columns: ColumnProps<ItableColumns>[] = [
     {
-      title: 'id',
-      dataIndex: 'id',
-      key: 'id',
-      render: id =>
-        match ? (
-          <Link to={`/clusters/${match.params.clusterId}/nodes/${id}`}>
-            {id}
-          </Link>
-        ) : null
-    },
-    {
       title: 'Name',
       dataIndex: 'name',
-      key: 'name'
+      key: 'name',
+      render: (value, _, index) =>
+        match ? (
+          <Link
+            to={`/clusters/${match.params.clusterId}/nodes/${data[index].id}`}
+          >
+            {value}
+          </Link>
+        ) : null
     },
     {
       title: 'Status',

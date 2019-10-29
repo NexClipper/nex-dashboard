@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch } from 'react-router-dom'
 import InfoContaier from '../components/InfoContainer'
-import Highchart from '../components/Highchart'
+import LineChart from '../components/LineChart'
 import { cpuTotalData } from '../apis/fakeData/cpuTotalData'
 import { cpuUsedData } from '../apis/fakeData/cpuUsedData'
 import { memoryTotalData } from '../apis/fakeData/memoryTotalData'
@@ -119,49 +119,37 @@ const clusterUsageData: IclusterUsageData[] = [
 ]
 
 const cpuConfig: Highcharts.Options = {
-  title: {
-    text: ''
-  },
-  xAxis: {
-    type: 'datetime',
-    categories: cpuTotalData.map(item => dayjs(item.time).format('H:m:s'))
-  },
-  plotOptions: {
-    line: {
-      animation: false
-    }
-  },
   series: [
     {
+      type: 'line',
       name: 'CPU Total',
       data: cpuTotalData.map(item => item.cpuTotal)
     },
     {
+      type: 'line',
       name: 'CPU Used',
       data: cpuUsedData.map(item => item.cpuUsed)
     }
-  ]
+  ],
+  xAxis: {
+    type: 'datetime',
+    categories: cpuTotalData.map(item => dayjs(item.time).format('H:m:s'))
+  }
 }
 
 const memoryConfig: Highcharts.Options = {
-  title: {
-    text: ''
-  },
   xAxis: {
     type: 'datetime',
     categories: memoryTotalData.map(item => dayjs(item.time).format('H:m:s'))
   },
-  plotOptions: {
-    line: {
-      animation: false
-    }
-  },
   series: [
     {
+      type: 'line',
       name: 'Memory Total',
       data: memoryTotalData.map(item => item.memoryTotal)
     },
     {
+      type: 'line',
       name: 'Memory Used',
       data: memoryUsedData.map(item => item.memoryUsed)
     }
@@ -169,24 +157,18 @@ const memoryConfig: Highcharts.Options = {
 }
 
 const podConfig: Highcharts.Options = {
-  title: {
-    text: ''
-  },
   xAxis: {
     type: 'datetime',
     categories: podTotalData.map(item => dayjs(item.time).format('H:m:s'))
   },
-  plotOptions: {
-    line: {
-      animation: false
-    }
-  },
   series: [
     {
+      type: 'line',
       name: 'Pod Total',
       data: podTotalData.map(item => item.podTotal)
     },
     {
+      type: 'line',
       name: 'Pod Used',
       data: podUsedData.map(item => item.podUsed)
     }
@@ -364,17 +346,17 @@ const ClusterDetail = () => {
       <PaddingRow gutter={16}>
         <Col span={8}>
           <Card title="CPU (Core)" bordered={false}>
-            <Highchart config={cpuConfig} />
+            <LineChart config={cpuConfig} />
           </Card>
         </Col>
         <Col span={8}>
           <Card title="Memory (GB)" bordered={false}>
-            <Highchart config={memoryConfig} />
+            <LineChart config={memoryConfig} />
           </Card>
         </Col>
         <Col span={8}>
           <Card title="Pod (Count)" bordered={false}>
-            <Highchart config={podConfig} />
+            <LineChart config={podConfig} />
           </Card>
         </Col>
       </PaddingRow>
