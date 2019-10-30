@@ -8,7 +8,6 @@ import ClusterDetail from '../page/ClusterDetail'
 import NodeList from '../page/NodeList'
 import PrometheusExporters from '../page/PrometheusExporters'
 import NodeDetail from '../page/NodeDetail'
-import Kubernetes from '../page/Kubernetes'
 import ThemeToggle from '../components/ThemeToggle'
 
 const { Content, Footer, Sider } = Layout
@@ -95,7 +94,6 @@ const RouteList = () => {
         component={NodeDetail}
       />
       <Route path="/prometheusExporters" component={PrometheusExporters} />
-      <Route path="/kubernetes" component={Kubernetes} />
       {/* <Redirect from="*" to="/" /> */}
     </>
   )

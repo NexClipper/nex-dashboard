@@ -2,25 +2,25 @@ import React, { useState, useEffect } from 'react'
 import { ColumnProps } from 'antd/es/table'
 import { Skeleton, Tag, Typography, Empty, Breadcrumb } from 'antd'
 
-import { getAgents } from '../apis/agents'
+import { getAgents, IagentsObjectData } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
-import { getNodes } from '../apis/nodes'
+import { getNodes, InodesObjectData } from '../apis/nodes'
 import useInterval from '../utils/useInterval'
 
 const { Title } = Typography
 
 const Home = () => {
-  const [agentsData, setAgentsData] = useState({})
-  const [nodesData, setNodesData] = useState({})
+  const [agentsData, setAgentsData] = useState<IagentsObjectData | null>(null)
+  const [nodesData, setNodesData] = useState<InodesObjectData | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
   const fetchClusters = async () => {
     try {
-      const agentsResponse = await getAgents()
-      const nodesResponse = await getNodes()
-      setAgentsData(agentsResponse.data)
-      setNodesData(nodesResponse.data)
+      const { data: agentsResponse } = await getAgents()
+      const { data: nodesResponse } = await getNodes()
+      setAgentsData(agentsResponse)
+      setNodesData(nodesResponse)
     } catch (error) {
       setError(error)
     } finally {
@@ -111,7 +111,7 @@ const Home = () => {
             <Breadcrumb.Item>Home</Breadcrumb.Item>
           </Breadcrumb>
           <Title level={2}>Agent List</Title>
-          {Object.keys(agentsData).length !== 0 ? (
+          {agentsData && Object.keys(agentsData).length !== 0 ? (
             Object.entries(agentsData).map(([title, value]: [string, any]) => {
               return (
                 <TableContainer
@@ -126,7 +126,7 @@ const Home = () => {
             <Empty />
           )}
           <Title level={2}>Node list</Title>
-          {Object.keys(nodesData).length !== 0 ? (
+          {nodesData && Object.keys(nodesData).length !== 0 ? (
             Object.entries(nodesData).map(([title, value]: [string, any]) => {
               return (
                 <TableContainer

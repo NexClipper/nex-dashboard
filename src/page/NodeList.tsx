@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Typography, Row, Col, Card, Tag, Breadcrumb } from 'antd'
 import styled from 'styled-components'
 import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
+import { getClusterNodes } from '../apis/clusters'
+import { getSnapshotNodes } from '../apis/snapshot'
 
 const { Title } = Typography
 
@@ -125,6 +127,8 @@ interface Iparams {
 
 const NodeList = () => {
   const match = useRouteMatch<Iparams>('/clusters/:clusterId/nodes')
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
   const columns: ColumnProps<ItableColumns>[] = [
     {
       title: 'Name',
@@ -179,6 +183,30 @@ const NodeList = () => {
       key: 'status.capacity.memory'
     }
   ]
+
+  const fetchData = async () => {
+    try {
+      if (match) {
+        const { data: nodesResponse } = await getClusterNodes(
+          Number(match.params.clusterId)
+        )
+        const { data: snapshotResponse } = await getSnapshotNodes(
+          Number(match.params.clusterId)
+        )
+        const NodeData = nodesResponse
+        console.log(nodesResponse)
+        console.log(snapshotResponse)
+      }
+    } catch (error) {
+      setError(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
   return (
     <>
       <Breadcrumb>
