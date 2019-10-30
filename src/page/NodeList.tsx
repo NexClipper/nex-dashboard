@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import { Typography, Row, Col, Card, Tag, Breadcrumb } from 'antd'
+import {
+  Typography,
+  Row,
+  Col,
+  Card,
+  Tag,
+  Breadcrumb,
+  Skeleton,
+  Empty
+} from 'antd'
 import styled from 'styled-components'
 import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
-import { getClusterNodes } from '../apis/clusters'
-import { getSnapshotNodes } from '../apis/snapshot'
+import { getClusterNodes, IclusterNodesData } from '../apis/clusters'
+import useInterval from '../utils/useInterval'
 
 const { Title } = Typography
 
@@ -33,109 +42,22 @@ const StatusBox = styled(Card)`
 const MarginRow = styled(Row)`
   margin-bottom: 16px;
 `
-
-interface Idata {
-  id: number
-  name: string
-  node_ip: string
-  status: object
-  conditions: object
-}
-
-const data: Idata[] = [
-  {
-    id: 1,
-    name:
-      'oke-c3tmzbqgmzd-n3wiolfmuzt-s5cclcvxucq-1.sub06030309400.oke.oraclevcn.com',
-    node_ip: '10.0.0.17',
-    status: {
-      allocatable: {
-        cpu: '4',
-        memory: '29.08'
-      },
-      capacity: {
-        cpu: '4',
-        memory: '29.18'
-      }
-    },
-    conditions: {
-      type: 'Ready'
-    }
-  },
-  {
-    id: 2,
-    name:
-      'oke-c3tmzbqgmzd-n3wiolfmuzt-s5cclcvxucq-3.sub06030309400.oke.oraclevcn.com',
-    node_ip: '10.0.0.18',
-    status: {
-      allocatable: {
-        cpu: '4',
-        memory: '29.08'
-      },
-      capacity: {
-        cpu: '4',
-        memory: '29.18'
-      }
-    },
-    conditions: {
-      type: 'Ready'
-    }
-  },
-  {
-    id: 3,
-    name:
-      'oke-c3tmzbqgmzd-n3wiolfmuzt-s5cclcvxucq-0.sub06030309400.oke.oraclevcn.com',
-    node_ip: '10.0.0.19',
-    status: {
-      allocatable: {
-        cpu: '4',
-        memory: '29.08'
-      },
-      capacity: {
-        cpu: '4',
-        memory: '29.18'
-      }
-    },
-    conditions: {
-      type: 'Ready'
-    }
-  },
-  {
-    id: 4,
-    name:
-      'oke-c3tmzbqgmzd-n3wiolfmuzt-s5cclcvxucq-2.sub06030309400.oke.oraclevcn.com',
-    node_ip: '10.0.0.20',
-    status: {
-      allocatable: {
-        cpu: '4',
-        memory: '29.08'
-      },
-      capacity: {
-        cpu: '4',
-        memory: '29.18'
-      }
-    },
-    conditions: {
-      type: 'Ready'
-    }
-  }
-]
-
 interface Iparams {
   clusterId: string | undefined
 }
 
 const NodeList = () => {
   const match = useRouteMatch<Iparams>('/clusters/:clusterId/nodes')
+  const [data, setData] = useState<IclusterNodesData[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
   const columns: ColumnProps<ItableColumns>[] = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'Host',
+      dataIndex: 'host',
+      key: 'host',
       render: (value, _, index) =>
-        match ? (
+        match && data ? (
           <Link
             to={`/clusters/${match.params.clusterId}/nodes/${data[index].id}`}
           >
@@ -144,58 +66,46 @@ const NodeList = () => {
         ) : null
     },
     {
-      title: 'Status',
-      dataIndex: 'conditions.type',
-      key: 'conditions.type',
-      render: ready => (
-        <span>
-          {ready === 'Ready' ? (
-            <Tag color="#2ecc71">Ready</Tag>
-          ) : (
-            <Tag color="#e67e22">Not Ready</Tag>
-          )}
-        </span>
-      )
+      title: 'IP',
+      dataIndex: 'ip',
+      key: 'ip'
     },
     {
-      title: 'Node Ip',
-      dataIndex: 'node_ip',
-      key: 'node_ip'
+      title: 'OS',
+      dataIndex: 'os',
+      key: 'os'
     },
     {
-      title: 'Allocatable CPU',
-      dataIndex: 'status.allocatable.cpu',
-      key: 'status.allocatable.cpu'
+      title: 'Platform',
+      dataIndex: 'platform',
+      key: 'platform'
     },
     {
-      title: 'Allocatable Memory',
-      dataIndex: 'status.allocatable.memory',
-      key: 'status.allocatable.memory'
+      title: 'Platform Family',
+      dataIndex: 'platform_family',
+      key: 'platform_family'
     },
     {
-      title: 'Capacity CPU',
-      dataIndex: 'status.capacity.cpu',
-      key: 'status.capacity.cpu'
+      title: 'Platform Version',
+      dataIndex: 'platform_version',
+      key: 'platform_version'
     },
     {
-      title: 'Capacity Memory',
-      dataIndex: 'status.capacity.memory',
-      key: 'status.capacity.memory'
+      title: 'Agent ID',
+      dataIndex: 'agent_id',
+      key: 'agent_id'
     }
   ]
 
   const fetchData = async () => {
     try {
       if (match) {
-        const { data: nodesResponse } = await getClusterNodes(
-          Number(match.params.clusterId)
-        )
-        const { data: snapshotResponse } = await getSnapshotNodes(
-          Number(match.params.clusterId)
-        )
-        const NodeData = nodesResponse
-        console.log(nodesResponse)
-        console.log(snapshotResponse)
+        const {
+          data: {
+            data: { data: nodesResponse }
+          }
+        } = await getClusterNodes(Number(match.params.clusterId))
+        setData(nodesResponse)
       }
     } catch (error) {
       setError(error)
@@ -207,67 +117,84 @@ const NodeList = () => {
   useEffect(() => {
     fetchData()
   }, [])
+
+  useInterval(() => {
+    !loading && !error ? fetchData() : console.log('')
+  }, 1000)
+
   return (
     <>
-      <Breadcrumb>
-        <Breadcrumb.Item>
-          <Link to="/">Home</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to="/clusters">Cluster List</Link>
-        </Breadcrumb.Item>
-        {match ? (
-          <Breadcrumb.Item>
-            <Link to={`/clusters/${match.params.clusterId}`}>Clutser Name</Link>
-          </Breadcrumb.Item>
-        ) : null}
-        <Breadcrumb.Item>Node List</Breadcrumb.Item>
-      </Breadcrumb>
-      <Title level={2}>Node</Title>
-      {/* <MarginRow gutter={16}>
-        <Col span={4}>
-          <StatusBox className="statusBox">
-            <p className="title">Disk Pressure</p>
-            <p className="number">0</p>
-          </StatusBox>
-        </Col>
-        <Col span={4}>
-          <StatusBox className="statusBox">
-            <p className="title">Memory Pressure</p>
-            <p className="number">0</p>
-          </StatusBox>
-        </Col>
-        <Col span={4}>
-          <StatusBox className="statusBox">
-            <p className="title">PID Pressure</p>
-            <p className="number">0</p>
-          </StatusBox>
-        </Col>
-        <Col span={4}>
-          <StatusBox className="statusBox">
-            <p className="title">Unschedulable</p>
-            <p className="number">0</p>
-          </StatusBox>
-        </Col>
-        <Col span={4}>
-          <StatusBox color="#FB8C00" className="statusBox">
-            <p className="title">Out of Disk</p>
-            <p className="number">0</p>
-          </StatusBox>
-        </Col>
-        <Col span={4}>
-          <StatusBox color="#9b59b6" className="statusBox">
-            <p className="title">Network Unavilable</p>
-            <p className="number">0</p>
-          </StatusBox>
-        </Col>
-      </MarginRow> */}
-      <TableContainer
-        key="id"
-        title={'Node List'}
-        columns={columns}
-        data={data}
-      />
+      {loading ? (
+        <Skeleton active />
+      ) : (
+        <>
+          <Breadcrumb>
+            <Breadcrumb.Item>
+              <Link to="/">Home</Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <Link to="/clusters">Cluster List</Link>
+            </Breadcrumb.Item>
+            {match ? (
+              <Breadcrumb.Item>
+                <Link to={`/clusters/${match.params.clusterId}`}>
+                  Clutser Name
+                </Link>
+              </Breadcrumb.Item>
+            ) : null}
+            <Breadcrumb.Item>Node List</Breadcrumb.Item>
+          </Breadcrumb>
+          <Title level={2}>Node</Title>
+          {/* <MarginRow gutter={16}>
+          <Col span={4}>
+            <StatusBox className="statusBox">
+              <p className="title">Disk Pressure</p>
+              <p className="number">0</p>
+            </StatusBox>
+          </Col>
+          <Col span={4}>
+            <StatusBox className="statusBox">
+              <p className="title">Memory Pressure</p>
+              <p className="number">0</p>
+            </StatusBox>
+          </Col>
+          <Col span={4}>
+            <StatusBox className="statusBox">
+              <p className="title">PID Pressure</p>
+              <p className="number">0</p>
+            </StatusBox>
+          </Col>
+          <Col span={4}>
+            <StatusBox className="statusBox">
+              <p className="title">Unschedulable</p>
+              <p className="number">0</p>
+            </StatusBox>
+          </Col>
+          <Col span={4}>
+            <StatusBox color="#FB8C00" className="statusBox">
+              <p className="title">Out of Disk</p>
+              <p className="number">0</p>
+            </StatusBox>
+          </Col>
+          <Col span={4}>
+            <StatusBox color="#9b59b6" className="statusBox">
+              <p className="title">Network Unavilable</p>
+              <p className="number">0</p>
+            </StatusBox>
+          </Col>
+        </MarginRow> */}
+          {data ? (
+            <TableContainer
+              key="id"
+              title={'Node List'}
+              columns={columns}
+              data={data}
+            />
+          ) : (
+            <Empty />
+          )}
+        </>
+      )}
     </>
   )
 }

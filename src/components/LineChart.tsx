@@ -138,7 +138,6 @@ const LineChart = ({ config }: HighchartProps) => {
 
   useEffect(() => {
     if (!dark) {
-      console.log('dark false', dark)
       setDefaultTheme({
         colors: [
           '#5f98cf',
@@ -227,7 +226,6 @@ const LineChart = ({ config }: HighchartProps) => {
         series: config.series
       })
     } else {
-      console.log('dark true', dark)
       setDefaultTheme({
         colors: config.colors ? config.colors : darkTheme.colors,
         chart: config.chart

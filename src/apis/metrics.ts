@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios'
 import { logger } from '../utils/logger'
 import api from './api'
 
-interface ImetricsNodeData {
+export interface ImetricsNodeData {
   node: Node
   node_id: number
   value: number
@@ -11,33 +11,29 @@ interface ImetricsNodeData {
   metric_name: string
   metric_label: string
 }
-export interface ImetricsNodeObjectData {
-  [key: string]: ImetricsNodeData[]
-}
+
 interface IgetMetricsNode {
-  data: ImetricsNodeObjectData
+  data: ImetricsNodeData[]
   message: string
   status: string
 }
 
-interface ImetricsNodeProcessData {
-  node: Node
-  node_id: number
+export interface ImetricsNodeProcessData {
+  process: Node
+  process_id: number
   value: number
   bucket: Date
   metric_name: string
   metric_label: string
 }
-export interface ImetricsNodeProcessObjectData {
-  [key: string]: ImetricsNodeProcessData[]
-}
+
 interface IgetMetricsNodeProcess {
-  data: ImetricsNodeProcessObjectData
+  data: ImetricsNodeProcessData[]
   message: string
   status: string
 }
 
-interface ImetricsNodeContainerData {
+export interface ImetricsNodeContainerData {
   container: Node
   container_id: number
   value: number
@@ -45,18 +41,16 @@ interface ImetricsNodeContainerData {
   metric_name: string
   metric_label: string
 }
-export interface ImetricsNodeContainerObjectData {
-  [key: string]: ImetricsNodeContainerData[]
-}
+
 interface IgetMetricsNodeContainer {
-  data: ImetricsNodeContainerObjectData
+  data: ImetricsNodeContainerData[]
   message: string
   status: string
 }
 
-export const getMetricsNodes = async (clusterId: number) => {
+export const getMetricsNodes = async (clusterId: number, query: string) => {
   try {
-    const action = `/metrics/${clusterId}/nodes`
+    const action = `/metrics/${clusterId}/nodes?${query}`
     const result: AxiosResponse<IgetMetricsNode> = await api.getData(action)
 
     return result.data
@@ -66,9 +60,13 @@ export const getMetricsNodes = async (clusterId: number) => {
   }
 }
 
-export const getMetricsNode = async (clusterId: number, nodeId: number) => {
+export const getMetricsNode = async (
+  clusterId: number,
+  nodeId: number,
+  query: string
+) => {
   try {
-    const action = `/metrics/${clusterId}/nodes/${nodeId}`
+    const action = `/metrics/${clusterId}/nodes/${nodeId}?${query}`
     const result: AxiosResponse<IgetMetricsNode> = await api.getData(action)
 
     return result.data
@@ -80,10 +78,11 @@ export const getMetricsNode = async (clusterId: number, nodeId: number) => {
 
 export const getMetricsNodeProcesses = async (
   clusterId: number,
-  nodeId: number
+  nodeId: number,
+  query: string
 ) => {
   try {
-    const action = `/metrics/${clusterId}/nodes/${nodeId}/processes`
+    const action = `/metrics/${clusterId}/nodes/${nodeId}/processes?${query}`
     const result: AxiosResponse<IgetMetricsNodeProcess> = await api.getData(
       action
     )
@@ -98,10 +97,11 @@ export const getMetricsNodeProcesses = async (
 export const getMetricsNodeProcess = async (
   clusterId: number,
   nodeId: number,
-  processId: number
+  processId: number,
+  query: string
 ) => {
   try {
-    const action = `/metrics/${clusterId}/nodes/${nodeId}/processes/${processId}`
+    const action = `/metrics/${clusterId}/nodes/${nodeId}/processes/${processId}?${query}`
     const result: AxiosResponse<IgetMetricsNodeProcess> = await api.getData(
       action
     )
@@ -115,10 +115,11 @@ export const getMetricsNodeProcess = async (
 
 export const getMetricsNodeContainers = async (
   clusterId: number,
-  nodeId: number
+  nodeId: number,
+  query: string
 ) => {
   try {
-    const action = `/metrics/${clusterId}/nodes/${nodeId}/containers`
+    const action = `/metrics/${clusterId}/nodes/${nodeId}/containers?${query}`
     const result = await api.getData(action)
 
     return result.data
@@ -131,10 +132,11 @@ export const getMetricsNodeContainers = async (
 export const getMetricsNodeContainer = async (
   clusterId: number,
   nodeId: number,
-  containersId: number
+  containersId: number,
+  query: string
 ) => {
   try {
-    const action = `/metrics/${clusterId}/nodes/${nodeId}/containers/${containersId}`
+    const action = `/metrics/${clusterId}/nodes/${nodeId}/containers/${containersId}?${query}`
     const result = await api.getData(action)
 
     return result.data
