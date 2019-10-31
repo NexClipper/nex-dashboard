@@ -123,41 +123,42 @@ const cpuConfig: Highcharts.Options = {
     {
       type: 'line',
       name: 'CPU Total',
-      data: cpuTotalData.map(item => item.cpuTotal)
+      data: cpuTotalData.map(item => item.cpuTotal),
+      pointStart: dayjs(cpuTotalData[0].time).millisecond()
     },
     {
       type: 'line',
       name: 'CPU Used',
-      data: cpuUsedData.map(item => item.cpuUsed)
+      data: cpuUsedData.map(item => item.cpuUsed),
+      pointStart: dayjs(cpuUsedData[0].time).millisecond()
     }
   ],
   xAxis: {
-    type: 'datetime',
-    categories: cpuTotalData.map(item => dayjs(item.time).format('H:m:s'))
+    type: 'datetime'
   }
 }
 
 const memoryConfig: Highcharts.Options = {
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: {
-      hour: '%H:%M'
+  plotOptions: {
+    column: {
+      pointPlacement: 'between'
     }
+  },
+  xAxis: {
+    type: 'datetime'
   },
   series: [
     {
       type: 'line',
       name: 'Memory Total',
       data: memoryTotalData.map(item => item.memoryTotal),
-      pointStart: dayjs(memoryTotalData[0].time).millisecond(),
-      pointInterval: 3600 * 1000
+      pointStart: dayjs(memoryTotalData[0].time).millisecond()
     },
     {
       type: 'line',
       name: 'Memory Used',
       data: memoryUsedData.map(item => item.memoryUsed),
-      pointStart: dayjs(memoryUsedData[0].time).millisecond(),
-      pointInterval: 24 * 3600 * 1000
+      pointStart: dayjs(memoryUsedData[0].time).millisecond()
     }
   ]
 }

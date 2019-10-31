@@ -245,11 +245,9 @@ const NodeDetail = () => {
             xAxis: {
               type: 'datetime',
               categories: nodeCpuLoadAvg1.map(item =>
-                dayjs(item.bucket).format('YYYY-MM-DD HH:mm:ss')
+                dayjs(item.bucket).format('YY-MM-DD H:mm:ss')
               ),
-              dateTimeLabelFormats: {
-                hour: '%H:%M'
-              }
+              tickInterval: 90
             },
             series: [
               {
@@ -273,8 +271,9 @@ const NodeDetail = () => {
             xAxis: {
               type: 'datetime',
               categories: nodeMemoryTotal.map(item =>
-                dayjs(item.bucket).format('YYYY-MM-DD HH:mm:ss')
-              )
+                dayjs(item.bucket).format('YY-MM-DD H:mm:ss')
+              ),
+              tickInterval: 90
             },
             series: [
               {
@@ -326,9 +325,11 @@ const NodeDetail = () => {
               </Breadcrumb.Item>
             ) : null}
             {match ? (
-              <Link to={`/clusters/${match.params.clusterId}/nodes`}>
-                <Breadcrumb.Item>Node List</Breadcrumb.Item>
-              </Link>
+              <Breadcrumb.Item>
+                <Link to={`/clusters/${match.params.clusterId}/nodes`}>
+                  Node List
+                </Link>
+              </Breadcrumb.Item>
             ) : null}
             <Breadcrumb.Item>
               {snapshotData ? Object.keys(snapshotData)[0] : null}
