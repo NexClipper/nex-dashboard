@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { Breadcrumb, Skeleton, Typography, Empty, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { ColumnProps } from 'antd/es/table'
 import useInterval from '../utils/useInterval'
 import { getClusters } from '../apis/clusters'
 import { getSummaryClusters } from '../apis/summary'
-import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
 
 const { Title } = Typography
@@ -49,7 +49,8 @@ const ClusterList = () => {
       render: (value, _, index) =>
         clustersData ? (
           <Link to={`/clusters/${clustersData[index].id}`}>{value}</Link>
-        ) : null
+        ) : null,
+      align: 'center'
     },
     {
       title: 'Kubernetes',
@@ -63,52 +64,62 @@ const ClusterList = () => {
             <Tag color="#e67e22">No</Tag>
           )}
         </span>
-      )
+      ),
+      align: 'center'
     },
     {
       title: 'node_cpu_iowait',
       dataIndex: 'node_cpu_iowait',
-      key: 'node_cpu_iowait'
+      key: 'node_cpu_iowait',
+      align: 'center'
     },
     {
       title: 'node_cpu_load_avg_1',
       dataIndex: 'node_cpu_load_avg_1',
-      key: 'node_cpu_load_avg_1'
+      key: 'node_cpu_load_avg_1',
+      align: 'center'
     },
     {
       title: 'node_cpu_load_avg_5',
       dataIndex: 'node_cpu_load_avg_5',
-      key: 'node_cpu_load_avg_5'
+      key: 'node_cpu_load_avg_5',
+      align: 'center'
     },
     {
       title: 'node_cpu_load_avg_15',
       dataIndex: 'node_cpu_load_avg_15',
-      key: 'node_cpu_load_avg_15'
+      key: 'node_cpu_load_avg_15',
+      align: 'center'
     },
     {
       title: 'node_cpu_system',
       dataIndex: 'node_cpu_system',
-      key: 'node_cpu_system'
+      key: 'node_cpu_system',
+      align: 'center'
     },
     {
       title: 'node_cpu_user',
       dataIndex: 'node_cpu_user',
-      key: 'node_cpu_user'
+      key: 'node_cpu_user',
+      align: 'center'
     },
     {
       title: 'node_memory_available',
       dataIndex: 'node_memory_available',
-      key: 'node_memory_available'
+      key: 'node_memory_available',
+      align: 'center'
     },
     {
       title: 'node_memory_total',
       dataIndex: 'node_memory_total',
-      key: 'node_memory_total'
+      key: 'node_memory_total',
+      align: 'center'
     },
     {
       title: 'node_memory_used',
       dataIndex: 'node_memory_used',
-      key: 'node_memory_used'
+      key: 'node_memory_used',
+      align: 'center'
     }
   ]
 

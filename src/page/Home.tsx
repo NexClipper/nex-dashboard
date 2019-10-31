@@ -40,7 +40,8 @@ const Home = () => {
     {
       title: 'Ip',
       dataIndex: 'ip',
-      key: 'ip'
+      key: 'ip',
+      align: 'center'
     },
     {
       title: 'Online',
@@ -54,12 +55,14 @@ const Home = () => {
             <Tag color="#e67e22">Offline</Tag>
           )}
         </span>
-      )
+      ),
+      align: 'center'
     },
     {
       title: 'Version',
       dataIndex: 'version',
-      key: 'version'
+      key: 'version',
+      align: 'center'
     }
   ]
 
@@ -67,22 +70,26 @@ const Home = () => {
     {
       title: 'Host',
       dataIndex: 'host',
-      key: 'host'
+      key: 'host',
+      align: 'center'
     },
     {
       title: 'Ip',
       dataIndex: 'ip',
-      key: 'ip'
+      key: 'ip',
+      align: 'center'
     },
     {
       title: 'OS',
       dataIndex: 'os',
-      key: 'os'
+      key: 'os',
+      align: 'center'
     },
     {
       title: 'Platform',
       dataIndex: 'platform',
-      key: 'platform'
+      key: 'platform',
+      align: 'center'
     },
     {
       title: 'Platform Family',
@@ -92,12 +99,14 @@ const Home = () => {
     {
       title: 'Platform Version',
       dataIndex: 'platform_version',
-      key: 'platform_version'
+      key: 'platform_version',
+      align: 'center'
     },
     {
       title: 'Agent ID',
       dataIndex: 'agent_id',
-      key: 'agent_id'
+      key: 'agent_id',
+      align: 'center'
     }
   ]
 

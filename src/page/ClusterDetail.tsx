@@ -1,10 +1,20 @@
-import React from 'react'
-import { Typography, Row, Col, Card, Table, List, Breadcrumb } from 'antd'
+import React, { useState, useEffect } from 'react'
+import {
+  Typography,
+  Row,
+  Col,
+  Card,
+  Table,
+  List,
+  Breadcrumb,
+  Skeleton,
+  Empty
+} from 'antd'
 import styled, { css } from 'styled-components'
 import dayjs from 'dayjs'
 import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch } from 'react-router-dom'
-import InfoContaier from '../components/InfoContainer'
+import { ColumnProps } from 'antd/es/table'
 import LineChart from '../components/LineChart'
 import { cpuTotalData } from '../apis/fakeData/cpuTotalData'
 import { cpuUsedData } from '../apis/fakeData/cpuUsedData'
@@ -12,6 +22,8 @@ import { memoryTotalData } from '../apis/fakeData/memoryTotalData'
 import { memoryUsedData } from '../apis/fakeData/memoryUsedData'
 import { podTotalData } from '../apis/fakeData/podTotalData'
 import { podUsedData } from '../apis/fakeData/podUsedData'
+import { IclusterNodesData, getClusterNodes } from '../apis/clusters'
+import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
 
 const { Title } = Typography
 
@@ -21,7 +33,9 @@ interface StateCircularProps {
 
 const FixedBox = styled.div`
   height: 231px;
-  overflow-y: auto;
+  .scrollBox {
+    overflow: auto;
+  }
 `
 
 const PaddingRow = styled(Row)`
@@ -73,50 +87,6 @@ const RightDateText = styled.span`
   width: 100px;
   text-align: center;
 `
-
-const columns: ItableColumns[] = [
-  {
-    title: 'Resource',
-    dataIndex: 'resource',
-    key: 'resource'
-  },
-  {
-    title: 'Total',
-    dataIndex: 'total',
-    key: 'total'
-  },
-  {
-    title: 'Usage',
-    dataIndex: 'usage',
-    key: 'usage'
-  },
-  {
-    title: 'UsagePercent',
-    dataIndex: 'usagePercent',
-    key: 'usagePercent'
-  }
-]
-
-const clusterUsageData: IclusterUsageData[] = [
-  {
-    resource: 'CPU',
-    total: 16,
-    usage: 0.269,
-    usagePercent: 1.681
-  },
-  {
-    resource: 'Memory',
-    total: 116.32,
-    usage: 1.811,
-    usagePercent: 1.557
-  },
-  {
-    resource: 'Pod',
-    total: 440,
-    usage: 38,
-    usagePercent: 8.636
-  }
-]
 
 const cpuConfig: Highcharts.Options = {
   series: [
@@ -295,151 +265,269 @@ interface Iparams {
 
 const ClusterDetail = () => {
   const match = useRouteMatch<Iparams>('/clusters/:clusterId')
-  if (match) console.log(match.params.clusterId)
+  const [nodeListData, setNodeListData] = useState<IclusterNodesData[] | null>(
+    null
+  )
+  const [usageData, setUsageData] = useState<IsummaryClustersData[] | null>(
+    null
+  )
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState<boolean>(true)
+
+  const nodeListColumns: ColumnProps<IclusterNodesData>[] = [
+    {
+      title: 'Host',
+      dataIndex: 'host',
+      key: 'host',
+      render: (value, _, index) =>
+        nodeListData && match ? (
+          <Link
+            to={`/clusters/${match.params.clusterId}/nodes/${nodeListData[index].id}`}
+          >
+            {value}
+          </Link>
+        ) : null,
+      width: 130,
+      align: 'center'
+    },
+    {
+      title: 'Ip',
+      dataIndex: 'ip',
+      key: 'ip',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: 'OS',
+      dataIndex: 'os',
+      key: 'os',
+      width: 100,
+      align: 'center'
+    },
+    {
+      title: 'Platform',
+      dataIndex: 'platform',
+      key: 'platform',
+      width: 100,
+      align: 'center'
+    },
+    {
+      title: 'Platform Family',
+      dataIndex: 'platform_family',
+      key: 'platform_family',
+      align: 'center'
+    },
+    {
+      title: 'Platform Version',
+      dataIndex: 'platform_version',
+      key: 'platform_version',
+      align: 'center'
+    }
+  ]
+
+  const clusterSummaryColumns: ColumnProps<IsummaryClustersData>[] = [
+    {
+      title: 'node_cpu_load_avg_1',
+      dataIndex: 'node_cpu_load_avg_1',
+      key: 'node_cpu_load_avg_1'
+    },
+    {
+      title: 'node_cpu_load_avg_5',
+      dataIndex: 'node_cpu_load_avg_5',
+      key: 'node_cpu_load_avg_5'
+    },
+    {
+      title: 'node_cpu_load_avg_15',
+      dataIndex: 'node_cpu_load_avg_15',
+      key: 'node_cpu_load_avg_15'
+    },
+    {
+      title: 'node_cpu_load_avg_15',
+      dataIndex: 'node_cpu_load_avg_15',
+      key: 'node_cpu_load_avg_15'
+    }
+  ]
+
+  const fetchClusters = async () => {
+    try {
+      if (match) {
+        const {
+          data: {
+            data: { data: nodeListResponse }
+          }
+        } = await getClusterNodes(Number(match.params.clusterId))
+        const { data: clusterSummaryResponse } = await getSummaryCluster(
+          Number(match.params.clusterId)
+        )
+        // console.log(Object.values(clusterSummaryResponse)[0])
+        setNodeListData(nodeListResponse)
+        setUsageData(Object.values(clusterSummaryResponse)[0])
+      }
+    } catch (error) {
+      setError(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchClusters()
+  }, [])
+
   return (
     <>
-      <Breadcrumb>
-        <Breadcrumb.Item>
-          <Link to="/">Home</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to="/clusters">Cluster List</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>Clutser Name</Breadcrumb.Item>
-      </Breadcrumb>
-      <Title level={2}>Cluster</Title>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Card title="Cluster" bordered={false}>
-            <FixedBox>
-              <InfoContaier>
-                <li>
-                  <p className="title">gitVersion</p>
-                  <p>v1.13.5-5+270f968ee96a91</p>
-                </li>
-                <li>
-                  <p className="title">goVersion</p>
-                  <p>go1.11.5</p>
-                </li>
-                <li>
-                  <p className="title">gitCommit</p>
-                  <p>270f968ee96a9166c3dee050b3f45d213e49a1d5</p>
-                </li>
-                <li>
-                  <p className="title">Platform</p>
-                  <p>linux/amd64</p>
-                </li>
-                <li>
-                  <p className="title">Built</p>
-                  <p>2019-07-25</p>
-                </li>
-              </InfoContaier>
-            </FixedBox>
-          </Card>
-        </Col>
-        <Col span={12}>
-          <Card title="Cluster Usage" bordered={false}>
-            <FixedBox>
-              <Table
-                key="ClusterUsage"
-                columns={columns}
-                dataSource={clusterUsageData}
-                pagination={false}
-              />
-            </FixedBox>
-          </Card>
-        </Col>
-      </Row>
-      <PaddingRow gutter={16}>
-        <Col span={8}>
-          <Card title="CPU (Core)" bordered={false}>
-            <LineChart config={cpuConfig} />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card title="Memory (GB)" bordered={false}>
-            <LineChart config={memoryConfig} />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card title="Pod (Count)" bordered={false}>
-            <LineChart config={podConfig} />
-          </Card>
-        </Col>
-      </PaddingRow>
-      <PaddingRow gutter={16}>
-        <Col span={8}>
-          <ScrollListCard title="Namespaces [6/6]" bordered={false}>
-            <List
-              itemLayout="horizontal"
-              dataSource={NamespacesData}
-              renderItem={item => (
-                <List.Item>
-                  <div>
-                    <StateCircular
-                      active={item.phase === 'Active' ? true : false}
+      {loading ? (
+        <Skeleton active />
+      ) : (
+        <>
+          <Breadcrumb>
+            <Breadcrumb.Item>
+              <Link to="/">Home</Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <Link to="/clusters">Cluster List</Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>Clutser Name</Breadcrumb.Item>
+          </Breadcrumb>
+          <Title level={2}>Clutser Name</Title>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Card
+                title="Node list"
+                bordered={false}
+                extra={
+                  match ? (
+                    <Link to={`/clusters/${match.params.clusterId}/nodes`}>
+                      More
+                    </Link>
+                  ) : null
+                }
+              >
+                <FixedBox>
+                  {nodeListData ? (
+                    <Table
+                      key="NodelistTable"
+                      columns={nodeListColumns}
+                      dataSource={nodeListData}
+                      scroll={{ y: 100 }}
                     />
-                    <strong>{item.name}</strong>
-                  </div>
-                  <RightDateText>{item.creationTimestamp}</RightDateText>
-                </List.Item>
-              )}
-            />
-          </ScrollListCard>
-        </Col>
-        <Col span={8}>
-          <ScrollListCard title="Daemon Sets [5/5]" bordered={false}>
-            <List
-              itemLayout="horizontal"
-              dataSource={DaemonSetsData}
-              renderItem={item => (
-                <List.Item>
-                  <div>
-                    <StateCircular
-                      active={item.numberUnavailable === 0 ? true : false}
+                  ) : (
+                    <Empty />
+                  )}
+                </FixedBox>
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card title="Cluster Usage" bordered={false}>
+                <FixedBox>
+                  {usageData ? (
+                    <Table
+                      key="ClusterUsage"
+                      columns={clusterSummaryColumns}
+                      dataSource={usageData}
+                      pagination={false}
                     />
-                    <strong>{item.name}</strong>
-                  </div>
-                  <div>
-                    <span>{item.namespace}</span>
-                    <span>
-                      [{item.numberReady}/{item.numberAvailable}]
-                    </span>
-                    <RightDateText>{item.creationTimestamp}</RightDateText>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </ScrollListCard>
-        </Col>
-        <Col span={8}>
-          <ScrollListCard title="Deployments [15/15]" bordered={false}>
-            <List
-              itemLayout="horizontal"
-              dataSource={DeploymentsData}
-              renderItem={item => (
-                <List.Item>
-                  <div>
-                    <StateCircular
-                      active={
-                        item.replicas === item.availableReplicas ? true : false
-                      }
-                    />
-                    <strong>{item.name}</strong>
-                  </div>
-                  <div>
-                    <span>{item.namespace}</span>
-                    <span>
-                      [{item.availableReplicas}/{item.replicas}]
-                    </span>
-                    <RightDateText>{item.creationTimestamp}</RightDateText>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </ScrollListCard>
-        </Col>
-      </PaddingRow>
+                  ) : (
+                    <Empty />
+                  )}
+                </FixedBox>
+              </Card>
+            </Col>
+          </Row>
+          <PaddingRow gutter={16}>
+            <Col span={8}>
+              <Card title="CPU (Core)" bordered={false}>
+                <LineChart config={cpuConfig} />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card title="Memory (GB)" bordered={false}>
+                <LineChart config={memoryConfig} />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card title="Pod (Count)" bordered={false}>
+                <LineChart config={podConfig} />
+              </Card>
+            </Col>
+          </PaddingRow>
+          <PaddingRow gutter={16}>
+            <Col span={8}>
+              <ScrollListCard title="Namespaces [6/6]" bordered={false}>
+                <List
+                  itemLayout="horizontal"
+                  dataSource={NamespacesData}
+                  renderItem={item => (
+                    <List.Item>
+                      <div>
+                        <StateCircular
+                          active={item.phase === 'Active' ? true : false}
+                        />
+                        <strong>{item.name}</strong>
+                      </div>
+                      <RightDateText>{item.creationTimestamp}</RightDateText>
+                    </List.Item>
+                  )}
+                />
+              </ScrollListCard>
+            </Col>
+            <Col span={8}>
+              <ScrollListCard title="Daemon Sets [5/5]" bordered={false}>
+                <List
+                  itemLayout="horizontal"
+                  dataSource={DaemonSetsData}
+                  renderItem={item => (
+                    <List.Item>
+                      <div>
+                        <StateCircular
+                          active={item.numberUnavailable === 0 ? true : false}
+                        />
+                        <strong>{item.name}</strong>
+                      </div>
+                      <div>
+                        <span>{item.namespace}</span>
+                        <span>
+                          [{item.numberReady}/{item.numberAvailable}]
+                        </span>
+                        <RightDateText>{item.creationTimestamp}</RightDateText>
+                      </div>
+                    </List.Item>
+                  )}
+                />
+              </ScrollListCard>
+            </Col>
+            <Col span={8}>
+              <ScrollListCard title="Deployments [15/15]" bordered={false}>
+                <List
+                  itemLayout="horizontal"
+                  dataSource={DeploymentsData}
+                  renderItem={item => (
+                    <List.Item>
+                      <div>
+                        <StateCircular
+                          active={
+                            item.replicas === item.availableReplicas
+                              ? true
+                              : false
+                          }
+                        />
+                        <strong>{item.name}</strong>
+                      </div>
+                      <div>
+                        <span>{item.namespace}</span>
+                        <span>
+                          [{item.availableReplicas}/{item.replicas}]
+                        </span>
+                        <RightDateText>{item.creationTimestamp}</RightDateText>
+                      </div>
+                    </List.Item>
+                  )}
+                />
+              </ScrollListCard>
+            </Col>
+          </PaddingRow>
+        </>
+      )}
     </>
   )
 }
