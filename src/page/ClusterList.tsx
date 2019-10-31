@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Breadcrumb, Skeleton, Typography, List } from 'antd'
+import { Breadcrumb, Skeleton, Typography, Empty, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import useInterval from '../utils/useInterval'
-import { getClusters, IclustersData } from '../apis/clusters'
-import { IsummaryClustersObjectData, getSummaryClusters } from '../apis/summary'
+import { getClusters } from '../apis/clusters'
+import { getSummaryClusters } from '../apis/summary'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
 
@@ -16,7 +16,7 @@ const FullLink = styled(Link)`
   height: 100%;
 `
 
-interface ItestData {
+interface Idata {
   node_cpu_idle?: number
   node_cpu_iowait?: number
   node_cpu_load_avg_1?: number
@@ -37,24 +37,95 @@ interface ItestData {
 }
 
 const ClusterList = () => {
-  const [clustersData, setClustersData] = useState<IclustersData[] | null>(null)
-  const [
-    clusterSummaryData,
-    setClusterSummaryData
-  ] = useState<IsummaryClustersObjectData | null>(null)
+  const [clustersData, setClustersData] = useState<any[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
+
+  const clusterColumns: ColumnProps<Idata>[] = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      render: (value, _, index) =>
+        clustersData ? (
+          <Link to={`/clusters/${clustersData[index].id}`}>{value}</Link>
+        ) : null
+    },
+    {
+      title: 'Kubernetes',
+      dataIndex: 'kubernetes',
+      key: 'kubernetes',
+      render: kubernetes => (
+        <span>
+          {kubernetes ? (
+            <Tag color="#2ecc71">Yes</Tag>
+          ) : (
+            <Tag color="#e67e22">No</Tag>
+          )}
+        </span>
+      )
+    },
+    {
+      title: 'node_cpu_iowait',
+      dataIndex: 'node_cpu_iowait',
+      key: 'node_cpu_iowait'
+    },
+    {
+      title: 'node_cpu_load_avg_1',
+      dataIndex: 'node_cpu_load_avg_1',
+      key: 'node_cpu_load_avg_1'
+    },
+    {
+      title: 'node_cpu_load_avg_5',
+      dataIndex: 'node_cpu_load_avg_5',
+      key: 'node_cpu_load_avg_5'
+    },
+    {
+      title: 'node_cpu_load_avg_15',
+      dataIndex: 'node_cpu_load_avg_15',
+      key: 'node_cpu_load_avg_15'
+    },
+    {
+      title: 'node_cpu_system',
+      dataIndex: 'node_cpu_system',
+      key: 'node_cpu_system'
+    },
+    {
+      title: 'node_cpu_user',
+      dataIndex: 'node_cpu_user',
+      key: 'node_cpu_user'
+    },
+    {
+      title: 'node_memory_available',
+      dataIndex: 'node_memory_available',
+      key: 'node_memory_available'
+    },
+    {
+      title: 'node_memory_total',
+      dataIndex: 'node_memory_total',
+      key: 'node_memory_total'
+    },
+    {
+      title: 'node_memory_used',
+      dataIndex: 'node_memory_used',
+      key: 'node_memory_used'
+    }
+  ]
 
   const fetchClusters = async () => {
     try {
       const { data: ClustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
-      const objectValue = Object.values(ClustersSummaryResponse)
-      const clustersData = ClustersResponse.map((item, index) =>
-        item ? { ...item, ...objectValue[index] } : objectValue[index]
+      let clustersData: any[] = []
+      clustersData = ClustersResponse.map((item, index) =>
+        item
+          ? {
+              ...item,
+              ...Object.values(ClustersSummaryResponse).slice(0)[index]
+            }
+          : Object.values(ClustersSummaryResponse).slice(0)
       )
-      console.log(clustersData)
-      setClustersData(ClustersResponse)
+      setClustersData(clustersData)
     } catch (error) {
       setError(error)
     } finally {
@@ -83,17 +154,15 @@ const ClusterList = () => {
           </Breadcrumb>
           <Title level={2}>Cluster List</Title>
           {clustersData ? (
-            <List
-              size="large"
-              bordered
-              dataSource={clustersData}
-              renderItem={item => (
-                <List.Item>
-                  <FullLink to={`clusters/${item.id}`}>{item.name}</FullLink>
-                </List.Item>
-              )}
+            <TableContainer
+              key="id"
+              title={''}
+              columns={clusterColumns}
+              data={clustersData}
             />
-          ) : null}
+          ) : (
+            <Empty />
+          )}
         </>
       )}
     </>

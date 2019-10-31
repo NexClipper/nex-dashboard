@@ -2,7 +2,7 @@ import { logger } from '../utils/logger'
 import api from './api'
 import { AxiosResponse } from 'axios'
 
-interface IsummaryClustersData {
+export interface IsummaryClustersData {
   node_cpu_idle: number
   node_cpu_iowait: number
   node_cpu_load_avg_1: number
@@ -18,7 +18,7 @@ interface IsummaryClustersData {
   node_memory_used: number
   node_memory_used_percent: number
 }
-export interface IsummaryClustersObjectData {
+interface IsummaryClustersObjectData {
   [key: string]: IsummaryClustersData[]
 }
 interface IgetSummaryClusters {

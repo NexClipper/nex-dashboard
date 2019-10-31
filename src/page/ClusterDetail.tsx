@@ -140,18 +140,24 @@ const cpuConfig: Highcharts.Options = {
 const memoryConfig: Highcharts.Options = {
   xAxis: {
     type: 'datetime',
-    categories: memoryTotalData.map(item => dayjs(item.time).format('H:m:s'))
+    dateTimeLabelFormats: {
+      hour: '%H:%M'
+    }
   },
   series: [
     {
       type: 'line',
       name: 'Memory Total',
-      data: memoryTotalData.map(item => item.memoryTotal)
+      data: memoryTotalData.map(item => item.memoryTotal),
+      pointStart: dayjs(memoryTotalData[0].time).millisecond(),
+      pointInterval: 3600 * 1000
     },
     {
       type: 'line',
       name: 'Memory Used',
-      data: memoryUsedData.map(item => item.memoryUsed)
+      data: memoryUsedData.map(item => item.memoryUsed),
+      pointStart: dayjs(memoryUsedData[0].time).millisecond(),
+      pointInterval: 24 * 3600 * 1000
     }
   ]
 }

@@ -6,11 +6,21 @@ import { Link } from 'react-router-dom'
 const { Title } = Typography
 
 const ListBox = styled.div`
-  .ant-list .ant-col {
-    height: 220px;
-    .ant-card-body {
-      height: 155px;
-    }
+  .ant-list .ant-card-body {
+    height: 180px;
+  }
+`
+
+const CoverImageContainr = styled.div`
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 120px !important;
+  img {
+    display: inline-block;
+    max-width: 120px;
+    max-height: 120px;
+    padding: 16px;
   }
 `
 
@@ -18,6 +28,7 @@ interface Idata {
   title: string
   description: string
   link: string
+  image_lik?: string
 }
 
 const data: Idata[] = [
@@ -30,13 +41,15 @@ const data: Idata[] = [
     title: 'Memcached exporter',
     description:
       'The memcached exporter exports metrics from a memcached server for consumption by prometheus.',
-    link: 'https://github.com/prometheus/memcached_exporter'
+    link: 'https://github.com/prometheus/memcached_exporter',
+    image_lik: 'PrometheusExportersLogos/Memcached.svg'
   },
   {
     title: 'MySQL server exporter',
     description:
       'Prometheus exporter for MySQL server metrics. Supported MySQL & MariaDB versions: 5.5 and up.',
-    link: 'https://github.com/prometheus/mysqld_exporter'
+    link: 'https://github.com/prometheus/mysqld_exporter',
+    image_lik: 'PrometheusExportersLogos/MySQL.svg'
   },
   {
     title: 'Node/system metrics exporter',
@@ -58,7 +71,8 @@ const data: Idata[] = [
   {
     title: 'Collectd exporter',
     description: `An exporter for collectd. It accepts collectd's binary network protocol as sent by collectd's network plugin and metrics in JSON format via HTTP POST as sent by collectd's write_http plugin, and transforms and exposes them for consumption by Prometheus.`,
-    link: 'https://github.com/prometheus/collectd_exporter'
+    link: 'https://github.com/prometheus/collectd_exporter',
+    image_lik: 'PrometheusExportersLogos/Collectd.svg'
   },
   {
     title: 'Graphite exporter',
@@ -115,8 +129,25 @@ const PrometheusExporters = () => {
           renderItem={item => (
             <List.Item>
               <a href={item.link} target="blank" title={item.title}>
-                <Card hoverable title={item.title}>
-                  {item.description}
+                <Card
+                  hoverable
+                  cover={
+                    <CoverImageContainr>
+                      <img
+                        src={
+                          item.image_lik
+                            ? item.image_lik
+                            : 'PrometheusExportersLogos/Prometheus.svg'
+                        }
+                        alt={item.title}
+                      />
+                    </CoverImageContainr>
+                  }
+                >
+                  <Card.Meta
+                    title={item.title}
+                    description={item.description}
+                  />
                 </Card>
               </a>
             </List.Item>
