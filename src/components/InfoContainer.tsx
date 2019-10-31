@@ -30,4 +30,4 @@ const InfoContainer = ({ children }: IinfoContainer) => {
   return <InfoContainerBox>{children}</InfoContainerBox>
 }
 
-export default InfoContainer
+export default React.memo(InfoContainer)

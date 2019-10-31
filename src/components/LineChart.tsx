@@ -277,4 +277,4 @@ const LineChart = ({ config }: HighchartProps) => {
   return <HighchartsReact highcharts={Highcharts} options={defaultTheme} />
 }
 
-export default LineChart
+export default React.memo(LineChart)
