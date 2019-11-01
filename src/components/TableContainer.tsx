@@ -26,6 +26,7 @@ type IProps = {
   title: string
   data: any[] | undefined
   columns: ColumnProps<any>[] | undefined
+  rowKey?: string
   handleChange?: (
     pagination: PaginationConfig,
     filters: Record<string | number | symbol, string[]>,
@@ -39,13 +40,14 @@ function TableContainer({
   title,
   columns,
   data,
+  rowKey,
   handleChange,
   loading
 }: IProps) {
   return (
     <TableContent title={title} bordered={false}>
       <Table
-        rowKey={data => data.id}
+        rowKey={rowKey ? `${rowKey}` : 'id'}
         columns={columns}
         dataSource={data}
         onChange={handleChange}

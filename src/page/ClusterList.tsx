@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Breadcrumb, Skeleton, Typography, Empty, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
@@ -68,73 +68,65 @@ const ClusterList = () => {
       align: 'center'
     },
     {
-      title: 'node_cpu_iowait',
-      dataIndex: 'node_cpu_iowait',
-      key: 'node_cpu_iowait',
-      align: 'center'
-    },
-    {
       title: 'node_cpu_load_avg_1',
       dataIndex: 'node_cpu_load_avg_1',
       key: 'node_cpu_load_avg_1',
-      align: 'center'
+      align: 'center',
+      render: load => `${load} %`
     },
     {
       title: 'node_cpu_load_avg_5',
       dataIndex: 'node_cpu_load_avg_5',
       key: 'node_cpu_load_avg_5',
-      align: 'center'
+      align: 'center',
+      render: load => `${load} %`
     },
     {
       title: 'node_cpu_load_avg_15',
       dataIndex: 'node_cpu_load_avg_15',
       key: 'node_cpu_load_avg_15',
-      align: 'center'
-    },
-    {
-      title: 'node_cpu_system',
-      dataIndex: 'node_cpu_system',
-      key: 'node_cpu_system',
-      align: 'center'
-    },
-    {
-      title: 'node_cpu_user',
-      dataIndex: 'node_cpu_user',
-      key: 'node_cpu_user',
-      align: 'center'
-    },
-    {
-      title: 'node_memory_available',
-      dataIndex: 'node_memory_available',
-      key: 'node_memory_available',
-      align: 'center'
+      align: 'center',
+      render: load => `${load} %`
     },
     {
       title: 'node_memory_total',
       dataIndex: 'node_memory_total',
       key: 'node_memory_total',
-      align: 'center'
+      align: 'center',
+      render: total => `${Math.round(total / 1024 / 1024 / 1024)} GB`
+    },
+    {
+      title: 'node_memory_available',
+      dataIndex: 'node_memory_available',
+      key: 'node_memory_available',
+      align: 'center',
+      render: available => `${Math.round(available / 1024 / 1024 / 1024)} GB`
     },
     {
       title: 'node_memory_used',
       dataIndex: 'node_memory_used',
       key: 'node_memory_used',
-      align: 'center'
+      align: 'center',
+      render: used => `${Math.round(used / 1024 / 1024 / 1024)} GB`
     }
   ]
 
-  const fetchClusters = async () => {
+  const fetchClusters = useCallback(async () => {
     try {
       const { data: ClustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
       let clustersData: any[] = []
-      clustersData = ClustersResponse.map((item, index) =>
+      clustersData = ClustersResponse.map(item =>
         item
           ? {
               ...item,
-              ...Object.values(ClustersSummaryResponse).slice(0)[index]
+              ...Object.values(ClustersSummaryResponse).slice(0)[
+                Object.keys(ClustersSummaryResponse)
+                  .slice(0)
+                  .indexOf(item.name)
+              ]
             }
-          : Object.values(ClustersSummaryResponse).slice(0)
+          : null
       )
       setClustersData(clustersData)
     } catch (error) {
@@ -142,7 +134,7 @@ const ClusterList = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchClusters()
@@ -150,7 +142,7 @@ const ClusterList = () => {
 
   useInterval(() => {
     !loading && !error ? fetchClusters() : console.log('')
-  }, 1000)
+  }, 5000)
   return (
     <>
       {loading ? (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Breadcrumb,
   Typography,
@@ -205,7 +205,7 @@ const NodeDetail = () => {
   ] = useState<Highcharts.Options | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (match) {
         const { data: snapShotResponse } = await getSnapshotNode(
@@ -295,7 +295,7 @@ const NodeDetail = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchData()
@@ -303,7 +303,7 @@ const NodeDetail = () => {
 
   useInterval(() => {
     !loading && !error ? fetchData() : console.log('')
-  }, 1000)
+  }, 5000)
   return (
     <>
       {loading && !snapshotData ? (
@@ -490,10 +490,10 @@ const NodeDetail = () => {
             style={{ width: 200 }}
           /> */}
               <TableContainer
-                key="PodList"
                 title={'Pod List'}
                 columns={columns}
                 data={NodePodListData}
+                rowKey={'metadata.namne'}
               />
             </Col>
           </MarginRow>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Typography,
   Row,
@@ -16,6 +16,7 @@ import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import LineChart from '../components/LineChart'
+import useInterval from '../utils/useInterval'
 import { cpuTotalData } from '../apis/fakeData/cpuTotalData'
 import { cpuUsedData } from '../apis/fakeData/cpuUsedData'
 import { memoryTotalData } from '../apis/fakeData/memoryTotalData'
@@ -24,6 +25,7 @@ import { podTotalData } from '../apis/fakeData/podTotalData'
 import { podUsedData } from '../apis/fakeData/podUsedData'
 import { IclusterNodesData, getClusterNodes } from '../apis/clusters'
 import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
+import { getMetricsNodes } from '../apis/metrics'
 
 const { Title } = Typography
 
@@ -87,51 +89,6 @@ const RightDateText = styled.span`
   width: 100px;
   text-align: center;
 `
-
-const cpuConfig: Highcharts.Options = {
-  series: [
-    {
-      type: 'line',
-      name: 'CPU Total',
-      data: cpuTotalData.map(item => item.cpuTotal),
-      pointStart: dayjs(cpuTotalData[0].time).millisecond()
-    },
-    {
-      type: 'line',
-      name: 'CPU Used',
-      data: cpuUsedData.map(item => item.cpuUsed),
-      pointStart: dayjs(cpuUsedData[0].time).millisecond()
-    }
-  ],
-  xAxis: {
-    type: 'datetime'
-  }
-}
-
-const memoryConfig: Highcharts.Options = {
-  plotOptions: {
-    column: {
-      pointPlacement: 'between'
-    }
-  },
-  xAxis: {
-    type: 'datetime'
-  },
-  series: [
-    {
-      type: 'line',
-      name: 'Memory Total',
-      data: memoryTotalData.map(item => item.memoryTotal),
-      pointStart: dayjs(memoryTotalData[0].time).millisecond()
-    },
-    {
-      type: 'line',
-      name: 'Memory Used',
-      data: memoryUsedData.map(item => item.memoryUsed),
-      pointStart: dayjs(memoryUsedData[0].time).millisecond()
-    }
-  ]
-}
 
 const podConfig: Highcharts.Options = {
   xAxis: {
@@ -271,6 +228,14 @@ const ClusterDetail = () => {
   const [usageData, setUsageData] = useState<IsummaryClustersData[] | null>(
     null
   )
+  const [
+    cpuChartConfig,
+    setCpuChartConfig
+  ] = useState<Highcharts.Options | null>(null)
+  const [
+    memoryChartConfig,
+    setMemoryChartConfig
+  ] = useState<Highcharts.Options | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -329,26 +294,41 @@ const ClusterDetail = () => {
     {
       title: 'node_cpu_load_avg_1',
       dataIndex: 'node_cpu_load_avg_1',
-      key: 'node_cpu_load_avg_1'
+      key: 'node_cpu_load_avg_1',
+      align: 'center',
+      render: load => `${load} %`
     },
     {
       title: 'node_cpu_load_avg_5',
       dataIndex: 'node_cpu_load_avg_5',
-      key: 'node_cpu_load_avg_5'
+      key: 'node_cpu_load_avg_5',
+      align: 'center',
+      render: load => `${load} %`
     },
     {
       title: 'node_cpu_load_avg_15',
       dataIndex: 'node_cpu_load_avg_15',
-      key: 'node_cpu_load_avg_15'
+      key: 'node_cpu_load_avg_15',
+      align: 'center',
+      render: load => `${load} %`
     },
     {
-      title: 'node_cpu_load_avg_15',
-      dataIndex: 'node_cpu_load_avg_15',
-      key: 'node_cpu_load_avg_15'
+      title: 'node_memory_total',
+      dataIndex: 'node_memory_total',
+      key: 'node_memory_total',
+      align: 'center',
+      render: total => `${Math.round(total / 1024 / 1024 / 1024)} GB`
+    },
+    {
+      title: 'node_memory_used',
+      dataIndex: 'node_memory_used',
+      key: 'node_memory_used',
+      align: 'center',
+      render: used => `${Math.round(used / 1024 / 1024 / 1024)} GB`
     }
   ]
 
-  const fetchClusters = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (match) {
         const {
@@ -359,20 +339,107 @@ const ClusterDetail = () => {
         const { data: clusterSummaryResponse } = await getSummaryCluster(
           Number(match.params.clusterId)
         )
-        // console.log(Object.values(clusterSummaryResponse)[0])
+        let summaryData: any[] = []
+        summaryData = Object.values(clusterSummaryResponse).map((item, index) =>
+          item
+            ? {
+                ...item,
+                ...Object.values(clusterSummaryResponse).slice(0)[index]
+              }
+            : null
+        )
+        const { data: metricDataResponse } = await getMetricsNodes(
+          Number(match.params.clusterId),
+          `dateRange=${dayjs(Date.now())
+            .utc()
+            .subtract(30, 'minute')
+            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now())
+            .utc()
+            .format(
+              'YYYY-MM-DD HH:mm:ss'
+            )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15`
+        )
+        const nodeCpuLoadAvg1 = metricDataResponse.filter(
+          item => item.metric_name === 'node_cpu_load_avg_1'
+        )
+        const nodeCpuLoadAvg5 = metricDataResponse.filter(
+          item => item.metric_name === 'node_cpu_load_avg_5'
+        )
+        const nodeCpuLoadAvg15 = metricDataResponse.filter(
+          item => item.metric_name === 'node_cpu_load_avg_15'
+        )
+        const nodeMemoryTotal = metricDataResponse.filter(
+          item => item.metric_name === 'node_memory_total'
+        )
+        const nodeMemoryUsed = metricDataResponse.filter(
+          item => item.metric_name === 'node_memory_used'
+        )
+        if (nodeCpuLoadAvg1) {
+          setCpuChartConfig({
+            xAxis: {
+              type: 'datetime',
+              categories: nodeCpuLoadAvg1.map(item =>
+                dayjs(item.bucket).format('H:mm:ss')
+              ),
+              tickInterval: 20
+            },
+            series: [
+              {
+                type: 'line',
+                name: 'node_cpu_load_avg_1',
+                data: nodeCpuLoadAvg1.map(item => item.value)
+              },
+              {
+                type: 'line',
+                name: 'node_cpu_load_avg_5',
+                data: nodeCpuLoadAvg5.map(item => item.value)
+              },
+              {
+                type: 'line',
+                name: 'node_cpu_load_avg_15',
+                data: nodeCpuLoadAvg15.map(item => item.value)
+              }
+            ]
+          })
+          setMemoryChartConfig({
+            xAxis: {
+              type: 'datetime',
+              categories: nodeMemoryTotal.map(item =>
+                dayjs(item.bucket).format('H:mm:ss')
+              ),
+              tickInterval: 20
+            },
+            series: [
+              {
+                type: 'line',
+                name: 'node_memory_total',
+                data: nodeMemoryTotal.map(item => item.value)
+              },
+              {
+                type: 'line',
+                name: 'node_memory_used',
+                data: nodeMemoryUsed.map(item => item.value)
+              }
+            ]
+          })
+        }
         setNodeListData(nodeListResponse)
-        setUsageData(Object.values(clusterSummaryResponse)[0])
+        setUsageData(summaryData)
       }
     } catch (error) {
       setError(error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    fetchClusters()
+    fetchData()
   }, [])
+
+  useInterval(() => {
+    !loading && !error ? fetchData() : console.log('')
+  }, 5000)
 
   return (
     <>
@@ -406,7 +473,7 @@ const ClusterDetail = () => {
                 <FixedBox>
                   {nodeListData ? (
                     <Table
-                      key="NodelistTable"
+                      rowKey="id"
                       columns={nodeListColumns}
                       dataSource={nodeListData}
                       scroll={{ y: 100 }}
@@ -422,7 +489,7 @@ const ClusterDetail = () => {
                 <FixedBox>
                   {usageData ? (
                     <Table
-                      key="ClusterUsage"
+                      rowKey="node_memory_total"
                       columns={clusterSummaryColumns}
                       dataSource={usageData}
                       pagination={false}
@@ -436,17 +503,25 @@ const ClusterDetail = () => {
           </Row>
           <PaddingRow gutter={16}>
             <Col span={8}>
-              <Card title="CPU (Core)" bordered={false}>
-                <LineChart config={cpuConfig} />
+              <Card title="CPU" bordered={false}>
+                {cpuChartConfig ? (
+                  <LineChart config={cpuChartConfig} />
+                ) : (
+                  <Empty />
+                )}
               </Card>
             </Col>
             <Col span={8}>
-              <Card title="Memory (GB)" bordered={false}>
-                <LineChart config={memoryConfig} />
+              <Card title="Memory" bordered={false}>
+                {memoryChartConfig ? (
+                  <LineChart config={memoryChartConfig} />
+                ) : (
+                  <Empty />
+                )}
               </Card>
             </Col>
             <Col span={8}>
-              <Card title="Pod (Count)" bordered={false}>
+              <Card title="Pod" bordered={false}>
                 <LineChart config={podConfig} />
               </Card>
             </Col>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Typography,
   Row,
@@ -15,6 +15,7 @@ import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
 import { getClusterNodes, IclusterNodesData } from '../apis/clusters'
 import useInterval from '../utils/useInterval'
+import { getSummaryClusterNodes } from '../apis/summary'
 
 const { Title } = Typography
 
@@ -48,7 +49,7 @@ interface Iparams {
 
 const NodeList = () => {
   const match = useRouteMatch<Iparams>('/clusters/:clusterId/nodes')
-  const [data, setData] = useState<IclusterNodesData[] | null>(null)
+  const [data, setData] = useState<any[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
   const columns: ColumnProps<ItableColumns>[] = [
@@ -63,27 +64,32 @@ const NodeList = () => {
           >
             {value}
           </Link>
-        ) : null
+        ) : null,
+      align: 'center'
     },
     {
       title: 'IP',
       dataIndex: 'ip',
-      key: 'ip'
+      key: 'ip',
+      align: 'center'
     },
     {
       title: 'OS',
       dataIndex: 'os',
-      key: 'os'
+      key: 'os',
+      align: 'center'
     },
     {
       title: 'Platform',
       dataIndex: 'platform',
-      key: 'platform'
+      key: 'platform',
+      align: 'center'
     },
     {
       title: 'Platform Family',
       dataIndex: 'platform_family',
-      key: 'platform_family'
+      key: 'platform_family',
+      align: 'center'
     },
     {
       title: 'Platform Version',
@@ -93,11 +99,47 @@ const NodeList = () => {
     {
       title: 'Agent ID',
       dataIndex: 'agent_id',
-      key: 'agent_id'
+      key: 'agent_id',
+      align: 'center'
+    },
+    {
+      title: 'node_cpu_load_avg_1',
+      dataIndex: 'node_cpu_load_avg_1',
+      key: 'node_cpu_load_avg_1',
+      align: 'center',
+      render: load => `${load} %`
+    },
+    {
+      title: 'node_cpu_load_avg_5',
+      dataIndex: 'node_cpu_load_avg_5',
+      key: 'node_cpu_load_avg_5',
+      align: 'center',
+      render: load => `${load} %`
+    },
+    {
+      title: 'node_cpu_load_avg_15',
+      dataIndex: 'node_cpu_load_avg_15',
+      key: 'node_cpu_load_avg_15',
+      align: 'center',
+      render: load => `${load} %`
+    },
+    {
+      title: 'node_memory_total',
+      dataIndex: 'node_memory_total',
+      key: 'node_memory_total',
+      align: 'center',
+      render: total => `${Math.round(total / 1024 / 1024 / 1024)} GB`
+    },
+    {
+      title: 'node_memory_used',
+      dataIndex: 'node_memory_used',
+      key: 'node_memory_used',
+      align: 'center',
+      render: used => `${Math.round(used / 1024 / 1024 / 1024)} GB`
     }
   ]
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (match) {
         const {
@@ -105,14 +147,30 @@ const NodeList = () => {
             data: { data: nodesResponse }
           }
         } = await getClusterNodes(Number(match.params.clusterId))
-        setData(nodesResponse)
+        const { data: summaryResponse } = await getSummaryClusterNodes(
+          Number(match.params.clusterId)
+        )
+        let clustersData: any[] = []
+        clustersData = nodesResponse.map(item =>
+          item
+            ? {
+                ...item,
+                ...Object.values(summaryResponse).slice(0)[
+                  Object.keys(summaryResponse)
+                    .slice(0)
+                    .indexOf(item.host)
+                ]
+              }
+            : null
+        )
+        setData(clustersData)
       }
     } catch (error) {
       setError(error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchData()
@@ -120,7 +178,7 @@ const NodeList = () => {
 
   useInterval(() => {
     !loading && !error ? fetchData() : console.log('')
-  }, 1000)
+  }, 5000)
 
   return (
     <>
