@@ -123,7 +123,6 @@ const Home = () => {
             }
           : null
       )
-      console.log(clustersData)
       setAgentsData(agentsResponse)
       setNodesData(nodesResponse)
       setClustersData(clustersData)
