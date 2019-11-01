@@ -17,11 +17,9 @@ import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import LineChart from '../components/LineChart'
 import useInterval from '../utils/useInterval'
-import { podTotalData } from '../apis/fakeData/podTotalData'
-import { podUsedData } from '../apis/fakeData/podUsedData'
 import { IclusterNodesData, getClusterNodes } from '../apis/clusters'
 import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
-import { getMetricsNodes } from '../apis/metrics'
+import { getMetricsNodes, getMetricsPods } from '../apis/metrics'
 
 const { Title } = Typography
 
@@ -85,25 +83,6 @@ const RightDateText = styled.span`
   width: 100px;
   text-align: center;
 `
-
-const podConfig: Highcharts.Options = {
-  xAxis: {
-    type: 'datetime',
-    categories: podTotalData.map(item => dayjs(item.time).format('H:m:s'))
-  },
-  series: [
-    {
-      type: 'line',
-      name: 'Pod Total',
-      data: podTotalData.map(item => item.podTotal)
-    },
-    {
-      type: 'line',
-      name: 'Pod Used',
-      data: podUsedData.map(item => item.podUsed)
-    }
-  ]
-}
 
 const NamespacesData: InamespacesData[] = [
   {
@@ -232,6 +211,10 @@ const ClusterDetail = () => {
     memoryChartConfig,
     setMemoryChartConfig
   ] = useState<Highcharts.Options | null>(null)
+  const [
+    podChartConfig,
+    setPodChartConfig
+  ] = useState<Highcharts.Options | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -344,7 +327,7 @@ const ClusterDetail = () => {
               }
             : null
         )
-        const { data: metricDataResponse } = await getMetricsNodes(
+        const { data: metricNodeDataResponse } = await getMetricsNodes(
           Number(match.params.clusterId),
           `dateRange=${dayjs(Date.now())
             .utc()
@@ -355,20 +338,37 @@ const ClusterDetail = () => {
               'YYYY-MM-DD HH:mm:ss'
             )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15`
         )
-        const nodeCpuLoadAvg1 = metricDataResponse.filter(
+        const nodeCpuLoadAvg1 = metricNodeDataResponse.filter(
           item => item.metric_name === 'node_cpu_load_avg_1'
         )
-        const nodeCpuLoadAvg5 = metricDataResponse.filter(
+        const nodeCpuLoadAvg5 = metricNodeDataResponse.filter(
           item => item.metric_name === 'node_cpu_load_avg_5'
         )
-        const nodeCpuLoadAvg15 = metricDataResponse.filter(
+        const nodeCpuLoadAvg15 = metricNodeDataResponse.filter(
           item => item.metric_name === 'node_cpu_load_avg_15'
         )
-        const nodeMemoryTotal = metricDataResponse.filter(
+        const nodeMemoryTotal = metricNodeDataResponse.filter(
           item => item.metric_name === 'node_memory_total'
         )
-        const nodeMemoryUsed = metricDataResponse.filter(
+        const nodeMemoryUsed = metricNodeDataResponse.filter(
           item => item.metric_name === 'node_memory_used'
+        )
+        const { data: metricPodsDataResponse } = await getMetricsPods(
+          Number(match.params.clusterId),
+          `dateRange=${dayjs(Date.now())
+            .utc()
+            .subtract(30, 'minute')
+            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now())
+            .utc()
+            .format(
+              'YYYY-MM-DD HH:mm:ss'
+            )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total`
+        )
+        const containerMemoryRss = metricPodsDataResponse.filter(
+          item => item.metric_name === 'container_memory_rss'
+        )
+        const containerCpuUsageTotal = metricPodsDataResponse.filter(
+          item => item.metric_name === 'container_cpu_usage_total'
         )
         if (nodeCpuLoadAvg1) {
           setCpuChartConfig({
@@ -377,7 +377,7 @@ const ClusterDetail = () => {
               categories: nodeCpuLoadAvg1.map(item =>
                 dayjs(item.bucket).format('H:mm:ss')
               ),
-              tickInterval: 20
+              tickInterval: 30
             },
             series: [
               {
@@ -403,7 +403,7 @@ const ClusterDetail = () => {
               categories: nodeMemoryTotal.map(item =>
                 dayjs(item.bucket).format('H:mm:ss')
               ),
-              tickInterval: 20
+              tickInterval: 30
             },
             series: [
               {
@@ -415,6 +415,27 @@ const ClusterDetail = () => {
                 type: 'line',
                 name: 'node_memory_used',
                 data: nodeMemoryUsed.map(item => item.value)
+              }
+            ]
+          })
+          setPodChartConfig({
+            xAxis: {
+              type: 'datetime',
+              categories: containerMemoryRss.map(item =>
+                dayjs(item.bucket).format('H:mm:ss')
+              ),
+              tickInterval: 30
+            },
+            series: [
+              {
+                type: 'line',
+                name: 'container_memory_rss',
+                data: containerMemoryRss.map(item => item.value)
+              },
+              {
+                type: 'line',
+                name: 'container_cpu_usage_total',
+                data: containerCpuUsageTotal.map(item => item.value)
               }
             ]
           })
@@ -518,11 +539,15 @@ const ClusterDetail = () => {
             </Col>
             <Col span={8}>
               <Card title="Pod" bordered={false}>
-                <LineChart config={podConfig} />
+                {podChartConfig ? (
+                  <LineChart config={podChartConfig} />
+                ) : (
+                  <Empty />
+                )}
               </Card>
             </Col>
           </PaddingRow>
-          <PaddingRow gutter={16}>
+          {/* <PaddingRow gutter={16}>
             <Col span={8}>
               <ScrollListCard title="Namespaces [6/6]" bordered={false}>
                 <List
@@ -596,7 +621,7 @@ const ClusterDetail = () => {
                 />
               </ScrollListCard>
             </Col>
-          </PaddingRow>
+          </PaddingRow> */}
         </>
       )}
     </>

@@ -104,7 +104,7 @@ const Home = () => {
     }
   ]
 
-  const fetchClusters = useCallback(async () => {
+  const fetchDatas = useCallback(async () => {
     try {
       const { data: agentsResponse } = await getAgents()
       const { data: nodesResponse } = await getNodes()
@@ -134,11 +134,11 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
-    fetchClusters()
+    fetchDatas()
   }, [])
 
   useInterval(() => {
-    !loading && !error ? fetchClusters() : console.log('')
+    !loading && !error ? fetchDatas() : console.log('')
   }, 5000)
 
   const agentsColumns: ColumnProps<IagentListData>[] = [

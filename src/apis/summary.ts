@@ -61,3 +61,18 @@ export const getSummaryClusterNodes = async (clusterId: number) => {
     throw error
   }
 }
+
+export const getSummaryClusterNode = async (
+  clusterId: number,
+  nodeId: Number
+) => {
+  try {
+    const action = `/summary/clusters/${clusterId}/nodes/${nodeId}`
+    const result: AxiosResponse<IgetSummaryClusters> = await api.getData(action)
+
+    return result.data
+  } catch (error) {
+    logger('error.response', error)
+    throw error
+  }
+}

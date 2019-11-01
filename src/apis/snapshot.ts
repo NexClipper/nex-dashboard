@@ -1,6 +1,7 @@
 import { logger } from '../utils/logger'
 import api from './api'
 import { AxiosResponse } from 'axios'
+import { async } from 'q'
 
 interface IsnapshotNodeData {
   node: Node
@@ -49,6 +50,24 @@ export interface IsnapshotNodeContainerObjectData {
 }
 interface IgetSnapshotNodeContainer {
   data: IsnapshotNodeContainerObjectData
+  message: string
+  status: string
+}
+
+interface ImetricsPodsData {
+  pod: string
+  namespace: string
+  ts: Date
+  value: number
+  metric_name: string
+}
+
+export interface ImetricsPodsObjectData {
+  [key: string]: ImetricsPodsData[]
+}
+
+interface IgetMetricsPods {
+  data: ImetricsPodsObjectData
   message: string
   status: string
 }
@@ -139,6 +158,49 @@ export const getSnapshotNodeContainer = async (
     const result: AxiosResponse<IgetSnapshotNodeContainer> = await api.getData(
       action
     )
+
+    return result.data
+  } catch (error) {
+    logger('error.response', error)
+    throw error
+  }
+}
+
+export const getSnapshotPods = async (clusterId: number) => {
+  try {
+    const action = `/snapshot/${clusterId}}/k8s/pods`
+    const result: AxiosResponse<IgetMetricsPods> = await api.getData(action)
+
+    return result.data
+  } catch (error) {
+    logger('error.response', error)
+    throw error
+  }
+}
+
+export const getSnapshotNamespacesPods = async (
+  clusterId: number,
+  namespaceId: number
+) => {
+  try {
+    const action = `/snapshot/${clusterId}}/k8s/namespaces/${namespaceId}/pods`
+    const result: AxiosResponse<IgetMetricsPods> = await api.getData(action)
+
+    return result.data
+  } catch (error) {
+    logger('error.response', error)
+    throw error
+  }
+}
+
+export const getSnapshotNamespacesPod = async (
+  clusterId: number,
+  namespaceId: number,
+  podId: number
+) => {
+  try {
+    const action = `/snapshot/${clusterId}}/k8s/namespaces/${namespaceId}/pods/${podId}`
+    const result: AxiosResponse<IgetMetricsPods> = await api.getData(action)
 
     return result.data
   } catch (error) {

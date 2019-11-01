@@ -4,7 +4,7 @@ import { logger } from '../utils/logger'
 import api from './api'
 
 export interface ImetricsNodeData {
-  node: Node
+  node: string
   node_id: number
   value: number
   bucket: Date
@@ -19,7 +19,7 @@ interface IgetMetricsNode {
 }
 
 export interface ImetricsNodeProcessData {
-  process: Node
+  process: string
   process_id: number
   value: number
   bucket: Date
@@ -34,7 +34,7 @@ interface IgetMetricsNodeProcess {
 }
 
 export interface ImetricsNodeContainerData {
-  container: Node
+  container: string
   container_id: number
   value: number
   bucket: Date
@@ -44,6 +44,20 @@ export interface ImetricsNodeContainerData {
 
 interface IgetMetricsNodeContainer {
   data: ImetricsNodeContainerData[]
+  message: string
+  status: string
+}
+
+export interface ImetricsPodsData {
+  pod: string
+  namespace: string
+  value: number
+  bucket: Date
+  metric_name: string
+}
+
+interface IgetMetricsPods {
+  data: ImetricsPodsData[]
   message: string
   status: string
 }
@@ -120,7 +134,9 @@ export const getMetricsNodeContainers = async (
 ) => {
   try {
     const action = `/metrics/${clusterId}/nodes/${nodeId}/containers?${query}`
-    const result = await api.getData(action)
+    const result: AxiosResponse<IgetMetricsNodeContainer> = await api.getData(
+      action
+    )
 
     return result.data
   } catch (error) {
@@ -137,7 +153,54 @@ export const getMetricsNodeContainer = async (
 ) => {
   try {
     const action = `/metrics/${clusterId}/nodes/${nodeId}/containers/${containersId}?${query}`
-    const result = await api.getData(action)
+    const result: AxiosResponse<IgetMetricsNodeContainer> = await api.getData(
+      action
+    )
+
+    return result.data
+  } catch (error) {
+    logger('error.response', error)
+    throw error
+  }
+}
+
+export const getMetricsPods = async (clusterId: number, query: string) => {
+  try {
+    const action = `/metrics/${clusterId}/k8s/pods?${query}`
+    const result: AxiosResponse<IgetMetricsPods> = await api.getData(action)
+
+    return result.data
+  } catch (error) {
+    logger('error.response', error)
+    throw error
+  }
+}
+
+export const getMetricsNamespacesPods = async (
+  clusterId: number,
+  namespaceId: number,
+  query: string
+) => {
+  try {
+    const action = `/metrics/${clusterId}/k8s/namespaces/${namespaceId}/pods?${query}`
+    const result: AxiosResponse<IgetMetricsPods> = await api.getData(action)
+
+    return result.data
+  } catch (error) {
+    logger('error.response', error)
+    throw error
+  }
+}
+
+export const getMetricsNamespacesPod = async (
+  clusterId: number,
+  namespaceId: number,
+  podId: number,
+  query: string
+) => {
+  try {
+    const action = `/metrics/${clusterId}/k8s/namespaces/${namespaceId}/pods/${podId}?${query}`
+    const result: AxiosResponse<IgetMetricsPods> = await api.getData(action)
 
     return result.data
   } catch (error) {
