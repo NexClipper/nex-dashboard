@@ -456,7 +456,7 @@ const ClusterDetail = () => {
 
   useInterval(() => {
     !loading && !error ? fetchData() : console.log('')
-  }, 5000)
+  }, 10000)
 
   return (
     <>
@@ -471,9 +471,11 @@ const ClusterDetail = () => {
             <Breadcrumb.Item>
               <Link to="/clusters">Cluster List</Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>Clutser Name</Breadcrumb.Item>
+            <Breadcrumb.Item>
+              {match ? match.params.clusterId : null}
+            </Breadcrumb.Item>
           </Breadcrumb>
-          <Title level={2}>Clutser Name</Title>
+          <Title level={2}>Clutser Detail</Title>
           <Row gutter={16}>
             <Col span={12}>
               <Card

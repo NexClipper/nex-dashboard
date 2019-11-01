@@ -263,7 +263,7 @@ const NodeDetail = () => {
 
   useInterval(() => {
     !loading && !error ? fetchData() : console.log('')
-  }, 5000)
+  }, 10000)
   return (
     <>
       {loading && !snapshotData ? (
@@ -280,7 +280,7 @@ const NodeDetail = () => {
             {match ? (
               <Breadcrumb.Item>
                 <Link to={`/clusters/${match.params.clusterId}`}>
-                  Clutser Name
+                  {match.params.clusterId}
                 </Link>
               </Breadcrumb.Item>
             ) : null}
@@ -330,7 +330,7 @@ const NodeDetail = () => {
                   ([title, value]: [string, any]) => {
                     return (
                       <TableContainer
-                        key={value}
+                        rowKey={'container_id'}
                         title={title}
                         columns={nodeContainerColumns}
                         data={value}
@@ -352,7 +352,7 @@ const NodeDetail = () => {
                   ([title, value]: [string, any]) => {
                     return (
                       <TableContainer
-                        key={value}
+                        rowKey={'process_id'}
                         title={title}
                         columns={nodeProcessColumns}
                         data={value}

@@ -178,7 +178,7 @@ const NodeList = () => {
 
   useInterval(() => {
     !loading && !error ? fetchData() : console.log('')
-  }, 5000)
+  }, 10000)
 
   return (
     <>
@@ -196,13 +196,13 @@ const NodeList = () => {
             {match ? (
               <Breadcrumb.Item>
                 <Link to={`/clusters/${match.params.clusterId}`}>
-                  Clutser Name
+                  {match.params.clusterId}
                 </Link>
               </Breadcrumb.Item>
             ) : null}
             <Breadcrumb.Item>Node List</Breadcrumb.Item>
           </Breadcrumb>
-          <Title level={2}>Node</Title>
+          <Title level={2}>Node List</Title>
           {/* <MarginRow gutter={16}>
           <Col span={4}>
             <StatusBox className="statusBox">
@@ -242,12 +242,7 @@ const NodeList = () => {
           </Col>
         </MarginRow> */}
           {data ? (
-            <TableContainer
-              key="id"
-              title={'Node List'}
-              columns={columns}
-              data={data}
-            />
+            <TableContainer key="id" title={''} columns={columns} data={data} />
           ) : (
             <Empty />
           )}

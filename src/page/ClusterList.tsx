@@ -142,7 +142,7 @@ const ClusterList = () => {
 
   useInterval(() => {
     !loading && !error ? fetchClusters() : console.log('')
-  }, 5000)
+  }, 10000)
   return (
     <>
       {loading ? (

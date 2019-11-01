@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { ColumnProps } from 'antd/es/table'
 import { Skeleton, Tag, Typography, Empty, Breadcrumb } from 'antd'
 
@@ -104,7 +104,7 @@ const Home = () => {
     }
   ]
 
-  const fetchDatas = useCallback(async () => {
+  const fetchDatas = async () => {
     try {
       const { data: agentsResponse } = await getAgents()
       const { data: nodesResponse } = await getNodes()
@@ -131,7 +131,7 @@ const Home = () => {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }
 
   useEffect(() => {
     fetchDatas()
@@ -139,7 +139,7 @@ const Home = () => {
 
   useInterval(() => {
     !loading && !error ? fetchDatas() : console.log('')
-  }, 5000)
+  }, 10000)
 
   const agentsColumns: ColumnProps<IagentListData>[] = [
     {
@@ -199,7 +199,8 @@ const Home = () => {
     {
       title: 'Platform Family',
       dataIndex: 'platform_family',
-      key: 'platform_family'
+      key: 'platform_family',
+      align: 'center'
     },
     {
       title: 'Platform Version',
