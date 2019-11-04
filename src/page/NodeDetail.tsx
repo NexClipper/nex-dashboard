@@ -14,7 +14,6 @@ import { Link, useRouteMatch } from 'react-router-dom'
 import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
 import LineChart from '../components/LineChart'
 import TableContainer from '../components/TableContainer'
@@ -29,8 +28,6 @@ import {
 } from '../apis/snapshot'
 import { getMetricsNode } from '../apis/metrics'
 import useInterval from '../utils/useInterval'
-
-dayjs.extend(utc)
 
 const { Search } = Input
 
@@ -173,13 +170,12 @@ const NodeDetail = () => {
           Number(match.params.clusterId),
           Number(match.params.nodeId),
           `dateRange=${dayjs(Date.now())
-            .utc()
             .subtract(1, 'day')
-            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now())
-            .utc()
-            .format(
-              'YYYY-MM-DD HH:mm:ss'
-            )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15`
+            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
+            Date.now()
+          ).format(
+            'YYYY-MM-DD HH:mm:ss'
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul`
         )
         const nodeCpuLoadAvg1 = metricDataResponse.filter(
           item => item.metric_name === 'node_cpu_load_avg_1'

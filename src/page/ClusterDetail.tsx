@@ -319,13 +319,12 @@ const ClusterDetail = () => {
         const { data: metricNodeDataResponse } = await getMetricsNodes(
           Number(match.params.clusterId),
           `dateRange=${dayjs(Date.now())
-            .utc()
-            .subtract(30, 'minute')
-            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now())
-            .utc()
-            .format(
-              'YYYY-MM-DD HH:mm:ss'
-            )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15`
+            .subtract(1, 'hour')
+            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
+            Date.now()
+          ).format(
+            'YYYY-MM-DD HH:mm:ss'
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul`
         )
         const nodeCpuLoadAvg1 = metricNodeDataResponse.filter(
           item => item.metric_name === 'node_cpu_load_avg_1'
@@ -345,13 +344,12 @@ const ClusterDetail = () => {
         const { data: metricPodsDataResponse } = await getMetricsPods(
           Number(match.params.clusterId),
           `dateRange=${dayjs(Date.now())
-            .utc()
-            .subtract(30, 'minute')
-            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now())
-            .utc()
-            .format(
-              'YYYY-MM-DD HH:mm:ss'
-            )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total`
+            .subtract(1, 'hour')
+            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
+            Date.now()
+          ).format(
+            'YYYY-MM-DD HH:mm:ss'
+          )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&timezone=Asia/Seoul`
         )
         const containerMemoryRss = metricPodsDataResponse.filter(
           item => item.metric_name === 'container_memory_rss'
@@ -366,7 +364,7 @@ const ClusterDetail = () => {
               categories: nodeCpuLoadAvg1.map(item =>
                 dayjs(item.bucket).format('H:mm:ss')
               ),
-              tickInterval: 30
+              tickInterval: 90
             },
             series: [
               {
@@ -392,7 +390,7 @@ const ClusterDetail = () => {
               categories: nodeMemoryTotal.map(item =>
                 dayjs(item.bucket).format('H:mm:ss')
               ),
-              tickInterval: 30
+              tickInterval: 90
             },
             series: [
               {
@@ -413,7 +411,7 @@ const ClusterDetail = () => {
               categories: containerMemoryRss.map(item =>
                 dayjs(item.bucket).format('H:mm:ss')
               ),
-              tickInterval: 30
+              tickInterval: 90
             },
             series: [
               {

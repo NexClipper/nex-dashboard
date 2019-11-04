@@ -14,6 +14,10 @@ import Event from '../page/Event'
 const { Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
 
+interface MainFooterProps {
+  readonly collapse: boolean
+}
+
 const FullLayout = styled.div`
   > .ant-layout {
     min-height: 100vh !important;
@@ -30,6 +34,16 @@ const Logo = styled.div`
 
 const MainContent = styled(Content)`
   padding: 32px 16px 16px;
+`
+
+const MainFooter = styled(Footer)<MainFooterProps>`
+  position: fixed;
+  z-index: 10;
+  width: 100%;
+  bottom: 0;
+  left: ${props => (props.collapse ? '80px' : '200px')};
+  right: 0;
+  transition: left 0.15s ease-in-out;
 `
 
 const SubMenuText = styled(Link)`
@@ -81,6 +95,7 @@ function Router() {
                 <RouteList />
               </Switch>
             </MainContent>
+            <MainFooter collapse={collapsed}>Footer</MainFooter>
           </Layout>
         </Layout>
       </FullLayout>
@@ -102,7 +117,7 @@ const RouteList = () => {
       />
       <Route path="/prometheusExporters" component={PrometheusExporters} />
       <Route path="/event" component={Event} />
-      <Redirect from="*" to="/" />
+      {/* <Redirect from="*" to="/" /> */}
     </>
   )
 }

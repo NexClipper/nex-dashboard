@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  prod:
+    container_name: nex-dashbaord
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
