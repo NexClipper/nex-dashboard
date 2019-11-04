@@ -9,6 +9,7 @@ import NodeList from '../page/NodeList'
 import PrometheusExporters from '../page/PrometheusExporters'
 import NodeDetail from '../page/NodeDetail'
 import ThemeToggle from '../components/ThemeToggle'
+import Event from '../page/Event'
 
 const { Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
@@ -60,6 +61,12 @@ function Router() {
                 </Link>
               </Menu.Item>
               <Menu.Item key="2">
+                <Link to="/event">
+                  <Icon type="alert" />
+                  <span>Event</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="3">
                 <Link to="/prometheusExporters">
                   <Icon type="export" />
                   <span>Prometheus Exporters</span>
@@ -94,7 +101,8 @@ const RouteList = () => {
         component={NodeDetail}
       />
       <Route path="/prometheusExporters" component={PrometheusExporters} />
-      {/* <Redirect from="*" to="/" /> */}
+      <Route path="/event" component={Event} />
+      <Redirect from="*" to="/" />
     </>
   )
 }
