@@ -1,23 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import {
-  Typography,
-  Row,
-  Col,
-  Card,
-  Tag,
-  Breadcrumb,
-  Skeleton,
-  Empty
-} from 'antd'
+import { Row, Col, Card, Tag, Breadcrumb, Skeleton, Empty } from 'antd'
 import styled from 'styled-components'
 import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
+import TitleContainer from '../components/TitleContainer'
 import { getClusterNodes, IclusterNodesData } from '../apis/clusters'
 import useInterval from '../utils/useInterval'
 import { getSummaryClusterNodes } from '../apis/summary'
-
-const { Title } = Typography
 
 const StatusBox = styled(Card)`
   &.ant-card.statusBox {
@@ -202,7 +192,8 @@ const NodeList = () => {
             ) : null}
             <Breadcrumb.Item>Node List</Breadcrumb.Item>
           </Breadcrumb>
-          <Title level={2}>Node List</Title>
+          <TitleContainer level={2} text={'Node List'} />
+
           {/* <MarginRow gutter={16}>
           <Col span={4}>
             <StatusBox className="statusBox">

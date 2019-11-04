@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { ColumnProps } from 'antd/es/table'
-import { Skeleton, Tag, Typography, Empty, Breadcrumb } from 'antd'
+import { Skeleton, Tag, Empty, Breadcrumb } from 'antd'
 
 import { getAgents, IagentsObjectData } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
+import TitleContainer from '../components/TitleContainer'
 import { getNodes, InodesObjectData } from '../apis/nodes'
 import useInterval from '../utils/useInterval'
 import { getClusters } from '../apis/clusters'
 import { getSummaryClusters } from '../apis/summary'
-
-const { Title } = Typography
 
 interface IclustersData {
   node_cpu_idle?: number
@@ -104,7 +103,7 @@ const Home = () => {
     }
   ]
 
-  const fetchDatas = async () => {
+  const fetchDatas = useCallback(async () => {
     try {
       const { data: agentsResponse } = await getAgents()
       const { data: nodesResponse } = await getNodes()
@@ -131,7 +130,7 @@ const Home = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchDatas()
@@ -225,7 +224,7 @@ const Home = () => {
           <Breadcrumb>
             <Breadcrumb.Item>Home</Breadcrumb.Item>
           </Breadcrumb>
-          <Title level={2}>Cluster list</Title>
+          <TitleContainer level={2} text={'Cluster list'} />
           {clustersData ? (
             <TableContainer
               key="id"
@@ -236,7 +235,7 @@ const Home = () => {
           ) : (
             <Empty />
           )}
-          <Title level={2}>Node list</Title>
+          <TitleContainer level={2} text={'Node list'} />
           {nodesData && Object.keys(nodesData).length !== 0 ? (
             Object.entries(nodesData).map(([title, value]: [string, any]) => {
               return (
@@ -251,7 +250,7 @@ const Home = () => {
           ) : (
             <Empty />
           )}
-          <Title level={2}>Agent List</Title>
+          <TitleContainer level={2} text={'Agent List'} />
           {agentsData && Object.keys(agentsData).length !== 0 ? (
             Object.entries(agentsData).map(([title, value]: [string, any]) => {
               return (

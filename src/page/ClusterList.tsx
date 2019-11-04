@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Breadcrumb, Skeleton, Typography, Empty, Tag } from 'antd'
+import { Breadcrumb, Skeleton, Empty, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { ColumnProps } from 'antd/es/table'
@@ -7,8 +7,7 @@ import useInterval from '../utils/useInterval'
 import { getClusters } from '../apis/clusters'
 import { getSummaryClusters } from '../apis/summary'
 import TableContainer from '../components/TableContainer'
-
-const { Title } = Typography
+import TitleContainer from '../components/TitleContainer'
 
 const FullLink = styled(Link)`
   display: block;
@@ -155,7 +154,7 @@ const ClusterList = () => {
             </Breadcrumb.Item>
             <Breadcrumb.Item>Cluster List</Breadcrumb.Item>
           </Breadcrumb>
-          <Title level={2}>Cluster List</Title>
+          <TitleContainer level={2} text={'Cluster List'} />
           {clustersData ? (
             <TableContainer
               key="id"

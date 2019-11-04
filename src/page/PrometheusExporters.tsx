@@ -1,9 +1,8 @@
 import React from 'react'
-import { List, Card, Typography, Breadcrumb } from 'antd'
+import { List, Card, Breadcrumb } from 'antd'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-
-const { Title } = Typography
+import TitleContainer from '../components/TitleContainer'
 
 const ListBox = styled.div`
   .ant-list .ant-card-body {
@@ -121,7 +120,7 @@ const PrometheusExporters = () => {
         </Breadcrumb.Item>
         <Breadcrumb.Item>Prometheus Exporters</Breadcrumb.Item>
       </Breadcrumb>
-      <Title level={2}>Prometheus Exporters</Title>
+      <TitleContainer level={2} text={'Prometheus Exporters'} />
       <ListBox>
         <List
           grid={{ gutter: 8, column: 4 }}

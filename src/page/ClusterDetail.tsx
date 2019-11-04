@@ -1,27 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import {
-  Typography,
-  Row,
-  Col,
-  Card,
-  Table,
-  List,
-  Breadcrumb,
-  Skeleton,
-  Empty
-} from 'antd'
+import { Row, Col, Card, Table, List, Breadcrumb, Skeleton, Empty } from 'antd'
 import styled, { css } from 'styled-components'
 import dayjs from 'dayjs'
 import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import LineChart from '../components/LineChart'
+import TitleContainer from '../components/TitleContainer'
 import useInterval from '../utils/useInterval'
 import { IclusterNodesData, getClusterNodes } from '../apis/clusters'
 import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
 import { getMetricsNodes, getMetricsPods } from '../apis/metrics'
-
-const { Title } = Typography
 
 interface StateCircularProps {
   readonly active: boolean
@@ -475,7 +464,7 @@ const ClusterDetail = () => {
               {match ? match.params.clusterId : null}
             </Breadcrumb.Item>
           </Breadcrumb>
-          <Title level={2}>Clutser Detail</Title>
+          <TitleContainer level={2} text={'Clutser Detail'} />
           <Row gutter={16}>
             <Col span={12}>
               <Card

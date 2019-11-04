@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import {
   Breadcrumb,
-  Typography,
   Row,
   Col,
   Card,
@@ -19,6 +18,7 @@ import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
 import LineChart from '../components/LineChart'
 import TableContainer from '../components/TableContainer'
+import TitleContainer from '../components/TitleContainer'
 import {
   IsnapshotNodeObjectData,
   getSnapshotNode,
@@ -32,7 +32,6 @@ import useInterval from '../utils/useInterval'
 
 dayjs.extend(utc)
 
-const { Title } = Typography
 const { Search } = Input
 
 const CropTag = styled(Tag)`
@@ -295,9 +294,10 @@ const NodeDetail = () => {
               {snapshotData ? Object.keys(snapshotData)[0] : null}
             </Breadcrumb.Item>
           </Breadcrumb>
-          <Title level={2}>
-            {snapshotData ? Object.keys(snapshotData)[0] : null}
-          </Title>
+          <TitleContainer
+            level={2}
+            text={snapshotData ? Object.keys(snapshotData)[0] : null}
+          />
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="CPU" bordered={false}>
@@ -323,7 +323,7 @@ const NodeDetail = () => {
           </MarginRow>
           <MarginRow gutter={16}>
             <Col span={24}>
-              <Title level={2}>Container List</Title>
+              <TitleContainer level={2} text={'Container List'} />
               {nodeContainersData &&
               Object.keys(nodeContainersData).length !== 0 ? (
                 Object.entries(nodeContainersData).map(
@@ -345,7 +345,7 @@ const NodeDetail = () => {
           </MarginRow>
           <MarginRow gutter={16}>
             <Col span={24}>
-              <Title level={2}>Process List</Title>
+              <TitleContainer level={2} text={'Process List'} />
               {nodeProcessesData &&
               Object.keys(nodeProcessesData).length !== 0 ? (
                 Object.entries(nodeProcessesData).map(
