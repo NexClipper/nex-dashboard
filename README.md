@@ -1,9 +1,8 @@
-# How to run (docker)
+# How to run (production-docker)
 
 1. `docker-compose -f docker-compose.yml up -d --build`
-2. `docker-compose up`
 
-# How to run
+# How to run (development)
 
 1. Install node.js LTS. (https://nodejs.org/en/download/package-manager/)
 2. Project install : `npm i`
