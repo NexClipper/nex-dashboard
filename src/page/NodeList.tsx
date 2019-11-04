@@ -5,7 +5,7 @@ import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
-import { getClusterNodes, IclusterNodesData } from '../apis/clusters'
+import { getClusterNodes } from '../apis/clusters'
 import useInterval from '../utils/useInterval'
 import { getSummaryClusterNodes } from '../apis/summary'
 
