@@ -207,7 +207,7 @@ const NodeDetail = () => {
             'YYYY-MM-DD HH:mm:ss'
           )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul&granularity=${
             chartDateRange.value
-          }${chartDateRange.value}`
+          }${chartDateRange.unit}`
         )
         const nodeCpuLoadAvg1 = metricDataResponse.filter(
           item => item.metric_name === 'node_cpu_load_avg_1'
