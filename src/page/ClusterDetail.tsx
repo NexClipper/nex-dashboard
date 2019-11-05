@@ -526,7 +526,7 @@ const ClusterDetail = () => {
               {match ? match.params.clusterId : null}
             </Breadcrumb.Item>
           </Breadcrumb>
-          <TitleContainer level={2} text={'Clutser Detail'} />
+          <TitleContainer level={2} text={'Cluster Detail'} />
           <PaddingRow gutter={16}>
             <Col span={12}>
               <Card

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Route, Switch, BrowserRouter, Redirect, Link } from 'react-router-dom'
 import { Layout, Menu, Icon } from 'antd'
 import styled from 'styled-components'
@@ -10,6 +10,9 @@ import PrometheusExporters from '../page/PrometheusExporters'
 import NodeDetail from '../page/NodeDetail'
 import ThemeToggle from '../components/ThemeToggle'
 import Event from '../page/Event'
+import { getStatus } from '../apis/status'
+import useInterval from '../utils/useInterval'
+import { logger } from '../utils/logger'
 
 const { Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
@@ -52,7 +55,30 @@ const SubMenuText = styled(Link)`
 
 function Router() {
   const [collapsed, setCollapsed] = useState<boolean>(true)
+  const [error, setError] = useState(null)
+  const [metricsPerSeconds, setMetricsPerSeconds] = useState('')
+  const [uptime, setUptime] = useState('')
+
   const onCollapse = (value: boolean) => setCollapsed(value)
+
+  const fetchData = useCallback(async () => {
+    try {
+      const { data: statusResponse } = await getStatus()
+      setMetricsPerSeconds(statusResponse.metricsPerSeconds)
+      setUptime(statusResponse.uptime)
+      logger(statusResponse)
+    } catch (error) {
+      setError(error)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  useInterval(() => {
+    !error ? fetchData() : console.log('')
+  }, 1000)
   return (
     <BrowserRouter>
       <FullLayout>
@@ -75,12 +101,6 @@ function Router() {
                 </Link>
               </Menu.Item>
               <Menu.Item key="2">
-                <Link to="/event">
-                  <Icon type="alert" />
-                  <span>Event</span>
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="3">
                 <Link to="/prometheusExporters">
                   <Icon type="export" />
                   <span>Prometheus Exporters</span>
@@ -95,7 +115,10 @@ function Router() {
                 <RouteList />
               </Switch>
             </MainContent>
-            <MainFooter collapse={collapsed}>Footer</MainFooter>
+            <MainFooter collapse={collapsed}>
+              MetricsPerSeconds : {metricsPerSeconds}&nbsp;&nbsp;Uptime :{' '}
+              {uptime}
+            </MainFooter>
           </Layout>
         </Layout>
       </FullLayout>
