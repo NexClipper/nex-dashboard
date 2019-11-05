@@ -273,7 +273,7 @@ const LineChart = ({ config }: HighchartProps) => {
       })
     }
     // eslint-disable-next-line
-  }, [dark])
+  }, [dark, config])
   return <HighchartsReact highcharts={Highcharts} options={defaultTheme} />
 }
 

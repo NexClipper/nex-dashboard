@@ -2,15 +2,21 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Row, Col, Card, Table, List, Breadcrumb, Skeleton, Empty } from 'antd'
 import styled, { css } from 'styled-components'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
+import { OpUnitType } from 'dayjs'
 import LineChart from '../components/LineChart'
 import TitleContainer from '../components/TitleContainer'
+import SelectDate from '../components/SelectDate'
 import useInterval from '../utils/useInterval'
 import { IclusterNodesData, getClusterNodes } from '../apis/clusters'
 import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
 import { getMetricsNodes, getMetricsPods } from '../apis/metrics'
+import { logger } from '../utils/logger'
+
+dayjs.extend(utc)
 
 interface StateCircularProps {
   readonly active: boolean
@@ -24,7 +30,22 @@ const FixedBox = styled.div`
 `
 
 const PaddingRow = styled(Row)`
-  margin-top: 16px;
+  margin-bottom: 16px;
+`
+
+const ChartContainer = styled(Card)`
+  .ant-card-body {
+    height: 480px;
+  }
+`
+
+const ChartTitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  .ant-typography {
+    margin: 0;
+  }
 `
 
 const ScrollListCard = styled(Card)`
@@ -72,6 +93,11 @@ const RightDateText = styled.span`
   width: 100px;
   text-align: center;
 `
+
+interface IchartDateRange {
+  value: number
+  unit: OpUnitType
+}
 
 const NamespacesData: InamespacesData[] = [
   {
@@ -206,6 +232,11 @@ const ClusterDetail = () => {
   ] = useState<Highcharts.Options | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
+  const [chartDateRange, setChartDateRange] = useState<IchartDateRange>({
+    value: 1,
+    unit: 'hour'
+  })
+  const [chartTickInterval, setChartTickInterval] = useState(90)
 
   const nodeListColumns: ColumnProps<IclusterNodesData>[] = [
     {
@@ -296,6 +327,25 @@ const ClusterDetail = () => {
     }
   ]
 
+  const ChangeChartDateRange = (value: any) => {
+    setChartDateRange({
+      value: Number(value.split(' ')[0]),
+      unit: value.split(' ')[1]
+    })
+    switch (value.split(' ')[1]) {
+      case 'hour':
+        setChartTickInterval(90)
+        break
+      case 'day':
+        setChartTickInterval(20)
+        break
+      case 'month':
+        setChartTickInterval(1)
+        break
+      default:
+        setChartTickInterval(90)
+    }
+  }
   const fetchData = useCallback(async () => {
     try {
       if (match) {
@@ -319,12 +369,14 @@ const ClusterDetail = () => {
         const { data: metricNodeDataResponse } = await getMetricsNodes(
           Number(match.params.clusterId),
           `dateRange=${dayjs(Date.now())
-            .subtract(1, 'hour')
+            .subtract(chartDateRange.value, chartDateRange.unit)
             .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
             Date.now()
           ).format(
             'YYYY-MM-DD HH:mm:ss'
-          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul`
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul&granularity=${
+            chartDateRange.value
+          }${chartDateRange.value}`
         )
         const nodeCpuLoadAvg1 = metricNodeDataResponse.filter(
           item => item.metric_name === 'node_cpu_load_avg_1'
@@ -344,12 +396,14 @@ const ClusterDetail = () => {
         const { data: metricPodsDataResponse } = await getMetricsPods(
           Number(match.params.clusterId),
           `dateRange=${dayjs(Date.now())
-            .subtract(1, 'hour')
+            .subtract(chartDateRange.value, chartDateRange.unit)
             .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
             Date.now()
           ).format(
             'YYYY-MM-DD HH:mm:ss'
-          )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&timezone=Asia/Seoul`
+          )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
+            chartDateRange.value
+          }${chartDateRange.value}`
         )
         const containerMemoryRss = metricPodsDataResponse.filter(
           item => item.metric_name === 'container_memory_rss'
@@ -358,13 +412,15 @@ const ClusterDetail = () => {
           item => item.metric_name === 'container_cpu_usage_total'
         )
         if (nodeCpuLoadAvg1) {
-          setCpuChartConfig({
+          const CpuChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
               categories: nodeCpuLoadAvg1.map(item =>
-                dayjs(item.bucket).format('H:mm:ss')
+                dayjs(item.bucket)
+                  .utc()
+                  .format('YY-M-D HH:mm:ss')
               ),
-              tickInterval: 90
+              tickInterval: chartTickInterval
             },
             series: [
               {
@@ -383,14 +439,16 @@ const ClusterDetail = () => {
                 data: nodeCpuLoadAvg15.map(item => item.value)
               }
             ]
-          })
-          setMemoryChartConfig({
+          }
+          const MemoryChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
               categories: nodeMemoryTotal.map(item =>
-                dayjs(item.bucket).format('H:mm:ss')
+                dayjs(item.bucket)
+                  .utc()
+                  .format('YY-M-D HH:mm:ss')
               ),
-              tickInterval: 90
+              tickInterval: chartTickInterval
             },
             series: [
               {
@@ -404,14 +462,16 @@ const ClusterDetail = () => {
                 data: nodeMemoryUsed.map(item => item.value)
               }
             ]
-          })
-          setPodChartConfig({
+          }
+          const PodChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
               categories: containerMemoryRss.map(item =>
-                dayjs(item.bucket).format('H:mm:ss')
+                dayjs(item.bucket)
+                  .utc()
+                  .format('YY-M-D HH:mm:ss')
               ),
-              tickInterval: 90
+              tickInterval: chartTickInterval * 5
             },
             series: [
               {
@@ -425,21 +485,24 @@ const ClusterDetail = () => {
                 data: containerCpuUsageTotal.map(item => item.value)
               }
             ]
-          })
+          }
+          setCpuChartConfig(CpuChartConfig)
+          setMemoryChartConfig(MemoryChartConfig)
+          setPodChartConfig(PodChartConfig)
+          setNodeListData(nodeListResponse)
+          setUsageData(summaryData)
         }
-        setNodeListData(nodeListResponse)
-        setUsageData(summaryData)
       }
     } catch (error) {
       setError(error)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [chartDateRange])
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [chartDateRange])
 
   useInterval(() => {
     !loading && !error ? fetchData() : console.log('')
@@ -463,7 +526,7 @@ const ClusterDetail = () => {
             </Breadcrumb.Item>
           </Breadcrumb>
           <TitleContainer level={2} text={'Clutser Detail'} />
-          <Row gutter={16}>
+          <PaddingRow gutter={16}>
             <Col span={12}>
               <Card
                 title="Node list"
@@ -506,36 +569,40 @@ const ClusterDetail = () => {
                 </FixedBox>
               </Card>
             </Col>
-          </Row>
-          <PaddingRow gutter={16}>
+          </PaddingRow>
+          <ChartTitleContainer>
+            <TitleContainer level={4} text={'Charts'} />
+            <SelectDate onChange={ChangeChartDateRange} />
+          </ChartTitleContainer>
+          <Row gutter={16}>
             <Col span={8}>
-              <Card title="CPU" bordered={false}>
+              <ChartContainer title="CPU" bordered={false}>
                 {cpuChartConfig ? (
                   <LineChart config={cpuChartConfig} />
                 ) : (
                   <Empty />
                 )}
-              </Card>
+              </ChartContainer>
             </Col>
             <Col span={8}>
-              <Card title="Memory" bordered={false}>
+              <ChartContainer title="Memory" bordered={false}>
                 {memoryChartConfig ? (
                   <LineChart config={memoryChartConfig} />
                 ) : (
                   <Empty />
                 )}
-              </Card>
+              </ChartContainer>
             </Col>
             <Col span={8}>
-              <Card title="Pod" bordered={false}>
+              <ChartContainer title="Pod" bordered={false}>
                 {podChartConfig ? (
                   <LineChart config={podChartConfig} />
                 ) : (
                   <Empty />
                 )}
-              </Card>
+              </ChartContainer>
             </Col>
-          </PaddingRow>
+          </Row>
           {/* <PaddingRow gutter={16}>
             <Col span={8}>
               <ScrollListCard title="Namespaces [6/6]" bordered={false}>

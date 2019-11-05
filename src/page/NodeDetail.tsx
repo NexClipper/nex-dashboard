@@ -14,10 +14,13 @@ import { Link, useRouteMatch } from 'react-router-dom'
 import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
+import { OpUnitType } from 'dayjs'
 import LineChart from '../components/LineChart'
 import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
+import SelectDate from '../components/SelectDate'
 import {
   IsnapshotNodeObjectData,
   getSnapshotNode,
@@ -28,6 +31,8 @@ import {
 } from '../apis/snapshot'
 import { getMetricsNode } from '../apis/metrics'
 import useInterval from '../utils/useInterval'
+
+dayjs.extend(utc)
 
 const { Search } = Input
 
@@ -52,9 +57,24 @@ const MarginRow = styled(Row)`
   margin-top: 16px;
 `
 
+const ChartTitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-top: 32px;
+  padding-bottom: 16px;
+  .ant-typography {
+    margin: 0;
+  }
+`
+
 interface Iparams {
   clusterId: string | undefined
   nodeId: string | undefined
+}
+
+interface IchartDateRange {
+  value: number
+  unit: OpUnitType
 }
 
 const nodeContainerColumns: ColumnProps<IsnapshotNodeContainerObjectData>[] = [
@@ -147,6 +167,32 @@ const NodeDetail = () => {
   ] = useState<IsnapshotNodeProcessObjectData | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [chartDateRange, setChartDateRange] = useState<IchartDateRange>({
+    value: 1,
+    unit: 'hour'
+  })
+  const [chartTickInterval, setChartTickInterval] = useState(5)
+
+  const ChangeChartDateRange = (value: any) => {
+    setChartDateRange({
+      value: Number(value.split(' ')[0]),
+      unit: value.split(' ')[1]
+    })
+    switch (value.split(' ')[1]) {
+      case 'hour':
+        setChartTickInterval(5)
+        break
+      case 'day':
+        setChartTickInterval(1)
+        break
+      case 'month':
+        setChartTickInterval(1)
+        break
+      default:
+        setChartTickInterval(5)
+    }
+  }
+
   const fetchData = useCallback(async () => {
     try {
       if (match) {
@@ -170,12 +216,14 @@ const NodeDetail = () => {
           Number(match.params.clusterId),
           Number(match.params.nodeId),
           `dateRange=${dayjs(Date.now())
-            .subtract(1, 'day')
+            .subtract(chartDateRange.value, chartDateRange.unit)
             .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
             Date.now()
           ).format(
             'YYYY-MM-DD HH:mm:ss'
-          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul`
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul&granularity=${
+            chartDateRange.value
+          }${chartDateRange.value}`
         )
         const nodeCpuLoadAvg1 = metricDataResponse.filter(
           item => item.metric_name === 'node_cpu_load_avg_1'
@@ -197,9 +245,11 @@ const NodeDetail = () => {
             xAxis: {
               type: 'datetime',
               categories: nodeCpuLoadAvg1.map(item =>
-                dayjs(item.bucket).format('YY-MM-DD H:mm:ss')
+                dayjs(item.bucket)
+                  .utc()
+                  .format('YY-M-D HH:mm:ss')
               ),
-              tickInterval: 90
+              tickInterval: chartTickInterval
             },
             series: [
               {
@@ -223,9 +273,11 @@ const NodeDetail = () => {
             xAxis: {
               type: 'datetime',
               categories: nodeMemoryTotal.map(item =>
-                dayjs(item.bucket).format('YY-MM-DD H:mm:ss')
+                dayjs(item.bucket)
+                  .utc()
+                  .format('YY-M-D HH:mm:ss')
               ),
-              tickInterval: 90
+              tickInterval: chartTickInterval
             },
             series: [
               {
@@ -250,11 +302,11 @@ const NodeDetail = () => {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [chartDateRange])
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [chartDateRange])
 
   useInterval(() => {
     !loading && !error ? fetchData() : console.log('')
@@ -290,10 +342,13 @@ const NodeDetail = () => {
               {snapshotData ? Object.keys(snapshotData)[0] : null}
             </Breadcrumb.Item>
           </Breadcrumb>
-          <TitleContainer
-            level={2}
-            text={snapshotData ? Object.keys(snapshotData)[0] : null}
-          />
+          <ChartTitleContainer>
+            <TitleContainer
+              level={2}
+              text={snapshotData ? Object.keys(snapshotData)[0] : null}
+            />
+            <SelectDate onChange={ChangeChartDateRange} />
+          </ChartTitleContainer>
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="CPU" bordered={false}>
