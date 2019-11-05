@@ -196,22 +196,6 @@ const NodeDetail = () => {
   const fetchData = useCallback(async () => {
     try {
       if (match) {
-        const { data: snapShotResponse } = await getSnapshotNode(
-          Number(match.params.clusterId),
-          Number(match.params.nodeId)
-        )
-        const {
-          data: snapShotContainersResponse
-        } = await getSnapshotNodeContainers(
-          Number(match.params.clusterId),
-          Number(match.params.nodeId)
-        )
-        const {
-          data: snapShotProcessesResponse
-        } = await getSnapshotNodeProcesses(
-          Number(match.params.clusterId),
-          Number(match.params.nodeId)
-        )
         const { data: metricDataResponse } = await getMetricsNode(
           Number(match.params.clusterId),
           Number(match.params.nodeId),
@@ -292,6 +276,22 @@ const NodeDetail = () => {
               }
             ]
           })
+          const { data: snapShotResponse } = await getSnapshotNode(
+            Number(match.params.clusterId),
+            Number(match.params.nodeId)
+          )
+          const {
+            data: snapShotContainersResponse
+          } = await getSnapshotNodeContainers(
+            Number(match.params.clusterId),
+            Number(match.params.nodeId)
+          )
+          const {
+            data: snapShotProcessesResponse
+          } = await getSnapshotNodeProcesses(
+            Number(match.params.clusterId),
+            Number(match.params.nodeId)
+          )
           setSnapshotData(snapShotResponse)
           setNodeContainersData(snapShotContainersResponse)
           setNodeProcessesData(snapShotProcessesResponse)

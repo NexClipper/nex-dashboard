@@ -349,23 +349,6 @@ const ClusterDetail = () => {
   const fetchData = useCallback(async () => {
     try {
       if (match) {
-        const {
-          data: {
-            data: { data: nodeListResponse }
-          }
-        } = await getClusterNodes(Number(match.params.clusterId))
-        const { data: clusterSummaryResponse } = await getSummaryCluster(
-          Number(match.params.clusterId)
-        )
-        let summaryData: any[] = []
-        summaryData = Object.values(clusterSummaryResponse).map((item, index) =>
-          item
-            ? {
-                ...item,
-                ...Object.values(clusterSummaryResponse).slice(0)[index]
-              }
-            : null
-        )
         const { data: metricNodeDataResponse } = await getMetricsNodes(
           Number(match.params.clusterId),
           `dateRange=${dayjs(Date.now())
@@ -489,6 +472,24 @@ const ClusterDetail = () => {
           setCpuChartConfig(CpuChartConfig)
           setMemoryChartConfig(MemoryChartConfig)
           setPodChartConfig(PodChartConfig)
+          const {
+            data: {
+              data: { data: nodeListResponse }
+            }
+          } = await getClusterNodes(Number(match.params.clusterId))
+          const { data: clusterSummaryResponse } = await getSummaryCluster(
+            Number(match.params.clusterId)
+          )
+          let summaryData: any[] = []
+          summaryData = Object.values(clusterSummaryResponse).map(
+            (item, index) =>
+              item
+                ? {
+                    ...item,
+                    ...Object.values(clusterSummaryResponse).slice(0)[index]
+                  }
+                : null
+          )
           setNodeListData(nodeListResponse)
           setUsageData(summaryData)
         }
