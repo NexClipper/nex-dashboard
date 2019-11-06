@@ -3,18 +3,18 @@ import { Breadcrumb } from 'antd'
 import { Link } from 'react-router-dom'
 import TitleContainer from '../components/TitleContainer'
 
-const Event = () => {
+const Events = () => {
   return (
     <>
       <Breadcrumb>
         <Breadcrumb.Item>
           <Link to="/">Home</Link>
         </Breadcrumb.Item>
-        <Breadcrumb.Item>Event</Breadcrumb.Item>
+        <Breadcrumb.Item>Events</Breadcrumb.Item>
       </Breadcrumb>
-      <TitleContainer level={2} text={'Event'} />
+      <TitleContainer level={2} text={'Events'} />
     </>
   )
 }
 
-export default Event
+export default Events

@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux'
 import theme from './theme'
+import cluster from './cluster'
 
 const rootReducer = combineReducers({
-  theme
+  theme,
+  cluster
 })
 
 export default rootReducer

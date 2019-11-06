@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Row, Col, Card, Tag, Breadcrumb, Skeleton, Empty } from 'antd'
 import styled from 'styled-components'
-import { Link, useRouteMatch } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { RootState } from '../modules'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
@@ -38,7 +40,7 @@ interface Iparams {
 }
 
 const NodeList = () => {
-  const match = useRouteMatch<Iparams>('/clusters/:clusterId/nodes')
+  const selectedClusterId = useSelector((state: RootState) => state.cluster.id)
   const [data, setData] = useState<any[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -48,13 +50,7 @@ const NodeList = () => {
       dataIndex: 'host',
       key: 'host',
       render: (value, _, index) =>
-        match && data ? (
-          <Link
-            to={`/clusters/${match.params.clusterId}/nodes/${data[index].id}`}
-          >
-            {value}
-          </Link>
-        ) : null,
+        data && <Link to={`/nodes/${data[index].id}`}>{value}</Link>,
       align: 'center'
     },
     {
@@ -131,30 +127,27 @@ const NodeList = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      if (match) {
-        const {
-          data: {
-            data: { data: nodesResponse }
+      const {
+        data: {
+          data: { data: nodesResponse }
+        }
+      } = await getClusterNodes(selectedClusterId)
+      const { data: summaryResponse } = await getSummaryClusterNodes(
+        selectedClusterId
+      )
+      let clustersData: any[] = []
+      clustersData = nodesResponse.map(
+        item =>
+          item && {
+            ...item,
+            ...Object.values(summaryResponse).slice(0)[
+              Object.keys(summaryResponse)
+                .slice(0)
+                .indexOf(item.host)
+            ]
           }
-        } = await getClusterNodes(Number(match.params.clusterId))
-        const { data: summaryResponse } = await getSummaryClusterNodes(
-          Number(match.params.clusterId)
-        )
-        let clustersData: any[] = []
-        clustersData = nodesResponse.map(item =>
-          item
-            ? {
-                ...item,
-                ...Object.values(summaryResponse).slice(0)[
-                  Object.keys(summaryResponse)
-                    .slice(0)
-                    .indexOf(item.host)
-                ]
-              }
-            : null
-        )
-        setData(clustersData)
-      }
+      )
+      setData(clustersData)
     } catch (error) {
       setError(error)
     } finally {
@@ -180,58 +173,9 @@ const NodeList = () => {
             <Breadcrumb.Item>
               <Link to="/">Home</Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              <Link to="/clusters">Cluster List</Link>
-            </Breadcrumb.Item>
-            {match ? (
-              <Breadcrumb.Item>
-                <Link to={`/clusters/${match.params.clusterId}`}>
-                  {match.params.clusterId}
-                </Link>
-              </Breadcrumb.Item>
-            ) : null}
             <Breadcrumb.Item>Node List</Breadcrumb.Item>
           </Breadcrumb>
           <TitleContainer level={2} text={'Node List'} />
-
-          {/* <MarginRow gutter={16}>
-          <Col span={4}>
-            <StatusBox className="statusBox">
-              <p className="title">Disk Pressure</p>
-              <p className="number">0</p>
-            </StatusBox>
-          </Col>
-          <Col span={4}>
-            <StatusBox className="statusBox">
-              <p className="title">Memory Pressure</p>
-              <p className="number">0</p>
-            </StatusBox>
-          </Col>
-          <Col span={4}>
-            <StatusBox className="statusBox">
-              <p className="title">PID Pressure</p>
-              <p className="number">0</p>
-            </StatusBox>
-          </Col>
-          <Col span={4}>
-            <StatusBox className="statusBox">
-              <p className="title">Unschedulable</p>
-              <p className="number">0</p>
-            </StatusBox>
-          </Col>
-          <Col span={4}>
-            <StatusBox color="#FB8C00" className="statusBox">
-              <p className="title">Out of Disk</p>
-              <p className="number">0</p>
-            </StatusBox>
-          </Col>
-          <Col span={4}>
-            <StatusBox color="#9b59b6" className="statusBox">
-              <p className="title">Network Unavilable</p>
-              <p className="number">0</p>
-            </StatusBox>
-          </Col>
-        </MarginRow> */}
           {data ? (
             <TableContainer key="id" title={''} columns={columns} data={data} />
           ) : (

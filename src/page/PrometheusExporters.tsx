@@ -2,6 +2,8 @@ import React from 'react'
 import { List, Card, Breadcrumb } from 'antd'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setCluster } from '../modules/cluster'
 import TitleContainer from '../components/TitleContainer'
 
 const ListBox = styled.div`
@@ -112,6 +114,8 @@ const data: Idata[] = [
 ]
 
 const PrometheusExporters = () => {
+  const dispatch = useDispatch()
+  dispatch(setCluster(1))
   return (
     <>
       <Breadcrumb>

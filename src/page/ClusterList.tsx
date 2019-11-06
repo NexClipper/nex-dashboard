@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Breadcrumb, Skeleton, Empty, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { useDispatch } from 'react-redux'
+import { setCluster } from '../modules/cluster'
 import { ColumnProps } from 'antd/es/table'
 import useInterval from '../utils/useInterval'
 import { getClusters } from '../apis/clusters'
@@ -36,6 +38,8 @@ interface Idata {
 }
 
 const ClusterList = () => {
+  const dispatch = useDispatch()
+  dispatch(setCluster(1))
   const [clustersData, setClustersData] = useState<any[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
@@ -46,9 +50,9 @@ const ClusterList = () => {
       dataIndex: 'name',
       key: 'name',
       render: (value, _, index) =>
-        clustersData ? (
+        clustersData && (
           <Link to={`/clusters/${clustersData[index].id}`}>{value}</Link>
-        ) : null,
+        ),
       align: 'center'
     },
     {
@@ -115,17 +119,16 @@ const ClusterList = () => {
       const { data: ClustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
       let clustersData: any[] = []
-      clustersData = ClustersResponse.map(item =>
-        item
-          ? {
-              ...item,
-              ...Object.values(ClustersSummaryResponse).slice(0)[
-                Object.keys(ClustersSummaryResponse)
-                  .slice(0)
-                  .indexOf(item.name)
-              ]
-            }
-          : null
+      clustersData = ClustersResponse.map(
+        item =>
+          item && {
+            ...item,
+            ...Object.values(ClustersSummaryResponse).slice(0)[
+              Object.keys(ClustersSummaryResponse)
+                .slice(0)
+                .indexOf(item.name)
+            ]
+          }
       )
       setClustersData(clustersData)
     } catch (error) {

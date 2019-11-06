@@ -9,10 +9,9 @@ import NodeList from '../page/NodeList'
 import PrometheusExporters from '../page/PrometheusExporters'
 import NodeDetail from '../page/NodeDetail'
 import ThemeToggle from '../components/ThemeToggle'
-import Event from '../page/Event'
+import Events from '../page/Events'
 import { getStatus } from '../apis/status'
 import useInterval from '../utils/useInterval'
-import { logger } from '../utils/logger'
 
 const { Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
@@ -53,7 +52,11 @@ const SubMenuText = styled(Link)`
   color: #fff;
 `
 
-function Router() {
+interface Iparams {
+  clusterId: string | undefined
+}
+
+const Router = () => {
   const [collapsed, setCollapsed] = useState<boolean>(true)
   const [error, setError] = useState(null)
   const [metricsPerSeconds, setMetricsPerSeconds] = useState('')
@@ -66,7 +69,6 @@ function Router() {
       const { data: statusResponse } = await getStatus()
       setMetricsPerSeconds(statusResponse.metricsPerSeconds)
       setUptime(statusResponse.uptime)
-      logger(statusResponse)
     } catch (error) {
       setError(error)
     }
@@ -101,6 +103,18 @@ function Router() {
                 </Link>
               </Menu.Item>
               <Menu.Item key="2">
+                <Link to="/nodes">
+                  <Icon type="appstore" />
+                  <span>Nodes</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="3">
+                <Link to="/events">
+                  <Icon type="alert" />
+                  <span>Events</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="4">
                 <Link to="/prometheusExporters">
                   <Icon type="export" />
                   <span>Prometheus Exporters</span>
@@ -132,14 +146,10 @@ const RouteList = () => {
       <Route exact path="/" component={Home} />
       <Route exact path="/clusters" component={ClusterList} />
       <Route exact path="/clusters/:clusterId" component={ClusterDetail} />
-      <Route exact path="/clusters/:clusterId/nodes" component={NodeList} />
-      <Route
-        exact
-        path="/clusters/:clusterId/nodes/:nodeId"
-        component={NodeDetail}
-      />
+      <Route exact path="/nodes" component={NodeList} />
+      <Route exact path="/nodes/:nodeId" component={NodeDetail} />
       <Route path="/prometheusExporters" component={PrometheusExporters} />
-      <Route path="/event" component={Event} />
+      <Route path="/events" component={Events} />
       {/* <Redirect from="*" to="/" /> */}
     </>
   )

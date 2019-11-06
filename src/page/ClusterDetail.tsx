@@ -1,33 +1,37 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Row, Col, Card, Table, List, Breadcrumb, Skeleton, Empty } from 'antd'
-import styled, { css } from 'styled-components'
+import {
+  Row,
+  Col,
+  Card,
+  Table,
+  Statistic,
+  Breadcrumb,
+  Skeleton,
+  Empty
+} from 'antd'
+import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
+import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
 import LineChart from '../components/LineChart'
 import TitleContainer from '../components/TitleContainer'
 import SelectDate from '../components/SelectDate'
 import useInterval from '../utils/useInterval'
 import { IclusterNodesData, getClusterNodes } from '../apis/clusters'
-import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
 import { getMetricsNodes, getMetricsPods } from '../apis/metrics'
-import { logger } from '../utils/logger'
+import { setCluster } from '../modules/cluster'
 
 dayjs.extend(utc)
 
-interface StateCircularProps {
-  readonly active: boolean
+interface IchartDateRange {
+  value: number
+  unit: OpUnitType
 }
-
-const FixedBox = styled.div`
-  height: 231px;
-  .scrollBox {
-    overflow: auto;
-  }
-`
 
 const PaddingRow = styled(Row)`
   margin-bottom: 16px;
@@ -47,175 +51,17 @@ const ChartTitleContainer = styled.div`
     margin: 0;
   }
 `
-
-const ScrollListCard = styled(Card)`
-  .ant-card-body {
-    overflow-y: scroll;
-    height: 300px;
-  }
-  .ant-list-item {
-    font-size: 12px;
-    justify-content: space-between;
-
-    span {
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 16px;
-    }
-
-    strong {
-      display: inline-block;
-      vertical-align: middle;
-      max-width: 200px;
-    }
-  }
-`
-
-const StateCircular = styled.span<StateCircularProps>`
-  vertical-align: middle;
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-right: 12px;
-  border-radius: 50%;
-  ${props =>
-    props.active
-      ? css`
-          background-color: #2ecc71;
-        `
-      : css`
-          background-color: #7f8c8d;
-        `}
-`
-
-const RightDateText = styled.span`
-  display: inline-block;
-  width: 100px;
-  text-align: center;
-`
-
-interface IchartDateRange {
-  value: number
-  unit: OpUnitType
-}
-
-const NamespacesData: InamespacesData[] = [
-  {
-    name: 'default',
-    phase: 'Active',
-    creationTimestamp: '2019-10-16T05:08:37Z'
-  },
-  {
-    name: 'kube-public',
-    phase: 'Active',
-    creationTimestamp: '2019-10-16T05:08:37Z'
-  },
-  {
-    name: 'kube-system',
-    phase: 'Active',
-    creationTimestamp: '2019-10-16T05:08:37Z'
-  },
-  {
-    name: 'kubernetes-dashboard',
-    phase: 'Active',
-    creationTimestamp: '2019-10-16T05:25:38Z'
-  },
-  {
-    name: 'nexclipper',
-    phase: 'Active',
-    creationTimestamp: '2019-10-16T05:25:39Z'
-  },
-  {
-    name: 'nexclipperagent',
-    phase: 'Active',
-    creationTimestamp: '2019-10-16T05:25:39Z'
-  }
-]
-
-const DaemonSetsData: IdaemonSetsData[] = [
-  {
-    name: 'kube-flannel-ds',
-    namespace: 'kube-system',
-    numberUnavailable: 0,
-    numberReady: 4,
-    numberAvailable: 4,
-    creationTimestamp: '2019-10-16T05:25:39Z'
-  },
-  {
-    name: 'kube-proxy',
-    namespace: 'kube-system',
-    numberUnavailable: 0,
-    numberReady: 4,
-    numberAvailable: 4,
-    creationTimestamp: '2019-10-16T05:10:36Z'
-  },
-  {
-    name: 'nvidia-gpu-device-plugin',
-    namespace: 'kube-system',
-    numberUnavailable: 0,
-    numberReady: 0,
-    numberAvailable: 0,
-    creationTimestamp: '2019-10-16T05:10:38Z'
-  },
-  {
-    name: 'nvidia-gpu-device-plugin-1-8',
-    namespace: 'kube-system',
-    numberUnavailable: 0,
-    numberReady: 0,
-    numberAvailable: 0,
-    creationTimestamp: '2019-10-16T05:25:39Z'
-  },
-  {
-    name: 'nexclipper-agent',
-    namespace: 'nexclipperagent',
-    numberUnavailable: 0,
-    numberReady: 4,
-    numberAvailable: 4,
-    creationTimestamp: '2019-10-21T08:01:10Z'
-  }
-]
-
-const DeploymentsData: IdeploymentsData[] = [
-  {
-    name: 'terrifying-eel-nginx-ingress-controller',
-    namespace: 'default',
-    availableReplicas: 1,
-    replicas: 1,
-    creationTimestamp: '2019-10-16T06:42:17Z'
-  },
-  {
-    name: 'terrifying-eel-nginx-ingress-controller-default-backend',
-    namespace: 'default',
-    availableReplicas: 1,
-    replicas: 1,
-    creationTimestamp: '2019-10-16T06:42:17Z'
-  },
-  {
-    name: 'cert-manager-cert-manager',
-    namespace: 'kube-system',
-    availableReplicas: 1,
-    replicas: 1,
-    creationTimestamp: '2019-10-16T06:24:27Z'
-  },
-  {
-    name: 'kube-dns',
-    namespace: 'kube-system',
-    availableReplicas: 4,
-    replicas: 4,
-    creationTimestamp: '2019-10-16T05:10:40Z'
-  }
-]
-
 interface Iparams {
   clusterId: string | undefined
 }
 
 const ClusterDetail = () => {
+  const dispatch = useDispatch()
   const match = useRouteMatch<Iparams>('/clusters/:clusterId')
+  match &&
+    match.params.clusterId &&
+    dispatch(setCluster(Number(match.params.clusterId)))
   const [nodeListData, setNodeListData] = useState<IclusterNodesData[] | null>(
-    null
-  )
-  const [usageData, setUsageData] = useState<IsummaryClustersData[] | null>(
     null
   )
   const [
@@ -230,6 +76,9 @@ const ClusterDetail = () => {
     podChartConfig,
     setPodChartConfig
   ] = useState<Highcharts.Options | null>(null)
+  const [usageData, setUsageData] = useState<IsummaryClustersData[] | null>(
+    null
+  )
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [chartDateRange, setChartDateRange] = useState<IchartDateRange>({
@@ -244,13 +93,8 @@ const ClusterDetail = () => {
       dataIndex: 'host',
       key: 'host',
       render: (value, _, index) =>
-        nodeListData && match ? (
-          <Link
-            to={`/clusters/${match.params.clusterId}/nodes/${nodeListData[index].id}`}
-          >
-            {value}
-          </Link>
-        ) : null,
+        nodeListData &&
+        match && <Link to={`/nodes/${nodeListData[index].id}`}>{value}</Link>,
       width: 130,
       align: 'center'
     },
@@ -286,44 +130,6 @@ const ClusterDetail = () => {
       dataIndex: 'platform_version',
       key: 'platform_version',
       align: 'center'
-    }
-  ]
-
-  const clusterSummaryColumns: ColumnProps<IsummaryClustersData>[] = [
-    {
-      title: 'node_cpu_load_avg_1',
-      dataIndex: 'node_cpu_load_avg_1',
-      key: 'node_cpu_load_avg_1',
-      align: 'center',
-      render: load => `${load} %`
-    },
-    {
-      title: 'node_cpu_load_avg_5',
-      dataIndex: 'node_cpu_load_avg_5',
-      key: 'node_cpu_load_avg_5',
-      align: 'center',
-      render: load => `${load} %`
-    },
-    {
-      title: 'node_cpu_load_avg_15',
-      dataIndex: 'node_cpu_load_avg_15',
-      key: 'node_cpu_load_avg_15',
-      align: 'center',
-      render: load => `${load} %`
-    },
-    {
-      title: 'node_memory_total',
-      dataIndex: 'node_memory_total',
-      key: 'node_memory_total',
-      align: 'center',
-      render: total => `${Math.round(total / 1024 / 1024 / 1024)} GB`
-    },
-    {
-      title: 'node_memory_used',
-      dataIndex: 'node_memory_used',
-      key: 'node_memory_used',
-      align: 'center',
-      render: used => `${Math.round(used / 1024 / 1024 / 1024)} GB`
     }
   ]
 
@@ -423,6 +229,7 @@ const ClusterDetail = () => {
               }
             ]
           }
+          setCpuChartConfig(CpuChartConfig)
           const MemoryChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
@@ -446,6 +253,7 @@ const ClusterDetail = () => {
               }
             ]
           }
+          setMemoryChartConfig(MemoryChartConfig)
           const PodChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
@@ -469,28 +277,24 @@ const ClusterDetail = () => {
               }
             ]
           }
-          setCpuChartConfig(CpuChartConfig)
-          setMemoryChartConfig(MemoryChartConfig)
           setPodChartConfig(PodChartConfig)
           const {
             data: {
               data: { data: nodeListResponse }
             }
           } = await getClusterNodes(Number(match.params.clusterId))
+          setNodeListData(nodeListResponse)
           const { data: clusterSummaryResponse } = await getSummaryCluster(
             Number(match.params.clusterId)
           )
           let summaryData: any[] = []
           summaryData = Object.values(clusterSummaryResponse).map(
             (item, index) =>
-              item
-                ? {
-                    ...item,
-                    ...Object.values(clusterSummaryResponse).slice(0)[index]
-                  }
-                : null
+              item && {
+                ...item,
+                ...Object.values(clusterSummaryResponse).slice(0)[index]
+              }
           )
-          setNodeListData(nodeListResponse)
           setUsageData(summaryData)
         }
       }
@@ -522,52 +326,83 @@ const ClusterDetail = () => {
             <Breadcrumb.Item>
               <Link to="/clusters">Cluster List</Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              {match ? match.params.clusterId : null}
-            </Breadcrumb.Item>
+            <Breadcrumb.Item>{match && match.params.clusterId}</Breadcrumb.Item>
           </Breadcrumb>
           <TitleContainer level={2} text={'Cluster Detail'} />
           <PaddingRow gutter={16}>
-            <Col span={12}>
+            <Col span={6}>
+              <Card>
+                {usageData ? (
+                  <Statistic
+                    title="node cpu load avg 1"
+                    value={usageData[0].node_cpu_load_avg_1}
+                    precision={2}
+                    suffix="%"
+                  />
+                ) : (
+                  <Empty />
+                )}
+              </Card>
+            </Col>
+            <Col span={6}>
+              <Card>
+                {usageData ? (
+                  <Statistic
+                    title="node cpu load avg 15"
+                    value={usageData[0].node_cpu_load_avg_15}
+                    precision={2}
+                    suffix="%"
+                  />
+                ) : (
+                  <Empty />
+                )}
+              </Card>
+            </Col>
+            <Col span={6}>
+              <Card>
+                {usageData ? (
+                  <Statistic
+                    title="node memory used"
+                    value={usageData[0].node_memory_used / 1024 / 1024 / 1024}
+                    precision={2}
+                    suffix="GB"
+                  />
+                ) : (
+                  <Empty />
+                )}
+              </Card>
+            </Col>
+            <Col span={6}>
+              <Card>
+                {usageData ? (
+                  <Statistic
+                    title="node memory total"
+                    value={usageData[0].node_memory_total / 1024 / 1024 / 1024}
+                    precision={2}
+                    suffix="GB"
+                  />
+                ) : (
+                  <Empty />
+                )}
+              </Card>
+            </Col>
+          </PaddingRow>
+          <PaddingRow gutter={16}>
+            <Col span={24}>
               <Card
                 title="Node list"
                 bordered={false}
-                extra={
-                  match ? (
-                    <Link to={`/clusters/${match.params.clusterId}/nodes`}>
-                      More
-                    </Link>
-                  ) : null
-                }
+                extra={match && <Link to={'/nodes'}>More</Link>}
               >
-                <FixedBox>
-                  {nodeListData ? (
-                    <Table
-                      rowKey="id"
-                      columns={nodeListColumns}
-                      dataSource={nodeListData}
-                      scroll={{ y: 100 }}
-                    />
-                  ) : (
-                    <Empty />
-                  )}
-                </FixedBox>
-              </Card>
-            </Col>
-            <Col span={12}>
-              <Card title="Cluster Usage" bordered={false}>
-                <FixedBox>
-                  {usageData ? (
-                    <Table
-                      rowKey="node_memory_total"
-                      columns={clusterSummaryColumns}
-                      dataSource={usageData}
-                      pagination={false}
-                    />
-                  ) : (
-                    <Empty />
-                  )}
-                </FixedBox>
+                {nodeListData ? (
+                  <Table
+                    rowKey="id"
+                    columns={nodeListColumns}
+                    dataSource={nodeListData}
+                  />
+                ) : (
+                  <Empty />
+                )}
               </Card>
             </Col>
           </PaddingRow>
@@ -604,81 +439,6 @@ const ClusterDetail = () => {
               </ChartContainer>
             </Col>
           </Row>
-          {/* <PaddingRow gutter={16}>
-            <Col span={8}>
-              <ScrollListCard title="Namespaces [6/6]" bordered={false}>
-                <List
-                  itemLayout="horizontal"
-                  dataSource={NamespacesData}
-                  renderItem={item => (
-                    <List.Item>
-                      <div>
-                        <StateCircular
-                          active={item.phase === 'Active' ? true : false}
-                        />
-                        <strong>{item.name}</strong>
-                      </div>
-                      <RightDateText>{item.creationTimestamp}</RightDateText>
-                    </List.Item>
-                  )}
-                />
-              </ScrollListCard>
-            </Col>
-            <Col span={8}>
-              <ScrollListCard title="Daemon Sets [5/5]" bordered={false}>
-                <List
-                  itemLayout="horizontal"
-                  dataSource={DaemonSetsData}
-                  renderItem={item => (
-                    <List.Item>
-                      <div>
-                        <StateCircular
-                          active={item.numberUnavailable === 0 ? true : false}
-                        />
-                        <strong>{item.name}</strong>
-                      </div>
-                      <div>
-                        <span>{item.namespace}</span>
-                        <span>
-                          [{item.numberReady}/{item.numberAvailable}]
-                        </span>
-                        <RightDateText>{item.creationTimestamp}</RightDateText>
-                      </div>
-                    </List.Item>
-                  )}
-                />
-              </ScrollListCard>
-            </Col>
-            <Col span={8}>
-              <ScrollListCard title="Deployments [15/15]" bordered={false}>
-                <List
-                  itemLayout="horizontal"
-                  dataSource={DeploymentsData}
-                  renderItem={item => (
-                    <List.Item>
-                      <div>
-                        <StateCircular
-                          active={
-                            item.replicas === item.availableReplicas
-                              ? true
-                              : false
-                          }
-                        />
-                        <strong>{item.name}</strong>
-                      </div>
-                      <div>
-                        <span>{item.namespace}</span>
-                        <span>
-                          [{item.availableReplicas}/{item.replicas}]
-                        </span>
-                        <RightDateText>{item.creationTimestamp}</RightDateText>
-                      </div>
-                    </List.Item>
-                  )}
-                />
-              </ScrollListCard>
-            </Col>
-          </PaddingRow> */}
         </>
       )}
     </>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { ColumnProps } from 'antd/es/table'
 import { Skeleton, Tag, Empty, Breadcrumb } from 'antd'
-
+import { useDispatch } from 'react-redux'
+import { setCluster } from '../modules/cluster'
 import { getAgents, IagentsObjectData } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
@@ -31,6 +32,8 @@ interface IclustersData {
 }
 
 const Home = () => {
+  const dispatch = useDispatch()
+  dispatch(setCluster(1))
   const [agentsData, setAgentsData] = useState<IagentsObjectData | null>(null)
   const [nodesData, setNodesData] = useState<InodesObjectData | null>(null)
   const [clustersData, setClustersData] = useState<any[] | null>(null)
@@ -110,17 +113,16 @@ const Home = () => {
       const { data: clustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
       let clustersData: any[] = []
-      clustersData = clustersResponse.map(item =>
-        item
-          ? {
-              ...item,
-              ...Object.values(ClustersSummaryResponse).slice(0)[
-                Object.keys(ClustersSummaryResponse)
-                  .slice(0)
-                  .indexOf(item.name)
-              ]
-            }
-          : null
+      clustersData = clustersResponse.map(
+        item =>
+          item && {
+            ...item,
+            ...Object.values(ClustersSummaryResponse).slice(0)[
+              Object.keys(ClustersSummaryResponse)
+                .slice(0)
+                .indexOf(item.name)
+            ]
+          }
       )
       setAgentsData(agentsResponse)
       setNodesData(nodesResponse)

@@ -14,6 +14,8 @@ import { Link, useRouteMatch } from 'react-router-dom'
 import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
+import { useSelector } from 'react-redux'
+import { RootState } from '../modules'
 import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
@@ -144,7 +146,8 @@ const nodeProcessColumns: ColumnProps<IsnapshotNodeProcessObjectData>[] = [
 ]
 
 const NodeDetail = () => {
-  const match = useRouteMatch<Iparams>('/clusters/:clusterId/nodes/:nodeId')
+  const selectedClusterId = useSelector((state: RootState) => state.cluster.id)
+  const match = useRouteMatch<Iparams>('/nodes/:nodeId')
   const [
     snapshotData,
     setSnapshotData
@@ -197,7 +200,7 @@ const NodeDetail = () => {
     try {
       if (match) {
         const { data: metricDataResponse } = await getMetricsNode(
-          Number(match.params.clusterId),
+          selectedClusterId,
           Number(match.params.nodeId),
           `dateRange=${dayjs(Date.now())
             .subtract(chartDateRange.value, chartDateRange.unit)
@@ -277,19 +280,19 @@ const NodeDetail = () => {
             ]
           })
           const { data: snapShotResponse } = await getSnapshotNode(
-            Number(match.params.clusterId),
+            selectedClusterId,
             Number(match.params.nodeId)
           )
           const {
             data: snapShotContainersResponse
           } = await getSnapshotNodeContainers(
-            Number(match.params.clusterId),
+            selectedClusterId,
             Number(match.params.nodeId)
           )
           const {
             data: snapShotProcessesResponse
           } = await getSnapshotNodeProcesses(
-            Number(match.params.clusterId),
+            selectedClusterId,
             Number(match.params.nodeId)
           )
           setSnapshotData(snapShotResponse)
@@ -321,31 +324,18 @@ const NodeDetail = () => {
             <Breadcrumb.Item>
               <Link to="/">Home</Link>
             </Breadcrumb.Item>
+
             <Breadcrumb.Item>
-              <Link to="/clusters">Cluster List</Link>
+              {match && <Link to="/nodes">Node List</Link>}
             </Breadcrumb.Item>
-            {match ? (
-              <Breadcrumb.Item>
-                <Link to={`/clusters/${match.params.clusterId}`}>
-                  {match.params.clusterId}
-                </Link>
-              </Breadcrumb.Item>
-            ) : null}
-            {match ? (
-              <Breadcrumb.Item>
-                <Link to={`/clusters/${match.params.clusterId}/nodes`}>
-                  Node List
-                </Link>
-              </Breadcrumb.Item>
-            ) : null}
             <Breadcrumb.Item>
-              {snapshotData ? Object.keys(snapshotData)[0] : null}
+              {snapshotData && Object.keys(snapshotData)[0]}
             </Breadcrumb.Item>
           </Breadcrumb>
           <ChartTitleContainer>
             <TitleContainer
               level={2}
-              text={snapshotData ? Object.keys(snapshotData)[0] : null}
+              text={snapshotData && Object.keys(snapshotData)[0]}
             />
             <SelectDate onChange={ChangeChartDateRange} />
           </ChartTitleContainer>
