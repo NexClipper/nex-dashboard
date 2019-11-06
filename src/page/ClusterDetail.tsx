@@ -25,6 +25,7 @@ import useInterval from '../utils/useInterval'
 import { IclusterNodesData, getClusterNodes } from '../apis/clusters'
 import { getMetricsNodes, getMetricsPods } from '../apis/metrics'
 import { setCluster } from '../modules/cluster'
+import { logger } from '../utils/logger'
 
 dayjs.extend(utc)
 
@@ -86,6 +87,7 @@ const ClusterDetail = () => {
     unit: 'hour'
   })
   const [chartTickInterval, setChartTickInterval] = useState(90)
+  const [clusterTtile, setClusterTitle] = useState('')
 
   const nodeListColumns: ColumnProps<IclusterNodesData>[] = [
     {
@@ -229,7 +231,9 @@ const ClusterDetail = () => {
               }
             ]
           }
-          setCpuChartConfig(CpuChartConfig)
+          setCpuChartConfig(
+            metricNodeDataResponse.length !== 0 ? CpuChartConfig : null
+          )
           const MemoryChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
@@ -253,7 +257,9 @@ const ClusterDetail = () => {
               }
             ]
           }
-          setMemoryChartConfig(MemoryChartConfig)
+          setMemoryChartConfig(
+            metricNodeDataResponse.length !== 0 ? MemoryChartConfig : null
+          )
           const PodChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
@@ -277,7 +283,9 @@ const ClusterDetail = () => {
               }
             ]
           }
-          setPodChartConfig(PodChartConfig)
+          setPodChartConfig(
+            metricPodsDataResponse.length !== 0 ? PodChartConfig : null
+          )
           const {
             data: {
               data: { data: nodeListResponse }
@@ -296,6 +304,7 @@ const ClusterDetail = () => {
               }
           )
           setUsageData(summaryData)
+          setClusterTitle(Object.keys(clusterSummaryResponse).slice(0)[0])
         }
       }
     } catch (error) {
@@ -326,9 +335,9 @@ const ClusterDetail = () => {
             <Breadcrumb.Item>
               <Link to="/clusters">Cluster List</Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>{match && match.params.clusterId}</Breadcrumb.Item>
+            <Breadcrumb.Item>{clusterTtile}</Breadcrumb.Item>
           </Breadcrumb>
-          <TitleContainer level={2} text={'Cluster Detail'} />
+          <TitleContainer level={2} text={clusterTtile} />
           <PaddingRow gutter={16}>
             <Col span={6}>
               <Card>
@@ -411,7 +420,7 @@ const ClusterDetail = () => {
             <SelectDate onChange={ChangeChartDateRange} />
           </ChartTitleContainer>
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={podChartConfig ? 8 : 12}>
               <ChartContainer title="CPU" bordered={false}>
                 {cpuChartConfig ? (
                   <LineChart config={cpuChartConfig} />
@@ -420,7 +429,7 @@ const ClusterDetail = () => {
                 )}
               </ChartContainer>
             </Col>
-            <Col span={8}>
+            <Col span={podChartConfig ? 8 : 12}>
               <ChartContainer title="Memory" bordered={false}>
                 {memoryChartConfig ? (
                   <LineChart config={memoryChartConfig} />
@@ -429,15 +438,13 @@ const ClusterDetail = () => {
                 )}
               </ChartContainer>
             </Col>
-            <Col span={8}>
-              <ChartContainer title="Pod" bordered={false}>
-                {podChartConfig ? (
+            {podChartConfig && (
+              <Col span={8}>
+                <ChartContainer title="Pod" bordered={false}>
                   <LineChart config={podChartConfig} />
-                ) : (
-                  <Empty />
-                )}
-              </ChartContainer>
-            </Col>
+                </ChartContainer>
+              </Col>
+            )}
           </Row>
         </>
       )}
