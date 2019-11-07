@@ -80,7 +80,7 @@ const Router = () => {
 
   useInterval(() => {
     !error ? fetchData() : console.log('')
-  }, 1000)
+  }, 3000)
   return (
     <BrowserRouter>
       <FullLayout>
@@ -130,7 +130,7 @@ const Router = () => {
               </Switch>
             </MainContent>
             <MainFooter collapse={collapsed}>
-              MetricsPerSeconds : {metricsPerSeconds}&nbsp;&nbsp;Uptime :{' '}
+              MetricsPerSeconds : {metricsPerSeconds}&nbsp;&nbsp;Uptime :
               {uptime}
             </MainFooter>
           </Layout>

@@ -13,7 +13,7 @@ import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import * as Highcharts from 'highcharts'
-import { Link, useRouteMatch } from 'react-router-dom'
+import { Link, useRouteMatch, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
@@ -22,9 +22,16 @@ import LineChart from '../components/LineChart'
 import TitleContainer from '../components/TitleContainer'
 import SelectDate from '../components/SelectDate'
 import useInterval from '../utils/useInterval'
-import { IclusterNodesData, getClusterNodes } from '../apis/clusters'
+import {
+  IclusterNodesData,
+  getClusterNodes,
+  getClusters
+} from '../apis/clusters'
 import { getMetricsNodes, getMetricsPods } from '../apis/metrics'
 import { setCluster } from '../modules/cluster'
+import BeadcrumbDropdown, {
+  IbreadcrumbDropdownMenu
+} from '../components/BreadcrumbDropdown'
 import { logger } from '../utils/logger'
 
 dayjs.extend(utc)
@@ -59,6 +66,8 @@ interface Iparams {
 const ClusterDetail = () => {
   const dispatch = useDispatch()
   const match = useRouteMatch<Iparams>('/clusters/:clusterId')
+  const location = useLocation()
+  logger('location', location)
   match &&
     match.params.clusterId &&
     dispatch(setCluster(Number(match.params.clusterId)))
@@ -88,7 +97,9 @@ const ClusterDetail = () => {
   })
   const [chartTickInterval, setChartTickInterval] = useState(90)
   const [clusterTtile, setClusterTitle] = useState('')
-
+  const [dropdownList, setDropdownList] = useState<
+    IbreadcrumbDropdownMenu[] | null
+  >(null)
   const nodeListColumns: ColumnProps<IclusterNodesData>[] = [
     {
       title: 'Host',
@@ -157,6 +168,16 @@ const ClusterDetail = () => {
   const fetchData = useCallback(async () => {
     try {
       if (match) {
+        const { data: ClustersResponse } = await getClusters()
+        let DropDwonList: IbreadcrumbDropdownMenu[] = []
+        ClustersResponse.map(item =>
+          DropDwonList.push({
+            id: item.id,
+            link: `/clusters/${item.id}`,
+            text: item.name
+          })
+        )
+        setDropdownList(DropDwonList)
         const { data: metricNodeDataResponse } = await getMetricsNodes(
           Number(match.params.clusterId),
           `dateRange=${dayjs(Date.now())
@@ -303,8 +324,15 @@ const ClusterDetail = () => {
                 ...Object.values(clusterSummaryResponse).slice(0)[index]
               }
           )
-          setUsageData(summaryData)
-          setClusterTitle(Object.keys(clusterSummaryResponse).slice(0)[0])
+          setUsageData(summaryData.length !== 0 ? summaryData : null)
+          const filterDropDownTitle = DropDwonList.filter(
+            item => Number(match.params.clusterId) === item.id
+          )[0].text
+          setClusterTitle(
+            Object.keys(clusterSummaryResponse).slice(0)[0]
+              ? Object.keys(clusterSummaryResponse).slice(0)[0]
+              : filterDropDownTitle
+          )
         }
       }
     } catch (error) {
@@ -312,11 +340,11 @@ const ClusterDetail = () => {
     } finally {
       setLoading(false)
     }
-  }, [chartDateRange])
+  }, [chartDateRange, location])
 
   useEffect(() => {
     fetchData()
-  }, [chartDateRange])
+  }, [chartDateRange, location])
 
   useInterval(() => {
     !loading && !error ? fetchData() : console.log('')
@@ -335,7 +363,12 @@ const ClusterDetail = () => {
             <Breadcrumb.Item>
               <Link to="/clusters">Cluster List</Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>{clusterTtile}</Breadcrumb.Item>
+            {dropdownList && (
+              <BeadcrumbDropdown
+                overlayMenu={dropdownList}
+                dropdownText={clusterTtile}
+              />
+            )}
           </Breadcrumb>
           <TitleContainer level={2} text={clusterTtile} />
           <PaddingRow gutter={16}>
