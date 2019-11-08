@@ -78,9 +78,7 @@ const Router = () => {
     fetchData()
   }, [])
 
-  useInterval(() => {
-    !error ? fetchData() : console.log('')
-  }, 3000)
+  useInterval(() => (!error ? fetchData() : null), 3000)
   return (
     <BrowserRouter>
       <FullLayout>

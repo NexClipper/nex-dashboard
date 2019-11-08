@@ -39,7 +39,7 @@ interface Idata {
 
 const ClusterList = () => {
   const dispatch = useDispatch()
-  dispatch(setCluster(1))
+  dispatch(setCluster(1, ''))
   const [clustersData, setClustersData] = useState<any[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
@@ -142,9 +142,7 @@ const ClusterList = () => {
     fetchClusters()
   }, [])
 
-  useInterval(() => {
-    !loading && !error ? fetchClusters() : console.log('')
-  }, 10000)
+  useInterval(() => (!loading && !error ? fetchClusters() : null), 10000)
   return (
     <>
       {loading ? (

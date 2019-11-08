@@ -1,11 +1,12 @@
 import React from 'react'
 import { Menu, Breadcrumb } from 'antd'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 export interface IbreadcrumbDropdownMenu {
   id?: number
-  link: string
+  link?: string
   text: string
+  onClick?: () => void
 }
 
 interface Iprops {
@@ -15,10 +16,14 @@ interface Iprops {
 
 const MenuItem = (item: IbreadcrumbDropdownMenu) => {
   return (
-    <Menu.Item>
-      <Link to={item.link} replace>
-        {item.text}
-      </Link>
+    <Menu.Item onClick={item.onClick}>
+      {item.link ? (
+        <Link to={item.link} replace>
+          {item.text}
+        </Link>
+      ) : (
+        <>{item.text}</>
+      )}
     </Menu.Item>
   )
 }

@@ -1,26 +1,35 @@
-import {
-  createStandardAction,
-  ActionType,
-  createReducer
-} from 'typesafe-actions'
+const SET_CLUSTER = 'cluster/SET_CLUSTER' as const
 
-const SET_CLUSTER = 'cluster/SET_CLUSTER'
+export const setCluster = (id: number, name: string) => ({
+  type: SET_CLUSTER,
+  payload: {
+    id,
+    name
+  }
+})
 
-export const setCluster = createStandardAction(SET_CLUSTER)<number>()
+type ClusterAction = ReturnType<typeof setCluster>
 
-const actions = { setCluster }
-type ClusterAction = ActionType<typeof actions>
-
-type ClusterState = {
+export type ClusterState = {
   id: number
+  name: string
 }
 
 const initialState: ClusterState = {
-  id: 1
+  id: 1,
+  name: ''
 }
 
-const cluster = createReducer<ClusterState, ClusterAction>(initialState, {
-  [SET_CLUSTER]: (_, { payload: id }) => ({ id })
-})
+const cluster = (
+  state: ClusterState = initialState,
+  action: ClusterAction
+): ClusterState => {
+  switch (action.type) {
+    case SET_CLUSTER:
+      return { ...action.payload }
+    default:
+      return state
+  }
+}
 
 export default cluster

@@ -1,17 +1,12 @@
-import {
-  createStandardAction,
-  ActionType,
-  createReducer
-} from 'typesafe-actions'
+const TOGGLE_THEME = 'theme/TOGGLE_THEME' as const
 
-const TOGGLE_THEME = 'theme/TOGGLE_THEME'
+export const toggleTheme = () => ({
+  type: TOGGLE_THEME
+})
 
-export const toggleTheme = createStandardAction(TOGGLE_THEME)()
+type ThemeAction = ReturnType<typeof toggleTheme>
 
-const actions = { toggleTheme }
-type ThemeAction = ActionType<typeof actions>
-
-type ThemeState = {
+export type ThemeState = {
   dark: boolean
 }
 
@@ -19,8 +14,16 @@ const initialState: ThemeState = {
   dark: true
 }
 
-const theme = createReducer<ThemeState, ThemeAction>(initialState, {
-  [TOGGLE_THEME]: state => ({ dark: !state.dark })
-})
+const theme = (
+  state: ThemeState = initialState,
+  action: ThemeAction
+): ThemeState => {
+  switch (action.type) {
+    case TOGGLE_THEME:
+      return { dark: !state.dark }
+    default:
+      return state
+  }
+}
 
 export default theme

@@ -7,9 +7,10 @@ import { RootState } from '../modules'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
-import { getClusterNodes } from '../apis/clusters'
+import { getClusterNodes, getClusters } from '../apis/clusters'
 import useInterval from '../utils/useInterval'
 import { getSummaryClusterNodes } from '../apis/summary'
+import { IbreadcrumbDropdownMenu } from '../components/BreadcrumbDropdown'
 
 const StatusBox = styled(Card)`
   &.ant-card.statusBox {
@@ -44,6 +45,10 @@ const NodeList = () => {
   const [data, setData] = useState<any[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [dropdownList, setDropdownList] = useState<
+    IbreadcrumbDropdownMenu[] | null
+  >(null)
+
   const columns: ColumnProps<ItableColumns>[] = [
     {
       title: 'Host',
@@ -127,6 +132,7 @@ const NodeList = () => {
 
   const fetchData = useCallback(async () => {
     try {
+      const { data: ClustersResponse } = await getClusters()
       const {
         data: {
           data: { data: nodesResponse }
@@ -159,9 +165,7 @@ const NodeList = () => {
     fetchData()
   }, [])
 
-  useInterval(() => {
-    !loading && !error ? fetchData() : console.log('')
-  }, 10000)
+  useInterval(() => (!loading && !error ? fetchData() : null), 10000)
 
   return (
     <>

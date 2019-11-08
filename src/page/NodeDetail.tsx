@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import {
-  Breadcrumb,
-  Row,
-  Col,
-  Card,
-  Tag,
-  Progress,
-  Input,
-  Skeleton,
-  Empty
-} from 'antd'
+import { Breadcrumb, Row, Col, Card, Skeleton, Empty } from 'antd'
 import { Link, useRouteMatch } from 'react-router-dom'
 import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
@@ -33,27 +23,9 @@ import {
 } from '../apis/snapshot'
 import { getMetricsNode } from '../apis/metrics'
 import useInterval from '../utils/useInterval'
+import { logger } from '../utils/logger'
 
 dayjs.extend(utc)
-
-const { Search } = Input
-
-const CropTag = styled(Tag)`
-  &.ant-tag {
-    max-width: 300px;
-    display: inline-block;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-`
-
-const FixedBox = styled.div`
-  height: 365px;
-  .scrollBox {
-    overflow: auto;
-  }
-`
 
 const MarginRow = styled(Row)`
   margin-top: 16px;
@@ -81,12 +53,6 @@ interface IchartDateRange {
 
 const nodeContainerColumns: ColumnProps<IsnapshotNodeContainerObjectData>[] = [
   {
-    title: 'Container Id',
-    dataIndex: 'container_id',
-    key: 'container_id',
-    align: 'center'
-  },
-  {
     title: 'Metric Name',
     dataIndex: 'metric_name',
     key: 'metric_name',
@@ -113,12 +79,6 @@ const nodeContainerColumns: ColumnProps<IsnapshotNodeContainerObjectData>[] = [
 ]
 
 const nodeProcessColumns: ColumnProps<IsnapshotNodeProcessObjectData>[] = [
-  {
-    title: 'Process ID',
-    dataIndex: 'process_id',
-    key: 'process_id',
-    align: 'center'
-  },
   {
     title: 'Metric Name',
     dataIndex: 'metric_name',
@@ -159,6 +119,10 @@ const NodeDetail = () => {
   const [
     memoryChartConfig,
     setMemoryChartConfig
+  ] = useState<Highcharts.Options | null>(null)
+  const [
+    diskChartConfig,
+    setDiskChartConfig
   ] = useState<Highcharts.Options | null>(null)
   const [
     nodeContainersData,
@@ -208,7 +172,7 @@ const NodeDetail = () => {
             Date.now()
           ).format(
             'YYYY-MM-DD HH:mm:ss'
-          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul&granularity=${
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&metricNames=node_disk_total&metricNames=node_disk_free&metricNames=node_disk_used&timezone=Asia/Seoul&granularity=${
             chartDateRange.value
           }${chartDateRange.unit}`
         )
@@ -227,8 +191,17 @@ const NodeDetail = () => {
         const nodeMemoryUsed = metricDataResponse.filter(
           item => item.metric_name === 'node_memory_used'
         )
+        const nodeDiskTotal = metricDataResponse.filter(
+          item => item.metric_name === 'node_disk_total'
+        )
+        const nodeDiskFree = metricDataResponse.filter(
+          item => item.metric_name === 'node_disk_free'
+        )
+        const nodeDiskUsed = metricDataResponse.filter(
+          item => item.metric_name === 'node_disk_used'
+        )
         if (nodeCpuLoadAvg1) {
-          setCpuChartConfig({
+          const CpuChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
               categories: nodeCpuLoadAvg1.map(item =>
@@ -255,8 +228,11 @@ const NodeDetail = () => {
                 data: nodeCpuLoadAvg15.map(item => item.value)
               }
             ]
-          })
-          setMemoryChartConfig({
+          }
+          setCpuChartConfig(
+            nodeCpuLoadAvg1.length !== 0 ? CpuChartConfig : null
+          )
+          const MemoryChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
               categories: nodeMemoryTotal.map(item =>
@@ -278,7 +254,41 @@ const NodeDetail = () => {
                 data: nodeMemoryUsed.map(item => item.value)
               }
             ]
-          })
+          }
+          setMemoryChartConfig(
+            nodeMemoryTotal.length !== 0 ? MemoryChartConfig : null
+          )
+          const DiskChartConfig: Highcharts.Options = {
+            xAxis: {
+              type: 'datetime',
+              categories: nodeDiskTotal.map(item =>
+                dayjs(item.bucket)
+                  .utc()
+                  .format('YY-M-D HH:mm:ss')
+              ),
+              tickInterval: chartTickInterval
+            },
+            series: [
+              {
+                type: 'line',
+                name: 'node_disk_total',
+                data: nodeDiskTotal.map(item => item.value)
+              },
+              {
+                type: 'line',
+                name: 'node_memory_free',
+                data: nodeDiskFree.map(item => item.value)
+              },
+              {
+                type: 'line',
+                name: 'node_memory_used',
+                data: nodeDiskUsed.map(item => item.value)
+              }
+            ]
+          }
+          setDiskChartConfig(
+            nodeDiskTotal.length !== 0 ? DiskChartConfig : null
+          )
           const { data: snapShotResponse } = await getSnapshotNode(
             selectedClusterId,
             Number(match.params.nodeId)
@@ -311,9 +321,7 @@ const NodeDetail = () => {
     fetchData()
   }, [chartDateRange])
 
-  useInterval(() => {
-    !loading && !error ? fetchData() : console.log('')
-  }, 10000)
+  useInterval(() => (!loading && !error ? fetchData() : null), 10000)
   return (
     <>
       {loading && !snapshotData ? (
@@ -356,6 +364,18 @@ const NodeDetail = () => {
                 {memoryChartConfig &&
                 Object.keys(memoryChartConfig).length !== 0 ? (
                   <LineChart config={memoryChartConfig} />
+                ) : (
+                  <Empty />
+                )}
+              </Card>
+            </Col>
+          </MarginRow>
+          <MarginRow gutter={16}>
+            <Col span={24}>
+              <Card title="Disk" bordered={false}>
+                {diskChartConfig &&
+                Object.keys(diskChartConfig).length !== 0 ? (
+                  <LineChart config={diskChartConfig} />
                 ) : (
                   <Empty />
                 )}

@@ -115,7 +115,7 @@ const data: Idata[] = [
 
 const PrometheusExporters = () => {
   const dispatch = useDispatch()
-  dispatch(setCluster(1))
+  dispatch(setCluster(1, ''))
   return (
     <>
       <Breadcrumb>

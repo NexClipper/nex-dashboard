@@ -14,7 +14,8 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch, useLocation } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../modules'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
 import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
@@ -64,13 +65,15 @@ interface Iparams {
 }
 
 const ClusterDetail = () => {
+  const selectedClusterTitle = useSelector(
+    (state: RootState) => state.cluster.name
+  )
   const dispatch = useDispatch()
   const match = useRouteMatch<Iparams>('/clusters/:clusterId')
   const location = useLocation()
-  logger('location', location)
   match &&
     match.params.clusterId &&
-    dispatch(setCluster(Number(match.params.clusterId)))
+    dispatch(setCluster(Number(match.params.clusterId), ''))
   const [nodeListData, setNodeListData] = useState<IclusterNodesData[] | null>(
     null
   )
@@ -96,7 +99,6 @@ const ClusterDetail = () => {
     unit: 'hour'
   })
   const [chartTickInterval, setChartTickInterval] = useState(90)
-  const [clusterTtile, setClusterTitle] = useState('')
   const [dropdownList, setDropdownList] = useState<
     IbreadcrumbDropdownMenu[] | null
   >(null)
@@ -325,14 +327,6 @@ const ClusterDetail = () => {
               }
           )
           setUsageData(summaryData.length !== 0 ? summaryData : null)
-          const filterDropDownTitle = DropDwonList.filter(
-            item => Number(match.params.clusterId) === item.id
-          )[0].text
-          setClusterTitle(
-            Object.keys(clusterSummaryResponse).slice(0)[0]
-              ? Object.keys(clusterSummaryResponse).slice(0)[0]
-              : filterDropDownTitle
-          )
         }
       }
     } catch (error) {
@@ -346,9 +340,7 @@ const ClusterDetail = () => {
     fetchData()
   }, [chartDateRange, location])
 
-  useInterval(() => {
-    !loading && !error ? fetchData() : console.log('')
-  }, 10000)
+  useInterval(() => (!loading && !error ? fetchData() : null), 10000)
 
   return (
     <>
@@ -366,14 +358,14 @@ const ClusterDetail = () => {
             {dropdownList && (
               <BeadcrumbDropdown
                 overlayMenu={dropdownList}
-                dropdownText={clusterTtile}
+                dropdownText={selectedClusterTitle}
               />
             )}
           </Breadcrumb>
-          <TitleContainer level={2} text={clusterTtile} />
+          <TitleContainer level={2} text={selectedClusterTitle} />
           <PaddingRow gutter={16}>
             <Col span={6}>
-              <Card>
+              <Card loading={loading}>
                 {usageData ? (
                   <Statistic
                     title="node cpu load avg 1"
@@ -387,7 +379,7 @@ const ClusterDetail = () => {
               </Card>
             </Col>
             <Col span={6}>
-              <Card>
+              <Card loading={loading}>
                 {usageData ? (
                   <Statistic
                     title="node cpu load avg 15"
@@ -401,7 +393,7 @@ const ClusterDetail = () => {
               </Card>
             </Col>
             <Col span={6}>
-              <Card>
+              <Card loading={loading}>
                 {usageData ? (
                   <Statistic
                     title="node memory used"
@@ -415,7 +407,7 @@ const ClusterDetail = () => {
               </Card>
             </Col>
             <Col span={6}>
-              <Card>
+              <Card loading={loading}>
                 {usageData ? (
                   <Statistic
                     title="node memory total"
@@ -435,6 +427,7 @@ const ClusterDetail = () => {
                 title="Node list"
                 bordered={false}
                 extra={match && <Link to={'/nodes'}>More</Link>}
+                loading={loading}
               >
                 {nodeListData ? (
                   <Table
@@ -454,7 +447,7 @@ const ClusterDetail = () => {
           </ChartTitleContainer>
           <Row gutter={16}>
             <Col span={podChartConfig ? 8 : 12}>
-              <ChartContainer title="CPU" bordered={false}>
+              <ChartContainer title="CPU" bordered={false} loading={loading}>
                 {cpuChartConfig ? (
                   <LineChart config={cpuChartConfig} />
                 ) : (
@@ -463,7 +456,7 @@ const ClusterDetail = () => {
               </ChartContainer>
             </Col>
             <Col span={podChartConfig ? 8 : 12}>
-              <ChartContainer title="Memory" bordered={false}>
+              <ChartContainer title="Memory" bordered={false} loading={loading}>
                 {memoryChartConfig ? (
                   <LineChart config={memoryChartConfig} />
                 ) : (
@@ -473,7 +466,7 @@ const ClusterDetail = () => {
             </Col>
             {podChartConfig && (
               <Col span={8}>
-                <ChartContainer title="Pod" bordered={false}>
+                <ChartContainer title="Pod" bordered={false} loading={loading}>
                   <LineChart config={podChartConfig} />
                 </ChartContainer>
               </Col>

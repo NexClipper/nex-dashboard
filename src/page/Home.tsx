@@ -33,7 +33,7 @@ interface IclustersData {
 
 const Home = () => {
   const dispatch = useDispatch()
-  dispatch(setCluster(1))
+  dispatch(setCluster(1, ''))
   const [agentsData, setAgentsData] = useState<IagentsObjectData | null>(null)
   const [nodesData, setNodesData] = useState<InodesObjectData | null>(null)
   const [clustersData, setClustersData] = useState<any[] | null>(null)
@@ -106,7 +106,7 @@ const Home = () => {
     }
   ]
 
-  const fetchDatas = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
       const { data: agentsResponse } = await getAgents()
       const { data: nodesResponse } = await getNodes()
@@ -135,12 +135,10 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
-    fetchDatas()
+    fetchData()
   }, [])
 
-  useInterval(() => {
-    !loading && !error ? fetchDatas() : console.log('')
-  }, 10000)
+  useInterval(() => (!loading && !error ? fetchData() : null), 10000)
 
   const agentsColumns: ColumnProps<IagentListData>[] = [
     {
