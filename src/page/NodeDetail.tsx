@@ -5,10 +5,11 @@ import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
 import { useSelector } from 'react-redux'
-import { RootState } from '../modules'
+import { RootState } from '../reducers'
 import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
+import values from 'lodash-es/values'
 import LineChart from '../components/LineChart'
 import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
@@ -19,7 +20,10 @@ import {
   getSnapshotNodeContainers,
   IsnapshotNodeContainerObjectData,
   IsnapshotNodeProcessObjectData,
-  getSnapshotNodeProcesses
+  getSnapshotNodeProcesses,
+  IsnapshotNodeProcessData,
+  IsnapshotNodeData,
+  IsnapshotNodeContainerData
 } from '../apis/snapshot'
 import { getMetricsNode } from '../apis/metrics'
 import useInterval from '../utils/useInterval'
@@ -124,14 +128,12 @@ const NodeDetail = () => {
     diskChartConfig,
     setDiskChartConfig
   ] = useState<Highcharts.Options | null>(null)
-  const [
-    nodeContainersData,
-    setNodeContainersData
-  ] = useState<IsnapshotNodeContainerObjectData | null>(null)
-  const [
-    nodeProcessesData,
-    setNodeProcessesData
-  ] = useState<IsnapshotNodeProcessObjectData | null>(null)
+  const [nodeContainersData, setNodeContainersData] = useState<
+    IsnapshotNodeContainerData[][] | null
+  >(null)
+  const [nodeProcessesData, setNodeProcessesData] = useState<
+    IsnapshotNodeProcessData[][] | null
+  >(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
   const [chartDateRange, setChartDateRange] = useState<IchartDateRange>({
@@ -305,9 +307,44 @@ const NodeDetail = () => {
             selectedClusterId,
             Number(match.params.nodeId)
           )
+          const filterSnapShotContainersResponse = values(
+            snapShotContainersResponse
+          ).map(responseItem =>
+            responseItem.filter(
+              item =>
+                item.metric_name === 'container_cpu_usage_user' ||
+                item.metric_name === 'container_cpu_usage_system' ||
+                item.metric_name === 'container_memory_rss'
+            )
+          )
+          const filterSnapShotProcessesResponse = values(
+            snapShotProcessesResponse
+          ).map(responseItem =>
+            responseItem.filter(
+              item =>
+                item.metric_name === 'process_cpu_user_load' ||
+                item.metric_name === 'process_cpu_system_load' ||
+                item.metric_name === 'process_memory_rss'
+            )
+          )
+
+          filterSnapShotProcessesResponse.map((nodeProcessesItem, index) =>
+            logger('processes', nodeProcessesItem[index].process)
+          )
+          logger(
+            'filterSnapShotProcessesResponse',
+            filterSnapShotProcessesResponse
+          )
+          filterSnapShotContainersResponse.map((item, index) =>
+            logger('filterSnapShotContainersResponseItem', item)
+          )
+          logger(
+            'filterSnapShotContainersResponse',
+            filterSnapShotContainersResponse
+          )
           setSnapshotData(snapShotResponse)
-          setNodeContainersData(snapShotContainersResponse)
-          setNodeProcessesData(snapShotProcessesResponse)
+          setNodeContainersData(filterSnapShotContainersResponse)
+          setNodeProcessesData(filterSnapShotProcessesResponse)
         }
       }
     } catch (error) {
@@ -385,20 +422,26 @@ const NodeDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <TitleContainer level={2} text={'Container List'} />
-              {nodeContainersData &&
-              Object.keys(nodeContainersData).length !== 0 ? (
-                Object.entries(nodeContainersData).map(
-                  ([title, value]: [string, any]) => {
-                    return (
+              {nodeContainersData && match ? (
+                nodeContainersData.map((item, index) => {
+                  return (
+                    <>
+                      <Link
+                        to={`/nodes/${match.params.nodeId}/container/${item[index].container_id}`}
+                      >
+                        <TitleContainer
+                          level={4}
+                          text={`${item[index].container}`}
+                        />
+                      </Link>
                       <TableContainer
-                        rowKey={'container_id'}
-                        title={title}
+                        rowKey={'metric_name'}
                         columns={nodeContainerColumns}
-                        data={value}
+                        data={item}
                       />
-                    )
-                  }
-                )
+                    </>
+                  )
+                })
               ) : (
                 <Empty />
               )}
@@ -407,20 +450,26 @@ const NodeDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <TitleContainer level={2} text={'Process List'} />
-              {nodeProcessesData &&
-              Object.keys(nodeProcessesData).length !== 0 ? (
-                Object.entries(nodeProcessesData).map(
-                  ([title, value]: [string, any]) => {
-                    return (
+              {nodeProcessesData && match ? (
+                nodeProcessesData.map((item, index) => {
+                  return (
+                    <>
+                      <Link
+                        to={`/nodes/${match.params.nodeId}/process/${item[index].process_id}`}
+                      >
+                        <TitleContainer
+                          level={4}
+                          text={`${item[index].process}`}
+                        />
+                      </Link>
                       <TableContainer
-                        rowKey={'process_id'}
-                        title={title}
+                        rowKey={'metric_name'}
                         columns={nodeProcessColumns}
-                        data={value}
+                        data={item}
                       />
-                    )
-                  }
-                )
+                    </>
+                  )
+                })
               ) : (
                 <Empty />
               )}

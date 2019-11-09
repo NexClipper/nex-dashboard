@@ -3,7 +3,7 @@ import { List, Card, Breadcrumb } from 'antd'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { setCluster } from '../modules/cluster'
+import { setCluster } from '../reducers/cluster'
 import TitleContainer from '../components/TitleContainer'
 
 const ListBox = styled.div`

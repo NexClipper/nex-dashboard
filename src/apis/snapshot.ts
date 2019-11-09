@@ -3,7 +3,7 @@ import api from './api'
 import { AxiosResponse } from 'axios'
 import { async } from 'q'
 
-interface IsnapshotNodeData {
+export interface IsnapshotNodeData {
   node: Node
   node_id: number
   ts: Date
@@ -20,7 +20,7 @@ interface IgetSnapshotNode {
   status: string
 }
 
-interface IsnapshotNodeProcessData {
+export interface IsnapshotNodeProcessData {
   process: string
   process_id: number
   ts: Date
@@ -37,7 +37,7 @@ interface IgetSnapshotNodeProcess {
   status: string
 }
 
-interface IsnapshotNodeContainerData {
+export interface IsnapshotNodeContainerData {
   container: string
   container_id: number
   ts: Date

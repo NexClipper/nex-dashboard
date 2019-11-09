@@ -23,7 +23,7 @@ const TableContent = styled(Card)`
 `
 
 type IProps = {
-  title: string
+  title?: string
   data: any[] | undefined
   columns: ColumnProps<any>[] | undefined
   rowKey?: string
@@ -45,7 +45,7 @@ function TableContainer({
   loading
 }: IProps) {
   return (
-    <TableContent title={title} bordered={false}>
+    <TableContent title={title ? title : undefined} bordered={false}>
       <Table
         rowKey={rowKey ? `${rowKey}` : 'id'}
         columns={columns}

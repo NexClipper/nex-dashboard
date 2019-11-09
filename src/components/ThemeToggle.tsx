@@ -2,8 +2,8 @@ import React from 'react'
 import { Switch } from 'antd'
 import styled from 'styled-components'
 import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '../modules'
-import { toggleTheme } from '../modules/theme'
+import { RootState } from '../reducers'
+import { toggleTheme } from '../reducers/theme'
 import * as Dom from '../utils/dom'
 
 const ThemeSwitchContainer = styled.div`

@@ -15,7 +15,8 @@ import utc from 'dayjs/plugin/utc'
 import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../modules'
+import mapValues from 'lodash-es/mapValues'
+import { RootState } from '../reducers'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
 import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
@@ -29,7 +30,7 @@ import {
   getClusters
 } from '../apis/clusters'
 import { getMetricsNodes, getMetricsPods } from '../apis/metrics'
-import { setCluster } from '../modules/cluster'
+import { setCluster } from '../reducers/cluster'
 import BeadcrumbDropdown, {
   IbreadcrumbDropdownMenu
 } from '../components/BreadcrumbDropdown'

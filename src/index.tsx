@@ -3,18 +3,16 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import rootReducer from './modules'
-import { composeWithDevTools } from 'redux-devtools-extension'
+import { PersistGate } from 'redux-persist/integration/react'
+import configureStore from './store'
 
-const store =
-  process.env.NODE_ENV === 'development'
-    ? createStore(rootReducer, composeWithDevTools())
-    : createStore(rootReducer)
+const { store, persistor } = configureStore()
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />/
+    <PersistGate loading={null} persistor={persistor}>
+      <App />
+    </PersistGate>
   </Provider>,
   document.getElementById('root')
 )
