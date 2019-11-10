@@ -44,6 +44,12 @@ const ChartTitleContainer = styled.div`
   }
 `
 
+const LinkTitle = styled(Link)`
+  .ant-typography {
+    color: #1890ff !important;
+  }
+`
+
 interface Iparams {
   clusterId: string | undefined
   nodeId: string | undefined
@@ -410,14 +416,14 @@ const NodeDetail = () => {
                 nodeContainersData.map(item => {
                   return (
                     <>
-                      <Link
+                      <LinkTitle
                         to={`/nodes/${match.params.nodeId}/container/${item[0].container_id}`}
                       >
                         <TitleContainer
                           level={4}
                           text={`${item[0].container}`}
                         />
-                      </Link>
+                      </LinkTitle>
                       <TableContainer
                         rowKey={'metric_name'}
                         columns={nodeContainerColumns}
@@ -438,11 +444,11 @@ const NodeDetail = () => {
                 nodeProcessesData.map(item => {
                   return (
                     <>
-                      <Link
+                      <LinkTitle
                         to={`/nodes/${match.params.nodeId}/process/${item[0].process_id}`}
                       >
                         <TitleContainer level={4} text={`${item[0].process}`} />
-                      </Link>
+                      </LinkTitle>
                       <TableContainer
                         rowKey={'metric_name'}
                         columns={nodeProcessColumns}

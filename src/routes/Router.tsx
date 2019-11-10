@@ -8,6 +8,8 @@ import ClusterDetail from '../page/ClusterDetail'
 import NodeList from '../page/NodeList'
 import PrometheusExporters from '../page/PrometheusExporters'
 import NodeDetail from '../page/NodeDetail'
+import ContainerDetail from '../page/ContainerDetail'
+import ProcessDetail from '../page/ProcessDetail'
 import ThemeToggle from '../components/ThemeToggle'
 import Events from '../page/Events'
 import { getStatus } from '../apis/status'
@@ -146,6 +148,16 @@ const RouteList = () => {
       <Route exact path="/clusters/:clusterId" component={ClusterDetail} />
       <Route exact path="/nodes" component={NodeList} />
       <Route exact path="/nodes/:nodeId" component={NodeDetail} />
+      <Route
+        exact
+        path="/nodes/:nodeId/container/:containerId"
+        component={ContainerDetail}
+      />
+      <Route
+        exact
+        path="/nodes/:nodeId/process/:processId"
+        component={ProcessDetail}
+      />
       <Route path="/prometheusExporters" component={PrometheusExporters} />
       <Route path="/events" component={Events} />
       {/* <Redirect from="*" to="/" /> */}
