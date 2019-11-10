@@ -1,7 +1,6 @@
 import { logger } from '../utils/logger'
 import api from './api'
 import { AxiosResponse } from 'axios'
-import { async } from 'q'
 
 export interface IsnapshotNodeData {
   node: Node

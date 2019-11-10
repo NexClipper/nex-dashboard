@@ -49,7 +49,7 @@ const PaddingRow = styled(Row)`
 
 const ChartContainer = styled(Card)`
   .ant-card-body {
-    height: 480px;
+    height: 500px;
   }
 `
 
@@ -72,9 +72,6 @@ const ClusterDetail = () => {
   const dispatch = useDispatch()
   const match = useRouteMatch<Iparams>('/clusters/:clusterId')
   const location = useLocation()
-  match &&
-    match.params.clusterId &&
-    dispatch(setCluster(Number(match.params.clusterId), ''))
   const [nodeListData, setNodeListData] = useState<IclusterNodesData[] | null>(
     null
   )
@@ -180,6 +177,11 @@ const ClusterDetail = () => {
             text: item.name
           })
         )
+        match &&
+          match.params.clusterId &&
+          dispatch(
+            setCluster(Number(match.params.clusterId), ClustersResponse[0].name)
+          )
         setDropdownList(DropDwonList)
         const { data: metricNodeDataResponse } = await getMetricsNodes(
           Number(match.params.clusterId),

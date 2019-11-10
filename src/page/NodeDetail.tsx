@@ -22,7 +22,6 @@ import {
   IsnapshotNodeProcessObjectData,
   getSnapshotNodeProcesses,
   IsnapshotNodeProcessData,
-  IsnapshotNodeData,
   IsnapshotNodeContainerData
 } from '../apis/snapshot'
 import { getMetricsNode } from '../apis/metrics'
@@ -327,21 +326,6 @@ const NodeDetail = () => {
                 item.metric_name === 'process_memory_rss'
             )
           )
-
-          filterSnapShotProcessesResponse.map((nodeProcessesItem, index) =>
-            logger('processes', nodeProcessesItem[index].process)
-          )
-          logger(
-            'filterSnapShotProcessesResponse',
-            filterSnapShotProcessesResponse
-          )
-          filterSnapShotContainersResponse.map((item, index) =>
-            logger('filterSnapShotContainersResponseItem', item)
-          )
-          logger(
-            'filterSnapShotContainersResponse',
-            filterSnapShotContainersResponse
-          )
           setSnapshotData(snapShotResponse)
           setNodeContainersData(filterSnapShotContainersResponse)
           setNodeProcessesData(filterSnapShotProcessesResponse)
@@ -423,15 +407,15 @@ const NodeDetail = () => {
             <Col span={24}>
               <TitleContainer level={2} text={'Container List'} />
               {nodeContainersData && match ? (
-                nodeContainersData.map((item, index) => {
+                nodeContainersData.map(item => {
                   return (
                     <>
                       <Link
-                        to={`/nodes/${match.params.nodeId}/container/${item[index].container_id}`}
+                        to={`/nodes/${match.params.nodeId}/container/${item[0].container_id}`}
                       >
                         <TitleContainer
                           level={4}
-                          text={`${item[index].container}`}
+                          text={`${item[0].container}`}
                         />
                       </Link>
                       <TableContainer
@@ -451,16 +435,13 @@ const NodeDetail = () => {
             <Col span={24}>
               <TitleContainer level={2} text={'Process List'} />
               {nodeProcessesData && match ? (
-                nodeProcessesData.map((item, index) => {
+                nodeProcessesData.map(item => {
                   return (
                     <>
                       <Link
-                        to={`/nodes/${match.params.nodeId}/process/${item[index].process_id}`}
+                        to={`/nodes/${match.params.nodeId}/process/${item[0].process_id}`}
                       >
-                        <TitleContainer
-                          level={4}
-                          text={`${item[index].process}`}
-                        />
+                        <TitleContainer level={4} text={`${item[0].process}`} />
                       </Link>
                       <TableContainer
                         rowKey={'metric_name'}
