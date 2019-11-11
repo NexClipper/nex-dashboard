@@ -3,6 +3,8 @@ import { Row, Col, Card, Tag, Breadcrumb, Skeleton, Empty } from 'antd'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import values from 'lodash-es/values'
+import keys from 'lodash-es/keys'
 import { RootState } from '../reducers'
 import { ColumnProps } from 'antd/es/table'
 import TableContainer from '../components/TableContainer'
@@ -146,8 +148,8 @@ const NodeList = () => {
         item =>
           item && {
             ...item,
-            ...Object.values(summaryResponse).slice(0)[
-              Object.keys(summaryResponse)
+            ...values(summaryResponse).slice(0)[
+              keys(summaryResponse)
                 .slice(0)
                 .indexOf(item.host)
             ]

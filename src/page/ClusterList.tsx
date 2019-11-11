@@ -3,6 +3,8 @@ import { Breadcrumb, Skeleton, Empty, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { useDispatch } from 'react-redux'
+import values from 'lodash-es/values'
+import keys from 'lodash-es/keys'
 import { setCluster } from '../reducers/cluster'
 import { ColumnProps } from 'antd/es/table'
 import useInterval from '../utils/useInterval'
@@ -10,6 +12,7 @@ import { getClusters } from '../apis/clusters'
 import { getSummaryClusters } from '../apis/summary'
 import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
+import { logger } from '../utils/logger'
 
 const FullLink = styled(Link)`
   display: block;
@@ -123,8 +126,8 @@ const ClusterList = () => {
         item =>
           item && {
             ...item,
-            ...Object.values(ClustersSummaryResponse).slice(0)[
-              Object.keys(ClustersSummaryResponse)
+            ...values(ClustersSummaryResponse).slice(0)[
+              keys(ClustersSummaryResponse)
                 .slice(0)
                 .indexOf(item.name)
             ]

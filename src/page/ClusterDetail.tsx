@@ -15,10 +15,10 @@ import utc from 'dayjs/plugin/utc'
 import * as Highcharts from 'highcharts'
 import { Link, useRouteMatch, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import mapValues from 'lodash-es/mapValues'
 import { RootState } from '../reducers'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
+import values from 'lodash-es/values'
 import { IsummaryClustersData, getSummaryCluster } from '../apis/summary'
 import LineChart from '../components/LineChart'
 import TitleContainer from '../components/TitleContainer'
@@ -277,14 +277,8 @@ const ClusterDetail = () => {
           const { data: clusterSummaryResponse } = await getSummaryCluster(
             Number(match.params.clusterId)
           )
-          let summaryData: any[] = []
-          summaryData = Object.values(clusterSummaryResponse).map(
-            (item, index) =>
-              item && {
-                ...item,
-                ...Object.values(clusterSummaryResponse).slice(0)[index]
-              }
-          )
+          let summaryData: IsummaryClustersData[] = []
+          summaryData = summaryData.concat(...values(clusterSummaryResponse))
           setUsageData(summaryData.length !== 0 ? summaryData : null)
           const { data: metricPodsDataResponse } = await getMetricsPods(
             Number(match.params.clusterId),

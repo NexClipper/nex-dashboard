@@ -6,6 +6,7 @@ import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import values from 'lodash-es/values'
+import keys from 'lodash-es/keys'
 import { useSelector } from 'react-redux'
 import { RootState } from '../reducers'
 import { OpUnitType } from 'dayjs'
@@ -88,7 +89,7 @@ const ContainerDetail = () => {
     }
   }
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (match) {
         const {
@@ -199,11 +200,13 @@ const ContainerDetail = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [chartDateRange])
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [chartDateRange])
+
+  useInterval(() => (!loading && !error ? fetchData() : null), 10000)
 
   return (
     <>
@@ -239,7 +242,7 @@ const ContainerDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="CPU" bordered={false}>
-                {cpuChartConfig && Object.keys(cpuChartConfig).length !== 0 ? (
+                {cpuChartConfig && keys(cpuChartConfig).length !== 0 ? (
                   <LineChart config={cpuChartConfig} />
                 ) : (
                   <Empty />
@@ -250,8 +253,7 @@ const ContainerDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="Memory" bordered={false}>
-                {memoryChartConfig &&
-                Object.keys(memoryChartConfig).length !== 0 ? (
+                {memoryChartConfig && keys(memoryChartConfig).length !== 0 ? (
                   <LineChart config={memoryChartConfig} />
                 ) : (
                   <Empty />

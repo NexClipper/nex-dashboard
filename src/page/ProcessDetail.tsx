@@ -6,6 +6,7 @@ import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import values from 'lodash-es/values'
+import keys from 'lodash-es/keys'
 import { useSelector } from 'react-redux'
 import { RootState } from '../reducers'
 import { OpUnitType } from 'dayjs'
@@ -285,7 +286,7 @@ const ProcessDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="CPU" bordered={false}>
-                {cpuChartConfig && Object.keys(cpuChartConfig).length !== 0 ? (
+                {cpuChartConfig && keys(cpuChartConfig).length !== 0 ? (
                   <LineChart config={cpuChartConfig} />
                 ) : (
                   <Empty />
@@ -296,8 +297,7 @@ const ProcessDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="Memory" bordered={false}>
-                {memoryChartConfig &&
-                Object.keys(memoryChartConfig).length !== 0 ? (
+                {memoryChartConfig && keys(memoryChartConfig).length !== 0 ? (
                   <LineChart config={memoryChartConfig} />
                 ) : (
                   <Empty />
@@ -308,8 +308,7 @@ const ProcessDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="Network" bordered={false}>
-                {networkChartConfig &&
-                Object.keys(networkChartConfig).length !== 0 ? (
+                {networkChartConfig && keys(networkChartConfig).length !== 0 ? (
                   <LineChart config={networkChartConfig} />
                 ) : (
                   <Empty />

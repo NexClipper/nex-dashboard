@@ -5,11 +5,12 @@ import styled from 'styled-components'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
 import { useSelector } from 'react-redux'
+import values from 'lodash-es/values'
+import keys from 'lodash-es/keys'
 import { RootState } from '../reducers'
 import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
-import values from 'lodash-es/values'
 import LineChart from '../components/LineChart'
 import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
@@ -363,20 +364,20 @@ const NodeDetail = () => {
               <Link to="/nodes">Node List</Link>
             </Breadcrumb.Item>
             <Breadcrumb.Item>
-              {snapshotData && Object.keys(snapshotData)[0]}
+              {snapshotData && keys(snapshotData)[0]}
             </Breadcrumb.Item>
           </Breadcrumb>
           <ChartTitleContainer>
             <TitleContainer
               level={2}
-              text={snapshotData && Object.keys(snapshotData)[0]}
+              text={snapshotData && keys(snapshotData)[0]}
             />
             <SelectDate onChange={ChangeChartDateRange} />
           </ChartTitleContainer>
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="CPU" bordered={false}>
-                {cpuChartConfig && Object.keys(cpuChartConfig).length !== 0 ? (
+                {cpuChartConfig && keys(cpuChartConfig).length !== 0 ? (
                   <LineChart config={cpuChartConfig} />
                 ) : (
                   <Empty />
@@ -387,8 +388,7 @@ const NodeDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="Memory" bordered={false}>
-                {memoryChartConfig &&
-                Object.keys(memoryChartConfig).length !== 0 ? (
+                {memoryChartConfig && keys(memoryChartConfig).length !== 0 ? (
                   <LineChart config={memoryChartConfig} />
                 ) : (
                   <Empty />
@@ -399,8 +399,7 @@ const NodeDetail = () => {
           <MarginRow gutter={16}>
             <Col span={24}>
               <Card title="Disk" bordered={false}>
-                {diskChartConfig &&
-                Object.keys(diskChartConfig).length !== 0 ? (
+                {diskChartConfig && keys(diskChartConfig).length !== 0 ? (
                   <LineChart config={diskChartConfig} />
                 ) : (
                   <Empty />

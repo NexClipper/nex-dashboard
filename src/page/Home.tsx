@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { ColumnProps } from 'antd/es/table'
 import { Skeleton, Tag, Empty, Breadcrumb } from 'antd'
 import { useDispatch } from 'react-redux'
+import values from 'lodash-es/values'
+import keys from 'lodash-es/keys'
 import { setCluster } from '../reducers/cluster'
 import { getAgents, IagentsObjectData } from '../apis/agents'
 import TableContainer from '../components/TableContainer'
@@ -117,8 +119,8 @@ const Home = () => {
         item =>
           item && {
             ...item,
-            ...Object.values(ClustersSummaryResponse).slice(0)[
-              Object.keys(ClustersSummaryResponse)
+            ...values(ClustersSummaryResponse).slice(0)[
+              keys(ClustersSummaryResponse)
                 .slice(0)
                 .indexOf(item.name)
             ]
@@ -236,7 +238,7 @@ const Home = () => {
             <Empty />
           )}
           <TitleContainer level={2} text={'Node list'} />
-          {nodesData && Object.keys(nodesData).length !== 0 ? (
+          {nodesData && keys(nodesData).length !== 0 ? (
             Object.entries(nodesData).map(([title, value]: [string, any]) => {
               return (
                 <TableContainer
@@ -251,7 +253,7 @@ const Home = () => {
             <Empty />
           )}
           <TitleContainer level={2} text={'Agent List'} />
-          {agentsData && Object.keys(agentsData).length !== 0 ? (
+          {agentsData && keys(agentsData).length !== 0 ? (
             Object.entries(agentsData).map(([title, value]: [string, any]) => {
               return (
                 <TableContainer
