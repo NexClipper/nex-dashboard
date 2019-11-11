@@ -8,20 +8,16 @@ import utc from 'dayjs/plugin/utc'
 import values from 'lodash-es/values'
 import { useSelector } from 'react-redux'
 import { RootState } from '../reducers'
-import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
 import LineChart from '../components/LineChart'
-import TableContainer from '../components/TableContainer'
 import TitleContainer from '../components/TitleContainer'
 import SelectDate from '../components/SelectDate'
 import useInterval from '../utils/useInterval'
 import {
   getSnapshotNodeProcess,
-  IsnapshotNodeProcessData,
-  IsnapshotNodeProcessObjectData
+  IsnapshotNodeProcessData
 } from '../apis/snapshot'
 import { getMetricsNodeProcess } from '../apis/metrics'
-import { logger } from '../utils/logger'
 
 dayjs.extend(utc)
 
@@ -95,7 +91,7 @@ const ProcessDetail = () => {
     }
   }
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (match) {
         const { data: processSnapShotResponse } = await getSnapshotNodeProcess(
@@ -107,7 +103,6 @@ const ProcessDetail = () => {
         processSnapShotResponseArray = processSnapShotResponseArray.concat(
           ...values(processSnapShotResponse)
         )
-        logger('processSnapShotResponseArray', processSnapShotResponseArray)
         const { data: processMetricResponse } = await getMetricsNodeProcess(
           selectedClusterId,
           Number(match.params.nodeId),
@@ -248,11 +243,13 @@ const ProcessDetail = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [chartDateRange])
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [chartDateRange])
+
+  useInterval(() => (!loading && !error ? fetchData() : null), 10000)
 
   return (
     <>
