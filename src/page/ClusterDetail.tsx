@@ -210,24 +210,6 @@ const ClusterDetail = () => {
         const nodeMemoryUsed = metricNodeDataResponse.filter(
           item => item.metric_name === 'node_memory_used'
         )
-        const { data: metricPodsDataResponse } = await getMetricsPods(
-          Number(match.params.clusterId),
-          `dateRange=${dayjs(Date.now())
-            .subtract(chartDateRange.value, chartDateRange.unit)
-            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
-            Date.now()
-          ).format(
-            'YYYY-MM-DD HH:mm:ss'
-          )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
-            chartDateRange.value
-          }${chartDateRange.unit}`
-        )
-        const containerMemoryRss = metricPodsDataResponse.filter(
-          item => item.metric_name === 'container_memory_rss'
-        )
-        const containerCpuUsageTotal = metricPodsDataResponse.filter(
-          item => item.metric_name === 'container_cpu_usage_total'
-        )
         if (nodeCpuLoadAvg1) {
           const CpuChartConfig: Highcharts.Options = {
             xAxis: {
@@ -286,6 +268,42 @@ const ClusterDetail = () => {
           setMemoryChartConfig(
             metricNodeDataResponse.length !== 0 ? MemoryChartConfig : null
           )
+          const {
+            data: {
+              data: { data: nodeListResponse }
+            }
+          } = await getClusterNodes(Number(match.params.clusterId))
+          setNodeListData(nodeListResponse)
+          const { data: clusterSummaryResponse } = await getSummaryCluster(
+            Number(match.params.clusterId)
+          )
+          let summaryData: any[] = []
+          summaryData = Object.values(clusterSummaryResponse).map(
+            (item, index) =>
+              item && {
+                ...item,
+                ...Object.values(clusterSummaryResponse).slice(0)[index]
+              }
+          )
+          setUsageData(summaryData.length !== 0 ? summaryData : null)
+          const { data: metricPodsDataResponse } = await getMetricsPods(
+            Number(match.params.clusterId),
+            `dateRange=${dayjs(Date.now())
+              .subtract(chartDateRange.value, chartDateRange.unit)
+              .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
+              Date.now()
+            ).format(
+              'YYYY-MM-DD HH:mm:ss'
+            )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
+              chartDateRange.value
+            }${chartDateRange.unit}`
+          )
+          const containerMemoryRss = metricPodsDataResponse.filter(
+            item => item.metric_name === 'container_memory_rss'
+          )
+          const containerCpuUsageTotal = metricPodsDataResponse.filter(
+            item => item.metric_name === 'container_cpu_usage_total'
+          )
           const PodChartConfig: Highcharts.Options = {
             xAxis: {
               type: 'datetime',
@@ -312,24 +330,6 @@ const ClusterDetail = () => {
           setPodChartConfig(
             metricPodsDataResponse.length !== 0 ? PodChartConfig : null
           )
-          const {
-            data: {
-              data: { data: nodeListResponse }
-            }
-          } = await getClusterNodes(Number(match.params.clusterId))
-          setNodeListData(nodeListResponse)
-          const { data: clusterSummaryResponse } = await getSummaryCluster(
-            Number(match.params.clusterId)
-          )
-          let summaryData: any[] = []
-          summaryData = Object.values(clusterSummaryResponse).map(
-            (item, index) =>
-              item && {
-                ...item,
-                ...Object.values(clusterSummaryResponse).slice(0)[index]
-              }
-          )
-          setUsageData(summaryData.length !== 0 ? summaryData : null)
         }
       }
     } catch (error) {

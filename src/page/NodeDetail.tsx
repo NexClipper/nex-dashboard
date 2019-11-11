@@ -359,9 +359,8 @@ const NodeDetail = () => {
             <Breadcrumb.Item>
               <Link to="/">Home</Link>
             </Breadcrumb.Item>
-
             <Breadcrumb.Item>
-              {match && <Link to="/nodes">Node List</Link>}
+              <Link to="/nodes">Node List</Link>
             </Breadcrumb.Item>
             <Breadcrumb.Item>
               {snapshotData && Object.keys(snapshotData)[0]}

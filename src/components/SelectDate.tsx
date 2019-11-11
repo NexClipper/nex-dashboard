@@ -62,7 +62,9 @@ const SelectDate = ({ onChange }: Iprops) => {
     <SelectContainer>
       <Select defaultValue="1 hour" onChange={onChange}>
         {options.map(option => (
-          <Option value={option.value}>{option.text}</Option>
+          <Option value={option.value} key={option.text}>
+            {option.text}
+          </Option>
         ))}
       </Select>
     </SelectContainer>

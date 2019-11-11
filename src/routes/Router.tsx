@@ -37,7 +37,7 @@ const Logo = styled.div`
 `
 
 const MainContent = styled(Content)`
-  padding: 32px 16px 16px;
+  padding: 32px 16px 85px;
 `
 
 const MainFooter = styled(Footer)<MainFooterProps>`
