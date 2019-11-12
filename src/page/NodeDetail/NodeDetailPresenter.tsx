@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import * as Highcharts from 'highcharts'
 import { ColumnProps } from 'antd/es/table'
 import keys from 'lodash-es/keys'
+import { match } from 'react-router'
 import LineChart from '../../components/LineChart'
 import TableContainer from '../../components/TableContainer'
 import TitleContainer from '../../components/TitleContainer'
@@ -37,8 +38,13 @@ const LinkTitle = styled(Link)`
   }
 `
 
+interface Iparams {
+  clusterId: string | undefined
+  nodeId: string | undefined
+}
+
 interface Iprops {
-  match: any
+  match: match<Iparams> | null
   loading: boolean
   snapshotData: IsnapshotNodeObjectData | null
   ChangeChartDateRange: (value: any) => void

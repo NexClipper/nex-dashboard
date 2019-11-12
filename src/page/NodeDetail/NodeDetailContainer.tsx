@@ -257,12 +257,12 @@ const NodeDetailContainer = () => {
               },
               {
                 type: 'line',
-                name: 'node_memory_free',
+                name: 'node_disk_free',
                 data: nodeDiskFree.map(item => item.value)
               },
               {
                 type: 'line',
-                name: 'node_memory_used',
+                name: 'node_disk_used',
                 data: nodeDiskUsed.map(item => item.value)
               }
             ]

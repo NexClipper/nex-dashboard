@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import keys from 'lodash-es/keys'
 import * as Highcharts from 'highcharts'
+import { match } from 'react-router'
 import LineChart from '../../components/LineChart'
 import TitleContainer from '../../components/TitleContainer'
 import SelectDate from '../../components/SelectDate'
@@ -23,9 +24,14 @@ const ChartTitleContainer = styled.div`
   }
 `
 
+interface Iparams {
+  nodeId: string | undefined
+  processId: string | undefined
+}
+
 interface Iprops {
   loading: boolean
-  match: any
+  match: match<Iparams> | null
   snapshotData: IsnapshotNodeProcessData[] | null
   ChangeChartDateRange: (value: any) => void
   cpuChartConfig: Highcharts.Options | null

@@ -12,6 +12,7 @@ import {
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
+import { match } from 'react-router'
 import * as Highcharts from 'highcharts'
 import BeadcrumbDropdown, {
   IbreadcrumbDropdownMenu
@@ -50,7 +51,7 @@ interface Ipros {
   dropdownList: IbreadcrumbDropdownMenu[] | null
   selectedClusterTitle: string
   usageData: IsummaryClustersData[] | null
-  match: any
+  match: match<Iparams> | null
   nodeListData: IclusterNodesData[] | null
   nodeListColumns: ColumnProps<IclusterNodesData>[]
   ChangeChartDateRange: (value: any) => void
