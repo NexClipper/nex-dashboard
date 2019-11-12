@@ -1,9 +1,9 @@
 import React from 'react'
 import { Breadcrumb } from 'antd'
 import { Link } from 'react-router-dom'
-import TitleContainer from '../components/TitleContainer'
+import TitleContainer from '../../components/TitleContainer'
 
-const Events = () => {
+const EventsPresenter = () => {
   return (
     <>
       <Breadcrumb>
@@ -17,4 +17,4 @@ const Events = () => {
   )
 }
 
-export default Events
+export default EventsPresenter

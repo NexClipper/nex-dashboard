@@ -1,55 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Row, Col, Card, Tag, Breadcrumb, Skeleton, Empty } from 'antd'
-import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import values from 'lodash-es/values'
 import keys from 'lodash-es/keys'
-import { RootState } from '../reducers'
+import { RootState } from '../../reducers'
 import { ColumnProps } from 'antd/es/table'
-import TableContainer from '../components/TableContainer'
-import TitleContainer from '../components/TitleContainer'
-import { getClusterNodes, getClusters } from '../apis/clusters'
-import useInterval from '../utils/useInterval'
-import { getSummaryClusterNodes } from '../apis/summary'
-import { IbreadcrumbDropdownMenu } from '../components/BreadcrumbDropdown'
+import NodeListPresenter from './NodeListPresenter'
+import { getClusterNodes, getClusters } from '../../apis/clusters'
+import useInterval from '../../utils/useInterval'
+import { getSummaryClusterNodes } from '../../apis/summary'
 
-const StatusBox = styled(Card)`
-  &.ant-card.statusBox {
-    height: 300px;
-    box-sizing: border-box;
-    color: #fff;
-    text-align: center;
-    padding: 32px;
-    background-color: ${props => props.color || '#0288d1'};
-    font-size: 24px;
-  }
-  .title {
-    line-height: 1.25;
-    height: 72px;
-    margin-bottom: 16px;
-  }
-  .number {
-    font-size: 64px;
-    margin: 0;
-  }
-`
-
-const MarginRow = styled(Row)`
-  margin-bottom: 16px;
-`
 interface Iparams {
   clusterId: string | undefined
 }
 
-const NodeList = () => {
+const NodeListContainer = () => {
   const selectedClusterId = useSelector((state: RootState) => state.cluster.id)
   const [data, setData] = useState<any[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [dropdownList, setDropdownList] = useState<
-    IbreadcrumbDropdownMenu[] | null
-  >(null)
 
   const columns: ColumnProps<ItableColumns>[] = [
     {
@@ -168,29 +137,7 @@ const NodeList = () => {
   }, [])
 
   useInterval(() => (!loading && !error ? fetchData() : null), 10000)
-
-  return (
-    <>
-      {loading ? (
-        <Skeleton active />
-      ) : (
-        <>
-          <Breadcrumb>
-            <Breadcrumb.Item>
-              <Link to="/">Home</Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>Node List</Breadcrumb.Item>
-          </Breadcrumb>
-          <TitleContainer level={2} text={'Node List'} />
-          {data ? (
-            <TableContainer key="id" title={''} columns={columns} data={data} />
-          ) : (
-            <Empty />
-          )}
-        </>
-      )}
-    </>
-  )
+  return <NodeListPresenter loading={loading} data={data} columns={columns} />
 }
 
-export default NodeList
+export default NodeListContainer

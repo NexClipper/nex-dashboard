@@ -1,20 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Breadcrumb, Row, Col, Card, Skeleton, Empty } from 'antd'
-import { Link, useRouteMatch } from 'react-router-dom'
-import styled from 'styled-components'
+import { useRouteMatch } from 'react-router-dom'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
 import { useSelector } from 'react-redux'
-import values from 'lodash-es/values'
-import keys from 'lodash-es/keys'
-import { RootState } from '../reducers'
+import NodeDetailPresenter from './NodeDetailPresenter'
 import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
 import { OpUnitType } from 'dayjs'
-import LineChart from '../components/LineChart'
-import TableContainer from '../components/TableContainer'
-import TitleContainer from '../components/TitleContainer'
-import SelectDate from '../components/SelectDate'
+import values from 'lodash-es/values'
+import { RootState } from '../../reducers'
 import {
   IsnapshotNodeObjectData,
   getSnapshotNode,
@@ -24,32 +18,11 @@ import {
   getSnapshotNodeProcesses,
   IsnapshotNodeProcessData,
   IsnapshotNodeContainerData
-} from '../apis/snapshot'
-import { getMetricsNode } from '../apis/metrics'
-import useInterval from '../utils/useInterval'
-import { logger } from '../utils/logger'
+} from '../../apis/snapshot'
+import { getMetricsNode } from '../../apis/metrics'
+import useInterval from '../../utils/useInterval'
 
 dayjs.extend(utc)
-
-const MarginRow = styled(Row)`
-  margin-top: 16px;
-`
-
-const ChartTitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding-top: 32px;
-  padding-bottom: 16px;
-  .ant-typography {
-    margin: 0;
-  }
-`
-
-const LinkTitle = styled(Link)`
-  .ant-typography {
-    color: #1890ff !important;
-  }
-`
 
 interface Iparams {
   clusterId: string | undefined
@@ -115,7 +88,7 @@ const nodeProcessColumns: ColumnProps<IsnapshotNodeProcessObjectData>[] = [
   }
 ]
 
-const NodeDetail = () => {
+const NodeDetailContainer = () => {
   const selectedClusterId = useSelector((state: RootState) => state.cluster.id)
   const match = useRouteMatch<Iparams>('/nodes/:nodeId')
   const [
@@ -351,119 +324,20 @@ const NodeDetail = () => {
 
   useInterval(() => (!loading && !error ? fetchData() : null), 10000)
   return (
-    <>
-      {loading && !snapshotData ? (
-        <Skeleton active />
-      ) : (
-        <>
-          <Breadcrumb>
-            <Breadcrumb.Item>
-              <Link to="/">Home</Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              <Link to="/nodes">Node List</Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              {snapshotData && keys(snapshotData)[0]}
-            </Breadcrumb.Item>
-          </Breadcrumb>
-          <ChartTitleContainer>
-            <TitleContainer
-              level={2}
-              text={snapshotData && keys(snapshotData)[0]}
-            />
-            <SelectDate onChange={ChangeChartDateRange} />
-          </ChartTitleContainer>
-          <MarginRow gutter={16}>
-            <Col span={24}>
-              <Card title="CPU" bordered={false}>
-                {cpuChartConfig && keys(cpuChartConfig).length !== 0 ? (
-                  <LineChart config={cpuChartConfig} />
-                ) : (
-                  <Empty />
-                )}
-              </Card>
-            </Col>
-          </MarginRow>
-          <MarginRow gutter={16}>
-            <Col span={24}>
-              <Card title="Memory" bordered={false}>
-                {memoryChartConfig && keys(memoryChartConfig).length !== 0 ? (
-                  <LineChart config={memoryChartConfig} />
-                ) : (
-                  <Empty />
-                )}
-              </Card>
-            </Col>
-          </MarginRow>
-          <MarginRow gutter={16}>
-            <Col span={24}>
-              <Card title="Disk" bordered={false}>
-                {diskChartConfig && keys(diskChartConfig).length !== 0 ? (
-                  <LineChart config={diskChartConfig} />
-                ) : (
-                  <Empty />
-                )}
-              </Card>
-            </Col>
-          </MarginRow>
-          <MarginRow gutter={16}>
-            <Col span={24}>
-              <TitleContainer level={2} text={'Container List'} />
-              {nodeContainersData && match ? (
-                nodeContainersData.map(item => {
-                  return (
-                    <>
-                      <LinkTitle
-                        to={`/nodes/${match.params.nodeId}/container/${item[0].container_id}`}
-                      >
-                        <TitleContainer
-                          level={4}
-                          text={`${item[0].container}`}
-                        />
-                      </LinkTitle>
-                      <TableContainer
-                        rowKey={'metric_name'}
-                        columns={nodeContainerColumns}
-                        data={item}
-                      />
-                    </>
-                  )
-                })
-              ) : (
-                <Empty />
-              )}
-            </Col>
-          </MarginRow>
-          <MarginRow gutter={16}>
-            <Col span={24}>
-              <TitleContainer level={2} text={'Process List'} />
-              {nodeProcessesData && match ? (
-                nodeProcessesData.map(item => {
-                  return (
-                    <>
-                      <LinkTitle
-                        to={`/nodes/${match.params.nodeId}/process/${item[0].process_id}`}
-                      >
-                        <TitleContainer level={4} text={`${item[0].process}`} />
-                      </LinkTitle>
-                      <TableContainer
-                        rowKey={'metric_name'}
-                        columns={nodeProcessColumns}
-                        data={item}
-                      />
-                    </>
-                  )
-                })
-              ) : (
-                <Empty />
-              )}
-            </Col>
-          </MarginRow>
-        </>
-      )}
-    </>
+    <NodeDetailPresenter
+      match={match}
+      loading={loading}
+      snapshotData={snapshotData}
+      ChangeChartDateRange={ChangeChartDateRange}
+      cpuChartConfig={cpuChartConfig}
+      memoryChartConfig={memoryChartConfig}
+      diskChartConfig={diskChartConfig}
+      nodeContainersData={nodeContainersData}
+      nodeContainerColumns={nodeContainerColumns}
+      nodeProcessesData={nodeProcessesData}
+      nodeProcessColumns={nodeProcessColumns}
+    />
   )
 }
 
-export default NodeDetail
+export default NodeDetailContainer
