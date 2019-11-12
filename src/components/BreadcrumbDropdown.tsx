@@ -11,7 +11,7 @@ export interface IbreadcrumbDropdownMenu {
 
 interface Iprops {
   overlayMenu: IbreadcrumbDropdownMenu[]
-  dropdownText: any
+  dropdownText: string
 }
 
 const MenuItem = (item: IbreadcrumbDropdownMenu) => {

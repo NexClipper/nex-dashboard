@@ -103,7 +103,6 @@ const NodeListContainer = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const { data: ClustersResponse } = await getClusters()
       const {
         data: {
           data: { data: nodesResponse }
