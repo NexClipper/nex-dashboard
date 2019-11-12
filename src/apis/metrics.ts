@@ -13,6 +13,8 @@ export interface ImetricsNodeData {
 }
 
 interface IgetMetricsNode {
+  count: number
+  db_query_time: string
   data: ImetricsNodeData[]
   message: string
   status: string
@@ -28,7 +30,9 @@ export interface ImetricsNodeProcessData {
 }
 
 interface IgetMetricsNodeProcess {
+  count: number
   data: ImetricsNodeProcessData[]
+  db_query_time: string
   message: string
   status: string
 }
@@ -43,7 +47,9 @@ export interface ImetricsNodeContainerData {
 }
 
 interface IgetMetricsNodeContainer {
+  count: number
   data: ImetricsNodeContainerData[]
+  db_query_time: string
   message: string
   status: string
 }

@@ -7,7 +7,8 @@ import {
   Statistic,
   Breadcrumb,
   Skeleton,
-  Empty
+  Empty,
+  Tag
 } from 'antd'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
@@ -40,6 +41,12 @@ const ChartTitleContainer = styled.div`
   .ant-typography {
     margin: 0;
   }
+  .right-box {
+    display: flex;
+  }
+  .ant-tag {
+    padding-top: 5px;
+  }
 `
 
 interface Iparams {
@@ -58,6 +65,7 @@ interface Ipros {
   cpuChartConfig: Highcharts.Options | null
   memoryChartConfig: Highcharts.Options | null
   podChartConfig: Highcharts.Options | null
+  dbQueryTime: string | null
 }
 
 const ClusterDetailPresenter = ({
@@ -71,7 +79,8 @@ const ClusterDetailPresenter = ({
   ChangeChartDateRange,
   cpuChartConfig,
   memoryChartConfig,
-  podChartConfig
+  podChartConfig,
+  dbQueryTime
 }: Ipros) => {
   return (
     <>
@@ -174,7 +183,10 @@ const ClusterDetailPresenter = ({
           </PaddingRow>
           <ChartTitleContainer>
             <TitleContainer level={4} text={'Charts'} />
-            <SelectDate onChange={ChangeChartDateRange} />
+            <div className="right-box">
+              {dbQueryTime && <Tag color="#f50">{dbQueryTime}</Tag>}
+              <SelectDate onChange={ChangeChartDateRange} />
+            </div>
           </ChartTitleContainer>
           <Row gutter={16}>
             <Col span={podChartConfig ? 8 : 12}>

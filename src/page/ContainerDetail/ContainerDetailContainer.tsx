@@ -48,6 +48,7 @@ const ContainerDetailContainer = () => {
     unit: 'hour'
   })
   const [chartTickInterval, setChartTickInterval] = useState(5)
+  const [dbQueryTime, setdbQueryTime] = useState<string | null>(null)
 
   const ChangeChartDateRange = (value: any) => {
     setChartDateRange({
@@ -84,7 +85,7 @@ const ContainerDetailContainer = () => {
           ...values(containerSnapShotResponse)
         )
         setSnapshotData(containerSnapShotResponseArray)
-        const { data: containerMetricResponse } = await getMetricsNodeContainer(
+        const containerMetricResponse = await getMetricsNodeContainer(
           selectedClusterId,
           Number(match.params.nodeId),
           Number(match.params.containerId),
@@ -98,19 +99,20 @@ const ContainerDetailContainer = () => {
             chartDateRange.value
           }${chartDateRange.unit}`
         )
-        const containerMemoryRss = containerMetricResponse.filter(
+        setdbQueryTime(containerMetricResponse.db_query_time)
+        const containerMemoryRss = containerMetricResponse.data.filter(
           item => item.metric_name === 'container_memory_rss'
         )
-        const containerMemoryRssTotal = containerMetricResponse.filter(
+        const containerMemoryRssTotal = containerMetricResponse.data.filter(
           item => item.metric_name === 'container_memory_rss_total'
         )
-        const containerCpuUsageSystem = containerMetricResponse.filter(
+        const containerCpuUsageSystem = containerMetricResponse.data.filter(
           item => item.metric_name === 'container_cpu_usage_system'
         )
-        const containerCpuUsageUser = containerMetricResponse.filter(
+        const containerCpuUsageUser = containerMetricResponse.data.filter(
           item => item.metric_name === 'container_cpu_usage_user'
         )
-        const containerCpuUsageTotal = containerMetricResponse.filter(
+        const containerCpuUsageTotal = containerMetricResponse.data.filter(
           item => item.metric_name === 'container_cpu_usage_total'
         )
         if (containerCpuUsageTotal) {
@@ -195,6 +197,7 @@ const ContainerDetailContainer = () => {
       ChangeChartDateRange={ChangeChartDateRange}
       cpuChartConfig={cpuChartConfig}
       memoryChartConfig={memoryChartConfig}
+      dbQueryTime={dbQueryTime}
     />
   )
 }

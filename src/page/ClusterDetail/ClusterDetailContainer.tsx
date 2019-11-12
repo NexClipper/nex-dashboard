@@ -55,6 +55,7 @@ const ClusterDetailContainer = () => {
   const [usageData, setUsageData] = useState<IsummaryClustersData[] | null>(
     null
   )
+  const [dbQueryTime, setdbQueryTime] = useState<string | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [chartDateRange, setChartDateRange] = useState<IchartDateRange>({
@@ -148,7 +149,7 @@ const ClusterDetailContainer = () => {
             setCluster(Number(match.params.clusterId), ClustersResponse[0].name)
           )
         setDropdownList(DropDwonList)
-        const { data: metricNodeDataResponse } = await getMetricsNodes(
+        const metricNodeDataResponse = await getMetricsNodes(
           Number(match.params.clusterId),
           `dateRange=${dayjs(Date.now())
             .subtract(chartDateRange.value, chartDateRange.unit)
@@ -160,19 +161,20 @@ const ClusterDetailContainer = () => {
             chartDateRange.value
           }${chartDateRange.unit}`
         )
-        const nodeCpuLoadAvg1 = metricNodeDataResponse.filter(
+        setdbQueryTime(metricNodeDataResponse.db_query_time)
+        const nodeCpuLoadAvg1 = metricNodeDataResponse.data.filter(
           item => item.metric_name === 'node_cpu_load_avg_1'
         )
-        const nodeCpuLoadAvg5 = metricNodeDataResponse.filter(
+        const nodeCpuLoadAvg5 = metricNodeDataResponse.data.filter(
           item => item.metric_name === 'node_cpu_load_avg_5'
         )
-        const nodeCpuLoadAvg15 = metricNodeDataResponse.filter(
+        const nodeCpuLoadAvg15 = metricNodeDataResponse.data.filter(
           item => item.metric_name === 'node_cpu_load_avg_15'
         )
-        const nodeMemoryTotal = metricNodeDataResponse.filter(
+        const nodeMemoryTotal = metricNodeDataResponse.data.filter(
           item => item.metric_name === 'node_memory_total'
         )
-        const nodeMemoryUsed = metricNodeDataResponse.filter(
+        const nodeMemoryUsed = metricNodeDataResponse.data.filter(
           item => item.metric_name === 'node_memory_used'
         )
         if (nodeCpuLoadAvg1) {
@@ -205,7 +207,7 @@ const ClusterDetailContainer = () => {
             ]
           }
           setCpuChartConfig(
-            metricNodeDataResponse.length !== 0 ? CpuChartConfig : null
+            metricNodeDataResponse.data.length !== 0 ? CpuChartConfig : null
           )
           const MemoryChartConfig: Highcharts.Options = {
             xAxis: {
@@ -231,7 +233,7 @@ const ClusterDetailContainer = () => {
             ]
           }
           setMemoryChartConfig(
-            metricNodeDataResponse.length !== 0 ? MemoryChartConfig : null
+            metricNodeDataResponse.data.length !== 0 ? MemoryChartConfig : null
           )
           const {
             data: {
@@ -316,6 +318,7 @@ const ClusterDetailContainer = () => {
       cpuChartConfig={cpuChartConfig}
       memoryChartConfig={memoryChartConfig}
       podChartConfig={podChartConfig}
+      dbQueryTime={dbQueryTime}
     />
   )
 }

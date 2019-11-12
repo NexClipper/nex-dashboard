@@ -120,6 +120,7 @@ const NodeDetailContainer = () => {
     unit: 'hour'
   })
   const [chartTickInterval, setChartTickInterval] = useState(5)
+  const [dbQueryTime, setdbQueryTime] = useState<string | null>(null)
 
   const ChangeChartDateRange = (value: any) => {
     setChartDateRange({
@@ -144,7 +145,7 @@ const NodeDetailContainer = () => {
   const fetchData = useCallback(async () => {
     try {
       if (match) {
-        const { data: metricDataResponse } = await getMetricsNode(
+        const metricDataResponse = await getMetricsNode(
           selectedClusterId,
           Number(match.params.nodeId),
           `dateRange=${dayjs(Date.now())
@@ -157,28 +158,29 @@ const NodeDetailContainer = () => {
             chartDateRange.value
           }${chartDateRange.unit}`
         )
-        const nodeCpuLoadAvg1 = metricDataResponse.filter(
+        setdbQueryTime(metricDataResponse.db_query_time)
+        const nodeCpuLoadAvg1 = metricDataResponse.data.filter(
           item => item.metric_name === 'node_cpu_load_avg_1'
         )
-        const nodeCpuLoadAvg5 = metricDataResponse.filter(
+        const nodeCpuLoadAvg5 = metricDataResponse.data.filter(
           item => item.metric_name === 'node_cpu_load_avg_5'
         )
-        const nodeCpuLoadAvg15 = metricDataResponse.filter(
+        const nodeCpuLoadAvg15 = metricDataResponse.data.filter(
           item => item.metric_name === 'node_cpu_load_avg_15'
         )
-        const nodeMemoryTotal = metricDataResponse.filter(
+        const nodeMemoryTotal = metricDataResponse.data.filter(
           item => item.metric_name === 'node_memory_total'
         )
-        const nodeMemoryUsed = metricDataResponse.filter(
+        const nodeMemoryUsed = metricDataResponse.data.filter(
           item => item.metric_name === 'node_memory_used'
         )
-        const nodeDiskTotal = metricDataResponse.filter(
+        const nodeDiskTotal = metricDataResponse.data.filter(
           item => item.metric_name === 'node_disk_total'
         )
-        const nodeDiskFree = metricDataResponse.filter(
+        const nodeDiskFree = metricDataResponse.data.filter(
           item => item.metric_name === 'node_disk_free'
         )
-        const nodeDiskUsed = metricDataResponse.filter(
+        const nodeDiskUsed = metricDataResponse.data.filter(
           item => item.metric_name === 'node_disk_used'
         )
         if (nodeCpuLoadAvg1) {
@@ -336,6 +338,7 @@ const NodeDetailContainer = () => {
       nodeContainerColumns={nodeContainerColumns}
       nodeProcessesData={nodeProcessesData}
       nodeProcessColumns={nodeProcessColumns}
+      dbQueryTime={dbQueryTime}
     />
   )
 }

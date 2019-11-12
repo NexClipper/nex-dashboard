@@ -1,5 +1,5 @@
 import React from 'react'
-import { Breadcrumb, Row, Col, Card, Skeleton, Empty } from 'antd'
+import { Breadcrumb, Row, Col, Card, Skeleton, Empty, Tag } from 'antd'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import * as Highcharts from 'highcharts'
@@ -30,6 +30,13 @@ const ChartTitleContainer = styled.div`
   .ant-typography {
     margin: 0;
   }
+  .right-box {
+    display: flex;
+  }
+  .ant-tag {
+    padding-top: 5px;
+    height: 32px;
+  }
 `
 
 const LinkTitle = styled(Link)`
@@ -55,6 +62,7 @@ interface Iprops {
   nodeContainerColumns: ColumnProps<IsnapshotNodeContainerObjectData>[]
   nodeProcessesData: IsnapshotNodeProcessData[][] | null
   nodeProcessColumns: ColumnProps<IsnapshotNodeProcessObjectData>[]
+  dbQueryTime: string | null
 }
 
 const NodeDetailPresenter = ({
@@ -68,7 +76,8 @@ const NodeDetailPresenter = ({
   nodeContainersData,
   nodeContainerColumns,
   nodeProcessesData,
-  nodeProcessColumns
+  nodeProcessColumns,
+  dbQueryTime
 }: Iprops) => {
   return (
     <>
@@ -92,7 +101,10 @@ const NodeDetailPresenter = ({
               level={2}
               text={snapshotData && keys(snapshotData)[0]}
             />
-            <SelectDate onChange={ChangeChartDateRange} />
+            <div className="right-box">
+              {dbQueryTime && <Tag color="#f50">{dbQueryTime}</Tag>}
+              <SelectDate onChange={ChangeChartDateRange} />
+            </div>
           </ChartTitleContainer>
           <MarginRow gutter={16}>
             <Col span={24}>

@@ -1,5 +1,14 @@
 import React from 'react'
-import { Breadcrumb, Row, Col, Card, Skeleton, Empty, Statistic } from 'antd'
+import {
+  Breadcrumb,
+  Row,
+  Col,
+  Card,
+  Skeleton,
+  Empty,
+  Statistic,
+  Tag
+} from 'antd'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import keys from 'lodash-es/keys'
@@ -22,6 +31,12 @@ const ChartTitleContainer = styled.div`
   .ant-typography {
     margin: 0;
   }
+  .right-box {
+    display: flex;
+  }
+  .ant-tag {
+    padding-top: 5px;
+  }
 `
 
 interface Iparams {
@@ -36,6 +51,7 @@ interface Iprops {
   ChangeChartDateRange: (value: any) => void
   cpuChartConfig: Highcharts.Options | null
   memoryChartConfig: Highcharts.Options | null
+  dbQueryTime: string | null
 }
 
 const ContainerDetailPresenter = ({
@@ -44,7 +60,8 @@ const ContainerDetailPresenter = ({
   snapshotData,
   ChangeChartDateRange,
   cpuChartConfig,
-  memoryChartConfig
+  memoryChartConfig,
+  dbQueryTime
 }: Iprops) => {
   return (
     <>
@@ -75,7 +92,10 @@ const ContainerDetailPresenter = ({
               level={2}
               text={snapshotData && snapshotData[0].container}
             />
-            <SelectDate onChange={ChangeChartDateRange} />
+            <div className="right-box">
+              {dbQueryTime && <Tag color="#f50">{dbQueryTime}</Tag>}
+              <SelectDate onChange={ChangeChartDateRange} />
+            </div>
           </ChartTitleContainer>
           <MarginRow gutter={16}>
             <Col span={24}>

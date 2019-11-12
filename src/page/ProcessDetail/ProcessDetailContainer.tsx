@@ -52,6 +52,7 @@ const ProcessDetailContainer = () => {
     unit: 'hour'
   })
   const [chartTickInterval, setChartTickInterval] = useState(5)
+  const [dbQueryTime, setdbQueryTime] = useState<string | null>(null)
 
   const ChangeChartDateRange = (value: any) => {
     setChartDateRange({
@@ -85,7 +86,7 @@ const ProcessDetailContainer = () => {
         processSnapShotResponseArray = processSnapShotResponseArray.concat(
           ...values(processSnapShotResponse)
         )
-        const { data: processMetricResponse } = await getMetricsNodeProcess(
+        const processMetricResponse = await getMetricsNodeProcess(
           selectedClusterId,
           Number(match.params.nodeId),
           Number(match.params.processId),
@@ -100,28 +101,29 @@ const ProcessDetailContainer = () => {
             chartDateRange.value
           }${chartDateRange.unit}`
         )
-        const processCpuUserLoad = processMetricResponse.filter(
+        setdbQueryTime(processMetricResponse.db_query_time)
+        const processCpuUserLoad = processMetricResponse.data.filter(
           item => item.metric_name === 'process_cpu_user_load'
         )
-        const processCpuSystemLoad = processMetricResponse.filter(
+        const processCpuSystemLoad = processMetricResponse.data.filter(
           item => item.metric_name === 'process_cpu_system_load'
         )
-        const processMemoryRss = processMetricResponse.filter(
+        const processMemoryRss = processMetricResponse.data.filter(
           item => item.metric_name === 'process_memory_rss'
         )
-        const processMemoryData = processMetricResponse.filter(
+        const processMemoryData = processMetricResponse.data.filter(
           item => item.metric_name === 'process_memory_data'
         )
-        const processMemoryStack = processMetricResponse.filter(
+        const processMemoryStack = processMetricResponse.data.filter(
           item => item.metric_name === 'process_memory_stack'
         )
-        const processMemorySwap = processMetricResponse.filter(
+        const processMemorySwap = processMetricResponse.data.filter(
           item => item.metric_name === 'process_memory_swap'
         )
-        const processNetWriteBytes = processMetricResponse.filter(
+        const processNetWriteBytes = processMetricResponse.data.filter(
           item => item.metric_name === 'process_net_write_bytes'
         )
-        const processNetReadBytes = processMetricResponse.filter(
+        const processNetReadBytes = processMetricResponse.data.filter(
           item => item.metric_name === 'process_net_read_bytes'
         )
         setSnapshotData(processSnapShotResponseArray)
@@ -241,6 +243,7 @@ const ProcessDetailContainer = () => {
       cpuChartConfig={cpuChartConfig}
       memoryChartConfig={memoryChartConfig}
       networkChartConfig={networkChartConfig}
+      dbQueryTime={dbQueryTime}
     />
   )
 }
