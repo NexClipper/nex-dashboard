@@ -11,34 +11,16 @@ import { getClusters } from '../../apis/clusters'
 import { getSummaryClusters } from '../../apis/summary'
 import ClusterListPresenter from './ClusterListPresenter'
 
-interface Idata {
-  node_cpu_idle?: number
-  node_cpu_iowait?: number
-  node_cpu_load_avg_1?: number
-  node_cpu_load_avg_15?: number
-  node_cpu_load_avg_5?: number
-  node_cpu_system?: number
-  node_cpu_user?: number
-  node_memory_available?: number
-  node_memory_buffers?: number
-  node_memory_cached?: number
-  node_memory_free?: number
-  node_memory_total?: number
-  node_memory_used?: number
-  node_memory_used_percent?: number
-  id: number
-  kubernetes: boolean
-  name: string
-}
-
 const ClusterListContainer = () => {
   const dispatch = useDispatch()
   dispatch(setCluster(1, ''))
-  const [clustersData, setClustersData] = useState<Idata[] | null>(null)
+  const [clustersData, setClustersData] = useState<
+    IclusterListContainer[] | null
+  >(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
 
-  const clusterColumns: ColumnProps<Idata>[] = [
+  const clusterColumns: ColumnProps<IclusterListContainer>[] = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -112,7 +94,7 @@ const ClusterListContainer = () => {
     try {
       const { data: ClustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
-      let clustersData: Idata[] = []
+      let clustersData: IclusterListContainer[] = []
       clustersData = ClustersResponse.map(
         item =>
           item && {

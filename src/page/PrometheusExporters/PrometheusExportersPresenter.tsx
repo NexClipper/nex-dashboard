@@ -23,15 +23,8 @@ const CoverImageContainr = styled.div`
   }
 `
 
-interface Idata {
-  title: string
-  description: string
-  link: string
-  image_lik?: string
-}
-
 interface Iprops {
-  data: Idata[]
+  data: IprometheusExportersData[]
 }
 
 const PrometheusExportersPresenter = ({ data }: Iprops) => {

@@ -7,24 +7,19 @@ import utc from 'dayjs/plugin/utc'
 import values from 'lodash-es/values'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../reducers'
-import { OpUnitType } from 'dayjs'
 import useInterval from '../../utils/useInterval'
 import {
   getSnapshotNodeProcess,
   IsnapshotNodeProcessData
 } from '../../apis/snapshot'
 import { getMetricsNodeProcess } from '../../apis/metrics'
+import { IchartDateRange } from '../../types/dateRange'
 
 dayjs.extend(utc)
 
 interface Iparams {
   nodeId: string | undefined
   processId: string | undefined
-}
-
-interface IchartDateRange {
-  value: number
-  unit: OpUnitType
 }
 
 const ProcessDetailContainer = () => {

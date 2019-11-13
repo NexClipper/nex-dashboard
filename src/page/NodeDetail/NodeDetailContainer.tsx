@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux'
 import NodeDetailPresenter from './NodeDetailPresenter'
 import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
-import { OpUnitType } from 'dayjs'
 import values from 'lodash-es/values'
 import { RootState } from '../../reducers'
 import {
@@ -21,17 +20,13 @@ import {
 } from '../../apis/snapshot'
 import { getMetricsNode } from '../../apis/metrics'
 import useInterval from '../../utils/useInterval'
+import { IchartDateRange } from '../../types/dateRange'
 
 dayjs.extend(utc)
 
 interface Iparams {
   clusterId: string | undefined
   nodeId: string | undefined
-}
-
-interface IchartDateRange {
-  value: number
-  unit: OpUnitType
 }
 
 const nodeContainerColumns: ColumnProps<IsnapshotNodeContainerObjectData>[] = [

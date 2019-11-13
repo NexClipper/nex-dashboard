@@ -3,15 +3,8 @@ import { useDispatch } from 'react-redux'
 import { setCluster } from '../../reducers/cluster'
 import PrometheusExportersPresenter from './PrometheusExportersPresenter'
 
-interface Idata {
-  title: string
-  description: string
-  link: string
-  image_lik?: string
-}
-
 const PrometheusExportersContainer = () => {
-  const data: Idata[] = [
+  const data: IprometheusExportersData[] = [
     {
       title: 'Container Info',
       description: 'Export Consul service health to Prometheus.',

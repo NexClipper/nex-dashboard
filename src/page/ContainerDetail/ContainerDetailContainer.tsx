@@ -14,17 +14,13 @@ import {
 } from '../../apis/snapshot'
 import { getMetricsNodeContainer } from '../../apis/metrics'
 import ContainerDetailPresenter from './ContainerDetailPresenter'
+import { IchartDateRange } from '../../types/dateRange'
 
 dayjs.extend(utc)
 
 interface Iparams {
   nodeId: string | undefined
   containerId: string | undefined
-}
-
-interface IchartDateRange {
-  value: number
-  unit: OpUnitType
 }
 
 const ContainerDetailContainer = () => {

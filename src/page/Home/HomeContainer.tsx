@@ -11,38 +11,19 @@ import useInterval from '../../utils/useInterval'
 import { getClusters } from '../../apis/clusters'
 import { getSummaryClusters } from '../../apis/summary'
 import HomePresenter from './HomePresenter'
-import { logger } from '../../utils/logger'
-
-interface IclustersData {
-  node_cpu_idle?: number
-  node_cpu_iowait?: number
-  node_cpu_load_avg_1?: number
-  node_cpu_load_avg_15?: number
-  node_cpu_load_avg_5?: number
-  node_cpu_system?: number
-  node_cpu_user?: number
-  node_memory_available?: number
-  node_memory_buffers?: number
-  node_memory_cached?: number
-  node_memory_free?: number
-  node_memory_total?: number
-  node_memory_used?: number
-  node_memory_used_percent?: number
-  id: number
-  kubernetes: boolean
-  name: string
-}
 
 const HomeContainer = () => {
   const dispatch = useDispatch()
   dispatch(setCluster(1, ''))
   const [agentsData, setAgentsData] = useState<IagentsObjectData | null>(null)
   const [nodesData, setNodesData] = useState<InodesObjectData | null>(null)
-  const [clustersData, setClustersData] = useState<IclustersData[] | null>(null)
+  const [clustersData, setClustersData] = useState<
+    IclusterListContainer[] | null
+  >(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const clusterColumns: ColumnProps<IclustersData>[] = [
+  const clusterColumns: ColumnProps<IclusterListContainer>[] = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -124,7 +105,7 @@ const HomeContainer = () => {
     try {
       const { data: clustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
-      let clustersData: IclustersData[] = []
+      let clustersData: IclusterListContainer[] = []
       clustersData = clustersResponse.map(
         item =>
           item && {

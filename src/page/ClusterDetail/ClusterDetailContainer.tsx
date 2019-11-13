@@ -3,7 +3,7 @@ import { Link, useRouteMatch, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../reducers'
 import { ColumnProps } from 'antd/es/table'
-import dayjs, { OpUnitType } from 'dayjs'
+import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import * as Highcharts from 'highcharts'
 import values from 'lodash-es/values'
@@ -18,13 +18,9 @@ import {
 import { getMetricsNodes, getMetricsPods } from '../../apis/metrics'
 import { setCluster } from '../../reducers/cluster'
 import { IbreadcrumbDropdownMenu } from '../../components/BreadcrumbDropdown'
+import { IchartDateRange } from '../../types/dateRange'
 
 dayjs.extend(utc)
-
-interface IchartDateRange {
-  value: number
-  unit: OpUnitType
-}
 
 interface Iparams {
   clusterId: string | undefined
