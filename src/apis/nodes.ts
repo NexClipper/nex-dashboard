@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios'
 import { logger } from '../utils/logger'
 import api from './api'
 
-interface InodesData {
+export interface InodesData {
   id: number
   host: string
   ip: string

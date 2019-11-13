@@ -34,7 +34,7 @@ interface Idata {
 const ClusterListContainer = () => {
   const dispatch = useDispatch()
   dispatch(setCluster(1, ''))
-  const [clustersData, setClustersData] = useState<any[] | null>(null)
+  const [clustersData, setClustersData] = useState<Idata[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -112,7 +112,7 @@ const ClusterListContainer = () => {
     try {
       const { data: ClustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
-      let clustersData: any[] = []
+      let clustersData: Idata[] = []
       clustersData = ClustersResponse.map(
         item =>
           item && {

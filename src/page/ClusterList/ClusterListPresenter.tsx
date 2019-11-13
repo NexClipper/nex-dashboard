@@ -27,7 +27,7 @@ interface Idata {
 
 interface Iprops {
   loading: boolean
-  clustersData: any[] | null
+  clustersData: Idata[] | null
   clusterColumns: ColumnProps<Idata>[]
 }
 

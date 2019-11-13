@@ -9,14 +9,36 @@ import NodeListPresenter from './NodeListPresenter'
 import { getClusterNodes, getClusters } from '../../apis/clusters'
 import useInterval from '../../utils/useInterval'
 import { getSummaryClusterNodes } from '../../apis/summary'
+import { logger } from '../../utils/logger'
 
-interface Iparams {
-  clusterId: string | undefined
+interface IclustersData {
+  id: number
+  host: string
+  ip: string
+  os: string
+  node_cpu_idle: number
+  node_cpu_iowait: number
+  node_cpu_load_avg_1: number
+  node_cpu_load_avg_15: number
+  node_cpu_load_avg_5: number
+  node_cpu_system: number
+  node_cpu_user: number
+  node_memory_available: number
+  node_memory_buffers: number
+  node_memory_cached: number
+  node_memory_free: number
+  node_memory_total: number
+  node_memory_used: number
+  node_memory_used_percent: number
+  platform: string
+  platform_family: string
+  platform_version: string
+  agent_id: number
 }
 
 const NodeListContainer = () => {
   const selectedClusterId = useSelector((state: RootState) => state.cluster.id)
-  const [data, setData] = useState<any[] | null>(null)
+  const [data, setData] = useState<IclustersData[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 

@@ -5,12 +5,12 @@ import keys from 'lodash-es/keys'
 import TableContainer from '../../components/TableContainer'
 import TitleContainer from '../../components/TitleContainer'
 import { IclustersData } from '../../apis/clusters'
-import { InodesObjectData } from '../../apis/nodes'
-import { IagentsObjectData } from '../../apis/agents'
+import { InodesObjectData, InodesData } from '../../apis/nodes'
+import { IagentsObjectData, IagentsData } from '../../apis/agents'
 
 interface Iprops {
   loading: boolean
-  clustersData: any[] | null
+  clustersData: IclustersData[] | null
   clusterColumns: ColumnProps<IclustersData>[]
   nodesData: InodesObjectData | null
   nodesColumns: ColumnProps<InodelistData>[]
@@ -49,31 +49,35 @@ const HomePresenter = ({
           )}
           <TitleContainer level={2} text={'Node list'} />
           {nodesData && keys(nodesData).length !== 0 ? (
-            Object.entries(nodesData).map(([title, value]: [string, any]) => {
-              return (
-                <TableContainer
-                  key={value}
-                  title={title}
-                  columns={nodesColumns}
-                  data={value}
-                />
-              )
-            })
+            Object.entries(nodesData).map(
+              ([title, value]: [string, InodesData[]]) => {
+                return (
+                  <TableContainer
+                    key={title}
+                    title={title}
+                    columns={nodesColumns}
+                    data={value}
+                  />
+                )
+              }
+            )
           ) : (
             <Empty />
           )}
           <TitleContainer level={2} text={'Agent List'} />
           {agentsData && keys(agentsData).length !== 0 ? (
-            Object.entries(agentsData).map(([title, value]: [string, any]) => {
-              return (
-                <TableContainer
-                  key={value}
-                  title={title}
-                  columns={agentsColumns}
-                  data={value}
-                />
-              )
-            })
+            Object.entries(agentsData).map(
+              ([title, value]: [string, IagentsData[]]) => {
+                return (
+                  <TableContainer
+                    key={title}
+                    title={title}
+                    columns={agentsColumns}
+                    data={value}
+                  />
+                )
+              }
+            )
           ) : (
             <Empty />
           )}

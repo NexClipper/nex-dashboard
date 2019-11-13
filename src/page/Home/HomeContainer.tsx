@@ -38,7 +38,7 @@ const HomeContainer = () => {
   dispatch(setCluster(1, ''))
   const [agentsData, setAgentsData] = useState<IagentsObjectData | null>(null)
   const [nodesData, setNodesData] = useState<InodesObjectData | null>(null)
-  const [clustersData, setClustersData] = useState<any[] | null>(null)
+  const [clustersData, setClustersData] = useState<IclustersData[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -124,7 +124,7 @@ const HomeContainer = () => {
     try {
       const { data: clustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
-      let clustersData: any[] = []
+      let clustersData: IclustersData[] = []
       clustersData = clustersResponse.map(
         item =>
           item && {

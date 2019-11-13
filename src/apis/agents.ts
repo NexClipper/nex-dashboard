@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios'
 import { logger } from '../utils/logger'
 import api from './api'
 
-interface IagentsData {
+export interface IagentsData {
   id: number
   version: string
   ip: string
