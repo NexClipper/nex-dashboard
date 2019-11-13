@@ -120,7 +120,7 @@ const ClusterListContainer = () => {
             ...values(ClustersSummaryResponse).slice(0)[
               keys(ClustersSummaryResponse)
                 .slice(0)
-                .indexOf(item.name)
+                .indexOf(item.id.toString())
             ]
           }
       )

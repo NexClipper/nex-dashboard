@@ -72,110 +72,110 @@ const ContainerDetailContainer = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      if (match) {
-        const {
-          data: containerSnapShotResponse
-        } = await getSnapshotNodeContainer(
-          selectedClusterId,
-          Number(match.params.nodeId),
-          Number(match.params.containerId)
-        )
-        let containerSnapShotResponseArray: IsnapshotNodeContainerData[] = []
-        containerSnapShotResponseArray = containerSnapShotResponseArray.concat(
-          ...values(containerSnapShotResponse)
-        )
-        setSnapshotData(containerSnapShotResponseArray)
-        const containerMetricResponse = await getMetricsNodeContainer(
-          selectedClusterId,
-          Number(match.params.nodeId),
-          Number(match.params.containerId),
-          `dateRange=${dayjs(Date.now())
-            .subtract(chartDateRange.value, chartDateRange.unit)
-            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
-            Date.now()
-          ).format(
-            'YYYY-MM-DD HH:mm:ss'
-          )}&metricNames=container_memory_rss&metricNames=container_memory_rss_total&metricNames=container_cpu_usage_system&metricNames=container_cpu_usage_user&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
-            chartDateRange.value
-          }${chartDateRange.unit}`
-        )
-        setdbQueryTime(containerMetricResponse.db_query_time)
-        const containerMemoryRss = containerMetricResponse.data.filter(
-          item => item.metric_name === 'container_memory_rss'
-        )
-        const containerMemoryRssTotal = containerMetricResponse.data.filter(
-          item => item.metric_name === 'container_memory_rss_total'
-        )
-        const containerCpuUsageSystem = containerMetricResponse.data.filter(
-          item => item.metric_name === 'container_cpu_usage_system'
-        )
-        const containerCpuUsageUser = containerMetricResponse.data.filter(
-          item => item.metric_name === 'container_cpu_usage_user'
-        )
-        const containerCpuUsageTotal = containerMetricResponse.data.filter(
-          item => item.metric_name === 'container_cpu_usage_total'
-        )
-        if (containerCpuUsageTotal) {
-          const CpuChartConfig: Highcharts.Options = {
-            xAxis: {
-              type: 'datetime',
-              categories: containerCpuUsageTotal.map(item =>
-                dayjs(item.bucket)
-                  .utc()
-                  .format('YY-M-D HH:mm:ss')
-              ),
-              tickInterval: chartTickInterval
+      const {
+        data: containerSnapShotResponse
+      } = await getSnapshotNodeContainer(
+        selectedClusterId,
+        Number(match && match.params.nodeId),
+        Number(match && match.params.containerId)
+      )
+      let containerSnapShotResponseArray: IsnapshotNodeContainerData[] = []
+      containerSnapShotResponseArray = containerSnapShotResponseArray.concat(
+        ...values(containerSnapShotResponse)
+      )
+      setSnapshotData(containerSnapShotResponseArray)
+    } catch (error) {
+      setError(error)
+    }
+    try {
+      const containerMetricResponse = await getMetricsNodeContainer(
+        selectedClusterId,
+        Number(match && match.params.nodeId),
+        Number(match && match.params.containerId),
+        `dateRange=${dayjs(Date.now())
+          .subtract(chartDateRange.value, chartDateRange.unit)
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
+          'YYYY-MM-DD HH:mm:ss'
+        )}&metricNames=container_memory_rss&metricNames=container_memory_rss_total&metricNames=container_cpu_usage_system&metricNames=container_cpu_usage_user&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
+          chartDateRange.value
+        }${chartDateRange.unit}`
+      )
+      setdbQueryTime(containerMetricResponse.db_query_time)
+      const containerMemoryRss = containerMetricResponse.data.filter(
+        item => item.metric_name === 'container_memory_rss'
+      )
+      const containerMemoryRssTotal = containerMetricResponse.data.filter(
+        item => item.metric_name === 'container_memory_rss_total'
+      )
+      const containerCpuUsageSystem = containerMetricResponse.data.filter(
+        item => item.metric_name === 'container_cpu_usage_system'
+      )
+      const containerCpuUsageUser = containerMetricResponse.data.filter(
+        item => item.metric_name === 'container_cpu_usage_user'
+      )
+      const containerCpuUsageTotal = containerMetricResponse.data.filter(
+        item => item.metric_name === 'container_cpu_usage_total'
+      )
+      if (containerCpuUsageTotal) {
+        const CpuChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: containerCpuUsageTotal.map(item =>
+              dayjs(item.bucket)
+                .utc()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'container_cpu_usage_total',
+              data: containerCpuUsageTotal.map(item => item.value)
             },
-            series: [
-              {
-                type: 'line',
-                name: 'container_cpu_usage_total',
-                data: containerCpuUsageTotal.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'container_cpu_usage_user',
-                data: containerCpuUsageUser.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'container_cpu_usage_system',
-                data: containerCpuUsageSystem.map(item => item.value)
-              }
-            ]
-          }
-          setCpuChartConfig(
-            containerCpuUsageTotal.length !== 0 ? CpuChartConfig : null
-          )
-        }
-        if (containerMemoryRss) {
-          const MemoryChartConfig: Highcharts.Options = {
-            xAxis: {
-              type: 'datetime',
-              categories: containerMemoryRss.map(item =>
-                dayjs(item.bucket)
-                  .utc()
-                  .format('YY-M-D HH:mm:ss')
-              ),
-              tickInterval: chartTickInterval
+            {
+              type: 'line',
+              name: 'container_cpu_usage_user',
+              data: containerCpuUsageUser.map(item => item.value)
             },
-            series: [
-              {
-                type: 'line',
-                name: 'container_memory_rss',
-                data: containerMemoryRss.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'container_memory_rss_total',
-                data: containerMemoryRssTotal.map(item => item.value)
-              }
-            ]
-          }
-          setMemoryChartConfig(
-            containerMemoryRss.length !== 0 ? MemoryChartConfig : null
-          )
+            {
+              type: 'line',
+              name: 'container_cpu_usage_system',
+              data: containerCpuUsageSystem.map(item => item.value)
+            }
+          ]
         }
+        setCpuChartConfig(
+          containerCpuUsageTotal.length !== 0 ? CpuChartConfig : null
+        )
+      }
+      if (containerMemoryRss) {
+        const MemoryChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: containerMemoryRss.map(item =>
+              dayjs(item.bucket)
+                .utc()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'container_memory_rss',
+              data: containerMemoryRss.map(item => item.value)
+            },
+            {
+              type: 'line',
+              name: 'container_memory_rss_total',
+              data: containerMemoryRssTotal.map(item => item.value)
+            }
+          ]
+        }
+        setMemoryChartConfig(
+          containerMemoryRss.length !== 0 ? MemoryChartConfig : null
+        )
       }
     } catch (error) {
       setError(error)

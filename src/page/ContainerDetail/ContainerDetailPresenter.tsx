@@ -36,6 +36,7 @@ const ChartTitleContainer = styled.div`
   }
   .ant-tag {
     padding-top: 5px;
+    height: 32px;
   }
 `
 

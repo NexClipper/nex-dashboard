@@ -76,151 +76,151 @@ const ProcessDetailContainer = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      if (match) {
-        const { data: processSnapShotResponse } = await getSnapshotNodeProcess(
-          selectedClusterId,
-          Number(match.params.nodeId),
-          Number(match.params.processId)
-        )
-        let processSnapShotResponseArray: IsnapshotNodeProcessData[] = []
-        processSnapShotResponseArray = processSnapShotResponseArray.concat(
-          ...values(processSnapShotResponse)
-        )
-        const processMetricResponse = await getMetricsNodeProcess(
-          selectedClusterId,
-          Number(match.params.nodeId),
-          Number(match.params.processId),
-          `dateRange=${dayjs(Date.now())
-            .subtract(chartDateRange.value, chartDateRange.unit)
-            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
-            Date.now()
-          ).format(
-            'YYYY-MM-DD HH:mm:ss'
-          )}&metricNames=process_cpu_user_load&metricNames=process_cpu_system_load&
+      const { data: processSnapShotResponse } = await getSnapshotNodeProcess(
+        selectedClusterId,
+        Number(match && match.params.nodeId),
+        Number(match && match.params.processId)
+      )
+      let processSnapShotResponseArray: IsnapshotNodeProcessData[] = []
+      processSnapShotResponseArray = processSnapShotResponseArray.concat(
+        ...values(processSnapShotResponse)
+      )
+      setSnapshotData(processSnapShotResponseArray)
+    } catch (error) {
+      setError(error)
+    }
+    try {
+      const processMetricResponse = await getMetricsNodeProcess(
+        selectedClusterId,
+        Number(match && match.params.nodeId),
+        Number(match && match.params.processId),
+        `dateRange=${dayjs(Date.now())
+          .subtract(chartDateRange.value, chartDateRange.unit)
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
+          'YYYY-MM-DD HH:mm:ss'
+        )}&metricNames=process_cpu_user_load&metricNames=process_cpu_system_load&
           metricNames=process_memory_percent&metricNames=process_memory_rss&metricNames=process_memory_data&metricNames=process_memory_stack&metricNames=process_memory_swap&metricNames=process_net_write_bytes&metricNames=process_net_read_bytes&timezone=Asia/Seoul&granularity=${
             chartDateRange.value
           }${chartDateRange.unit}`
-        )
-        setdbQueryTime(processMetricResponse.db_query_time)
-        const processCpuUserLoad = processMetricResponse.data.filter(
-          item => item.metric_name === 'process_cpu_user_load'
-        )
-        const processCpuSystemLoad = processMetricResponse.data.filter(
-          item => item.metric_name === 'process_cpu_system_load'
-        )
-        const processMemoryRss = processMetricResponse.data.filter(
-          item => item.metric_name === 'process_memory_rss'
-        )
-        const processMemoryData = processMetricResponse.data.filter(
-          item => item.metric_name === 'process_memory_data'
-        )
-        const processMemoryStack = processMetricResponse.data.filter(
-          item => item.metric_name === 'process_memory_stack'
-        )
-        const processMemorySwap = processMetricResponse.data.filter(
-          item => item.metric_name === 'process_memory_swap'
-        )
-        const processNetWriteBytes = processMetricResponse.data.filter(
-          item => item.metric_name === 'process_net_write_bytes'
-        )
-        const processNetReadBytes = processMetricResponse.data.filter(
-          item => item.metric_name === 'process_net_read_bytes'
-        )
-        setSnapshotData(processSnapShotResponseArray)
-        if (processCpuUserLoad) {
-          const CpuChartConfig: Highcharts.Options = {
-            xAxis: {
-              type: 'datetime',
-              categories: processCpuUserLoad.map(item =>
-                dayjs(item.bucket)
-                  .utc()
-                  .format('YY-M-D HH:mm:ss')
-              ),
-              tickInterval: chartTickInterval
+      )
+      setdbQueryTime(processMetricResponse.db_query_time)
+      const processCpuUserLoad = processMetricResponse.data.filter(
+        item => item.metric_name === 'process_cpu_user_load'
+      )
+      const processCpuSystemLoad = processMetricResponse.data.filter(
+        item => item.metric_name === 'process_cpu_system_load'
+      )
+      const processMemoryRss = processMetricResponse.data.filter(
+        item => item.metric_name === 'process_memory_rss'
+      )
+      const processMemoryData = processMetricResponse.data.filter(
+        item => item.metric_name === 'process_memory_data'
+      )
+      const processMemoryStack = processMetricResponse.data.filter(
+        item => item.metric_name === 'process_memory_stack'
+      )
+      const processMemorySwap = processMetricResponse.data.filter(
+        item => item.metric_name === 'process_memory_swap'
+      )
+      const processNetWriteBytes = processMetricResponse.data.filter(
+        item => item.metric_name === 'process_net_write_bytes'
+      )
+      const processNetReadBytes = processMetricResponse.data.filter(
+        item => item.metric_name === 'process_net_read_bytes'
+      )
+      if (processCpuUserLoad) {
+        const CpuChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: processCpuUserLoad.map(item =>
+              dayjs(item.bucket)
+                .utc()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'process_cpu_user_load',
+              data: processCpuUserLoad.map(item => item.value)
             },
-            series: [
-              {
-                type: 'line',
-                name: 'process_cpu_user_load',
-                data: processCpuUserLoad.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'process_cpu_system_load',
-                data: processCpuSystemLoad.map(item => item.value)
-              }
-            ]
-          }
-          setCpuChartConfig(
-            processCpuUserLoad.length !== 0 ? CpuChartConfig : null
-          )
+            {
+              type: 'line',
+              name: 'process_cpu_system_load',
+              data: processCpuSystemLoad.map(item => item.value)
+            }
+          ]
         }
-        if (processMemoryRss) {
-          const memoryChartConfig: Highcharts.Options = {
-            xAxis: {
-              type: 'datetime',
-              categories: processMemoryRss.map(item =>
-                dayjs(item.bucket)
-                  .utc()
-                  .format('YY-M-D HH:mm:ss')
-              ),
-              tickInterval: chartTickInterval
+        setCpuChartConfig(
+          processCpuUserLoad.length !== 0 ? CpuChartConfig : null
+        )
+      }
+      if (processMemoryRss) {
+        const memoryChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: processMemoryRss.map(item =>
+              dayjs(item.bucket)
+                .utc()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'process_memory_rss',
+              data: processMemoryRss.map(item => item.value)
             },
-            series: [
-              {
-                type: 'line',
-                name: 'process_memory_rss',
-                data: processMemoryRss.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'process_memory_data',
-                data: processMemoryData.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'process_memory_stack',
-                data: processMemoryStack.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'process_memory_swap',
-                data: processMemorySwap.map(item => item.value)
-              }
-            ]
-          }
-          setMemoryChartConfig(
-            processMemoryRss.length !== 0 ? memoryChartConfig : null
-          )
-        }
-        if (processNetWriteBytes) {
-          const NetworkChartConfig: Highcharts.Options = {
-            xAxis: {
-              type: 'datetime',
-              categories: processNetWriteBytes.map(item =>
-                dayjs(item.bucket)
-                  .utc()
-                  .format('YY-M-D HH:mm:ss')
-              ),
-              tickInterval: chartTickInterval
+            {
+              type: 'line',
+              name: 'process_memory_data',
+              data: processMemoryData.map(item => item.value)
             },
-            series: [
-              {
-                type: 'line',
-                name: 'process_net_write_bytes',
-                data: processNetWriteBytes.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'process_net_read_bytes',
-                data: processNetReadBytes.map(item => item.value)
-              }
-            ]
-          }
-          setNetworkChartConfig(
-            processNetWriteBytes.length !== 0 ? NetworkChartConfig : null
-          )
+            {
+              type: 'line',
+              name: 'process_memory_stack',
+              data: processMemoryStack.map(item => item.value)
+            },
+            {
+              type: 'line',
+              name: 'process_memory_swap',
+              data: processMemorySwap.map(item => item.value)
+            }
+          ]
         }
+        setMemoryChartConfig(
+          processMemoryRss.length !== 0 ? memoryChartConfig : null
+        )
+      }
+      if (processNetWriteBytes) {
+        const NetworkChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: processNetWriteBytes.map(item =>
+              dayjs(item.bucket)
+                .utc()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'process_net_write_bytes',
+              data: processNetWriteBytes.map(item => item.value)
+            },
+            {
+              type: 'line',
+              name: 'process_net_read_bytes',
+              data: processNetReadBytes.map(item => item.value)
+            }
+          ]
+        }
+        setNetworkChartConfig(
+          processNetWriteBytes.length !== 0 ? NetworkChartConfig : null
+        )
       }
     } catch (error) {
       setError(error)

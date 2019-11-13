@@ -133,166 +133,172 @@ const ClusterDetailContainer = () => {
   }
   const fetchData = useCallback(async () => {
     try {
-      if (match) {
-        const { data: ClustersResponse } = await getClusters()
-        let DropDwonList: IbreadcrumbDropdownMenu[] = []
-        ClustersResponse.map(item =>
-          DropDwonList.push({
-            id: item.id,
-            link: `/clusters/${item.id}`,
-            text: item.name
-          })
+      const { data: ClustersResponse } = await getClusters()
+      let DropDwonList: IbreadcrumbDropdownMenu[] = []
+      ClustersResponse.map(item =>
+        DropDwonList.push({
+          id: item.id,
+          link: `/clusters/${item.id}`,
+          text: item.name
+        })
+      )
+      match &&
+        match.params.clusterId &&
+        dispatch(
+          setCluster(Number(match.params.clusterId), ClustersResponse[0].name)
         )
-        match &&
-          match.params.clusterId &&
-          dispatch(
-            setCluster(Number(match.params.clusterId), ClustersResponse[0].name)
-          )
-        setDropdownList(DropDwonList)
-        const metricNodeDataResponse = await getMetricsNodes(
-          Number(match.params.clusterId),
-          `dateRange=${dayjs(Date.now())
-            .subtract(chartDateRange.value, chartDateRange.unit)
-            .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
-            Date.now()
-          ).format(
-            'YYYY-MM-DD HH:mm:ss'
-          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul&granularity=${
-            chartDateRange.value
-          }${chartDateRange.unit}`
-        )
-        setdbQueryTime(metricNodeDataResponse.db_query_time)
-        const nodeCpuLoadAvg1 = metricNodeDataResponse.data.filter(
-          item => item.metric_name === 'node_cpu_load_avg_1'
-        )
-        const nodeCpuLoadAvg5 = metricNodeDataResponse.data.filter(
-          item => item.metric_name === 'node_cpu_load_avg_5'
-        )
-        const nodeCpuLoadAvg15 = metricNodeDataResponse.data.filter(
-          item => item.metric_name === 'node_cpu_load_avg_15'
-        )
-        const nodeMemoryTotal = metricNodeDataResponse.data.filter(
-          item => item.metric_name === 'node_memory_total'
-        )
-        const nodeMemoryUsed = metricNodeDataResponse.data.filter(
-          item => item.metric_name === 'node_memory_used'
-        )
-        if (nodeCpuLoadAvg1) {
-          const CpuChartConfig: Highcharts.Options = {
-            xAxis: {
-              type: 'datetime',
-              categories: nodeCpuLoadAvg1.map(item =>
-                dayjs(item.bucket)
-                  .utc()
-                  .format('YY-M-D HH:mm:ss')
-              ),
-              tickInterval: chartTickInterval
+      setDropdownList(DropDwonList)
+    } catch (error) {
+      setError(error)
+    }
+    try {
+      const metricNodeDataResponse = await getMetricsNodes(
+        Number(match && match.params.clusterId),
+        `dateRange=${dayjs(Date.now())
+          .subtract(chartDateRange.value, chartDateRange.unit)
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
+          'YYYY-MM-DD HH:mm:ss'
+        )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul&granularity=${
+          chartDateRange.value
+        }${chartDateRange.unit}`
+      )
+      setdbQueryTime(metricNodeDataResponse.db_query_time)
+      const nodeCpuLoadAvg1 = metricNodeDataResponse.data.filter(
+        item => item.metric_name === 'node_cpu_load_avg_1'
+      )
+      const nodeCpuLoadAvg5 = metricNodeDataResponse.data.filter(
+        item => item.metric_name === 'node_cpu_load_avg_5'
+      )
+      const nodeCpuLoadAvg15 = metricNodeDataResponse.data.filter(
+        item => item.metric_name === 'node_cpu_load_avg_15'
+      )
+      const nodeMemoryTotal = metricNodeDataResponse.data.filter(
+        item => item.metric_name === 'node_memory_total'
+      )
+      const nodeMemoryUsed = metricNodeDataResponse.data.filter(
+        item => item.metric_name === 'node_memory_used'
+      )
+      if (nodeCpuLoadAvg1) {
+        const CpuChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: nodeCpuLoadAvg1.map(item =>
+              dayjs(item.bucket)
+                .utc()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'node_cpu_load_avg_1',
+              data: nodeCpuLoadAvg1.map(item => item.value)
             },
-            series: [
-              {
-                type: 'line',
-                name: 'node_cpu_load_avg_1',
-                data: nodeCpuLoadAvg1.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'node_cpu_load_avg_5',
-                data: nodeCpuLoadAvg5.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'node_cpu_load_avg_15',
-                data: nodeCpuLoadAvg15.map(item => item.value)
-              }
-            ]
-          }
-          setCpuChartConfig(
-            metricNodeDataResponse.data.length !== 0 ? CpuChartConfig : null
-          )
-          const MemoryChartConfig: Highcharts.Options = {
-            xAxis: {
-              type: 'datetime',
-              categories: nodeMemoryTotal.map(item =>
-                dayjs(item.bucket)
-                  .utc()
-                  .format('YY-M-D HH:mm:ss')
-              ),
-              tickInterval: chartTickInterval
+            {
+              type: 'line',
+              name: 'node_cpu_load_avg_5',
+              data: nodeCpuLoadAvg5.map(item => item.value)
             },
-            series: [
-              {
-                type: 'line',
-                name: 'node_memory_total',
-                data: nodeMemoryTotal.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'node_memory_used',
-                data: nodeMemoryUsed.map(item => item.value)
-              }
-            ]
-          }
-          setMemoryChartConfig(
-            metricNodeDataResponse.data.length !== 0 ? MemoryChartConfig : null
-          )
-          const {
-            data: {
-              data: { data: nodeListResponse }
+            {
+              type: 'line',
+              name: 'node_cpu_load_avg_15',
+              data: nodeCpuLoadAvg15.map(item => item.value)
             }
-          } = await getClusterNodes(Number(match.params.clusterId))
-          setNodeListData(nodeListResponse)
-          const { data: clusterSummaryResponse } = await getSummaryCluster(
-            Number(match.params.clusterId)
-          )
-          let summaryData: IsummaryClustersData[] = []
-          summaryData = summaryData.concat(...values(clusterSummaryResponse))
-          setUsageData(summaryData.length !== 0 ? summaryData : null)
-          const { data: metricPodsDataResponse } = await getMetricsPods(
-            Number(match.params.clusterId),
-            `dateRange=${dayjs(Date.now())
-              .subtract(chartDateRange.value, chartDateRange.unit)
-              .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(
-              Date.now()
-            ).format(
-              'YYYY-MM-DD HH:mm:ss'
-            )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
-              chartDateRange.value
-            }${chartDateRange.unit}`
-          )
-          const containerMemoryRss = metricPodsDataResponse.filter(
-            item => item.metric_name === 'container_memory_rss'
-          )
-          const containerCpuUsageTotal = metricPodsDataResponse.filter(
-            item => item.metric_name === 'container_cpu_usage_total'
-          )
-          const PodChartConfig: Highcharts.Options = {
-            xAxis: {
-              type: 'datetime',
-              categories: containerMemoryRss.map(item =>
-                dayjs(item.bucket)
-                  .utc()
-                  .format('YY-M-D HH:mm:ss')
-              ),
-              tickInterval: chartTickInterval * 5
-            },
-            series: [
-              {
-                type: 'line',
-                name: 'container_memory_rss',
-                data: containerMemoryRss.map(item => item.value)
-              },
-              {
-                type: 'line',
-                name: 'container_cpu_usage_total',
-                data: containerCpuUsageTotal.map(item => item.value)
-              }
-            ]
-          }
-          setPodChartConfig(
-            metricPodsDataResponse.length !== 0 ? PodChartConfig : null
-          )
+          ]
         }
+        setCpuChartConfig(
+          metricNodeDataResponse.data.length !== 0 ? CpuChartConfig : null
+        )
+        const MemoryChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: nodeMemoryTotal.map(item =>
+              dayjs(item.bucket)
+                .utc()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'node_memory_total',
+              data: nodeMemoryTotal.map(item => item.value)
+            },
+            {
+              type: 'line',
+              name: 'node_memory_used',
+              data: nodeMemoryUsed.map(item => item.value)
+            }
+          ]
+        }
+        setMemoryChartConfig(
+          metricNodeDataResponse.data.length !== 0 ? MemoryChartConfig : null
+        )
       }
+    } catch (error) {
+      setError(error)
+    }
+    try {
+      const {
+        data: {
+          data: { data: nodeListResponse }
+        }
+      } = await getClusterNodes(Number(match && match.params.clusterId))
+      setNodeListData(nodeListResponse)
+      const { data: clusterSummaryResponse } = await getSummaryCluster(
+        Number(match && match.params.clusterId)
+      )
+      let summaryData: IsummaryClustersData[] = []
+      summaryData = summaryData.concat(...values(clusterSummaryResponse))
+      setUsageData(summaryData.length !== 0 ? summaryData : null)
+    } catch (error) {
+      setError(error)
+    }
+    try {
+      const { data: metricPodsDataResponse } = await getMetricsPods(
+        Number(match && match.params.clusterId),
+        `dateRange=${dayjs(Date.now())
+          .subtract(chartDateRange.value, chartDateRange.unit)
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
+          'YYYY-MM-DD HH:mm:ss'
+        )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
+          chartDateRange.value
+        }${chartDateRange.unit}`
+      )
+      const containerMemoryRss = metricPodsDataResponse.filter(
+        item => item.metric_name === 'container_memory_rss'
+      )
+      const containerCpuUsageTotal = metricPodsDataResponse.filter(
+        item => item.metric_name === 'container_cpu_usage_total'
+      )
+      const PodChartConfig: Highcharts.Options = {
+        xAxis: {
+          type: 'datetime',
+          categories: containerMemoryRss.map(item =>
+            dayjs(item.bucket)
+              .utc()
+              .format('YY-M-D HH:mm:ss')
+          ),
+          tickInterval: chartTickInterval * 5
+        },
+        series: [
+          {
+            type: 'line',
+            name: 'container_memory_rss',
+            data: containerMemoryRss.map(item => item.value)
+          },
+          {
+            type: 'line',
+            name: 'container_cpu_usage_total',
+            data: containerCpuUsageTotal.map(item => item.value)
+          }
+        ]
+      }
+      setPodChartConfig(
+        metricPodsDataResponse.length !== 0 ? PodChartConfig : null
+      )
     } catch (error) {
       setError(error)
     } finally {

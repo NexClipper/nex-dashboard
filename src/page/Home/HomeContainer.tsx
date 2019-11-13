@@ -11,6 +11,7 @@ import useInterval from '../../utils/useInterval'
 import { getClusters } from '../../apis/clusters'
 import { getSummaryClusters } from '../../apis/summary'
 import HomePresenter from './HomePresenter'
+import { logger } from '../../utils/logger'
 
 interface IclustersData {
   node_cpu_idle?: number
@@ -110,7 +111,17 @@ const HomeContainer = () => {
   const fetchData = useCallback(async () => {
     try {
       const { data: agentsResponse } = await getAgents()
+      setAgentsData(agentsResponse)
+    } catch (error) {
+      setError(error)
+    }
+    try {
       const { data: nodesResponse } = await getNodes()
+      setNodesData(nodesResponse)
+    } catch (error) {
+      setError(error)
+    }
+    try {
       const { data: clustersResponse } = await getClusters()
       const { data: ClustersSummaryResponse } = await getSummaryClusters()
       let clustersData: any[] = []
@@ -121,12 +132,10 @@ const HomeContainer = () => {
             ...values(ClustersSummaryResponse).slice(0)[
               keys(ClustersSummaryResponse)
                 .slice(0)
-                .indexOf(item.name)
+                .indexOf(item.id.toString())
             ]
           }
       )
-      setAgentsData(agentsResponse)
-      setNodesData(nodesResponse)
       setClustersData(clustersData)
     } catch (error) {
       setError(error)

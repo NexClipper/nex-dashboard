@@ -57,7 +57,6 @@ interface Iprops {
   ChangeChartDateRange: (value: any) => void
   cpuChartConfig: Highcharts.Options | null
   memoryChartConfig: Highcharts.Options | null
-  diskChartConfig: Highcharts.Options | null
   nodeContainersData: IsnapshotNodeContainerData[][] | null
   nodeContainerColumns: ColumnProps<IsnapshotNodeContainerObjectData>[]
   nodeProcessesData: IsnapshotNodeProcessData[][] | null
@@ -72,7 +71,6 @@ const NodeDetailPresenter = ({
   ChangeChartDateRange,
   cpuChartConfig,
   memoryChartConfig,
-  diskChartConfig,
   nodeContainersData,
   nodeContainerColumns,
   nodeProcessesData,
@@ -122,17 +120,6 @@ const NodeDetailPresenter = ({
               <Card title="Memory" bordered={false}>
                 {memoryChartConfig && keys(memoryChartConfig).length !== 0 ? (
                   <LineChart config={memoryChartConfig} />
-                ) : (
-                  <Empty />
-                )}
-              </Card>
-            </Col>
-          </MarginRow>
-          <MarginRow gutter={16}>
-            <Col span={24}>
-              <Card title="Disk" bordered={false}>
-                {diskChartConfig && keys(diskChartConfig).length !== 0 ? (
-                  <LineChart config={diskChartConfig} />
                 ) : (
                   <Empty />
                 )}
