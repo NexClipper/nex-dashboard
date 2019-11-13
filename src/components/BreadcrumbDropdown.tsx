@@ -16,7 +16,7 @@ interface Iprops {
 
 const MenuItem = (item: IbreadcrumbDropdownMenu) => {
   return (
-    <Menu.Item onClick={item.onClick}>
+    <Menu.Item key={item.text} onClick={item.onClick}>
       {item.link ? (
         <Link to={item.link} replace>
           {item.text}

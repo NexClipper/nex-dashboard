@@ -9,7 +9,7 @@ import useInterval from '../utils/useInterval'
 const { Content, Footer, Sider } = Layout
 
 interface MainFooterProps {
-  readonly collapse: boolean
+  readonly collapse: string
 }
 
 const FullLayout = styled.div`
@@ -35,7 +35,7 @@ const MainFooter = styled(Footer)<MainFooterProps>`
   z-index: 10;
   width: 100%;
   bottom: 0;
-  left: ${props => (props.collapse ? '80px' : '200px')};
+  left: ${props => (props.collapse === 'true' ? '80px' : '200px')};
   right: 0;
   transition: left 0.15s ease-in-out;
 `
@@ -113,7 +113,7 @@ const CommonLayout = ({ children }: Iprops) => {
               <ThemeToggle />
               <Switch>{children}</Switch>
             </MainContent>
-            <MainFooter collapse={collapsed}>
+            <MainFooter collapse={collapsed.toString()}>
               MetricsPerSeconds : {metricsPerSeconds}s&nbsp;&nbsp;Uptime :
               {uptime}
             </MainFooter>
