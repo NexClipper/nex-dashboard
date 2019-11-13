@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom'
 import { ColumnProps } from 'antd/es/table'
 import { match } from 'react-router'
 import * as Highcharts from 'highcharts'
-import BeadcrumbDropdown, {
+import BreadcrumbDropdown, {
   IbreadcrumbDropdownMenu
 } from '../../components/BreadcrumbDropdown'
 import LineChart from '../../components/LineChart'
@@ -97,7 +97,7 @@ const ClusterDetailPresenter = ({
               <Link to="/clusters">Cluster List</Link>
             </Breadcrumb.Item>
             {dropdownList && (
-              <BeadcrumbDropdown
+              <BreadcrumbDropdown
                 overlayMenu={dropdownList}
                 dropdownText={selectedClusterTitle}
               />

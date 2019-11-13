@@ -135,10 +135,12 @@ const NodeDetailPresenter = ({
                     <>
                       <LinkTitle
                         to={`/nodes/${match.params.nodeId}/container/${item[0].container_id}`}
+                        key={item[0].container_id}
                       >
                         <TitleContainer
                           level={4}
                           text={`${item[0].container}`}
+                          key={item[0].container_id}
                         />
                       </LinkTitle>
                       <TableContainer
@@ -163,8 +165,13 @@ const NodeDetailPresenter = ({
                     <>
                       <LinkTitle
                         to={`/nodes/${match.params.nodeId}/process/${item[0].process_id}`}
+                        key={item[0].process_id}
                       >
-                        <TitleContainer level={4} text={`${item[0].process}`} />
+                        <TitleContainer
+                          level={4}
+                          key={item[0].process}
+                          text={`${item[0].process}`}
+                        />
                       </LinkTitle>
                       <TableContainer
                         rowKey={'metric_name'}
