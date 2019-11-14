@@ -63,7 +63,9 @@ export interface ImetricsPodsData {
 }
 
 interface IgetMetricsPods {
+  count: number
   data: ImetricsPodsData[]
+  db_query_time: string
   message: string
   status: string
 }

@@ -88,11 +88,14 @@ const ContainerDetailContainer = () => {
         selectedClusterId,
         Number(match && match.params.nodeId),
         Number(match && match.params.containerId),
-        `dateRange=${dayjs(Date.now())
+        `dateRange=${dayjs
+          .utc()
           .subtract(chartDateRange.value, chartDateRange.unit)
-          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
-          'YYYY-MM-DD HH:mm:ss'
-        )}&metricNames=container_memory_rss&metricNames=container_memory_rss_total&metricNames=container_cpu_usage_system&metricNames=container_cpu_usage_user&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs
+          .utc()
+          .format(
+            'YYYY-MM-DD HH:mm:ss'
+          )}&metricNames=container_memory_rss&metricNames=container_memory_rss_total&metricNames=container_cpu_usage_system&metricNames=container_cpu_usage_user&metricNames=container_cpu_usage_total&granularity=${
           chartDateRange.value
         }${chartDateRange.unit}`
       )
@@ -118,7 +121,7 @@ const ContainerDetailContainer = () => {
             type: 'datetime',
             categories: containerCpuUsageTotal.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval
@@ -151,7 +154,7 @@ const ContainerDetailContainer = () => {
             type: 'datetime',
             categories: containerMemoryRss.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval

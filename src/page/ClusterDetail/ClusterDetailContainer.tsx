@@ -19,6 +19,7 @@ import { getMetricsNodes, getMetricsPods } from '../../apis/metrics'
 import { setCluster } from '../../reducers/cluster'
 import { IbreadcrumbDropdownMenu } from '../../components/BreadcrumbDropdown'
 import { IchartDateRange } from '../../types/dateRange'
+import { logger } from '../../utils/logger'
 
 dayjs.extend(utc)
 
@@ -158,11 +159,14 @@ const ClusterDetailContainer = () => {
     try {
       const metricNodeDataResponse = await getMetricsNodes(
         Number(match && match.params.clusterId),
-        `dateRange=${dayjs(Date.now())
+        `dateRange=${dayjs
+          .utc()
           .subtract(chartDateRange.value, chartDateRange.unit)
-          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
-          'YYYY-MM-DD HH:mm:ss'
-        )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul&granularity=${
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs
+          .utc()
+          .format(
+            'YYYY-MM-DD HH:mm:ss'
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&granularity=${
           chartDateRange.value
         }${chartDateRange.unit}`
       )
@@ -188,7 +192,7 @@ const ClusterDetailContainer = () => {
             type: 'datetime',
             categories: nodeCpuLoadAvg1.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval
@@ -219,7 +223,7 @@ const ClusterDetailContainer = () => {
             type: 'datetime',
             categories: nodeMemoryTotal.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval
@@ -263,11 +267,14 @@ const ClusterDetailContainer = () => {
     try {
       const { data: metricPodsDataResponse } = await getMetricsPods(
         Number(match && match.params.clusterId),
-        `dateRange=${dayjs(Date.now())
+        `dateRange=${dayjs
+          .utc()
           .subtract(chartDateRange.value, chartDateRange.unit)
-          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
-          'YYYY-MM-DD HH:mm:ss'
-        )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&timezone=Asia/Seoul&granularity=${
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs
+          .utc()
+          .format(
+            'YYYY-MM-DD HH:mm:ss'
+          )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&granularity=${
           chartDateRange.value
         }${chartDateRange.unit}`
       )
@@ -283,6 +290,7 @@ const ClusterDetailContainer = () => {
           categories: containerMemoryRss.map(item =>
             dayjs(item.bucket)
               .utc()
+              .local()
               .format('YY-M-D HH:mm:ss')
           ),
           tickInterval: chartTickInterval * 5

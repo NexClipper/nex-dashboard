@@ -154,11 +154,14 @@ const NodeDetailContainer = () => {
       const metricDataResponse = await getMetricsNode(
         selectedClusterId,
         Number(match && match.params.nodeId),
-        `dateRange=${dayjs(Date.now())
+        `dateRange=${dayjs
+          .utc()
           .subtract(chartDateRange.value, chartDateRange.unit)
-          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
-          'YYYY-MM-DD HH:mm:ss'
-        )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&timezone=Asia/Seoul&granularity=${
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs
+          .utc()
+          .format(
+            'YYYY-MM-DD HH:mm:ss'
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&granularity=${
           chartDateRange.value
         }${chartDateRange.unit}`
       )
@@ -184,7 +187,7 @@ const NodeDetailContainer = () => {
             type: 'datetime',
             categories: nodeCpuLoadAvg1.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval
@@ -213,7 +216,7 @@ const NodeDetailContainer = () => {
             type: 'datetime',
             categories: nodeMemoryTotal.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval

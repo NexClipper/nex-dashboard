@@ -89,12 +89,15 @@ const ProcessDetailContainer = () => {
         selectedClusterId,
         Number(match && match.params.nodeId),
         Number(match && match.params.processId),
-        `dateRange=${dayjs(Date.now())
+        `dateRange=${dayjs
+          .utc()
           .subtract(chartDateRange.value, chartDateRange.unit)
-          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs(Date.now()).format(
-          'YYYY-MM-DD HH:mm:ss'
-        )}&metricNames=process_cpu_user_load&metricNames=process_cpu_system_load&
-          metricNames=process_memory_percent&metricNames=process_memory_rss&metricNames=process_memory_data&metricNames=process_memory_stack&metricNames=process_memory_swap&metricNames=process_net_write_bytes&metricNames=process_net_read_bytes&timezone=Asia/Seoul&granularity=${
+          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs
+          .utc()
+          .format(
+            'YYYY-MM-DD HH:mm:ss'
+          )}&metricNames=process_cpu_user_load&metricNames=process_cpu_system_load&
+          metricNames=process_memory_percent&metricNames=process_memory_rss&metricNames=process_memory_data&metricNames=process_memory_stack&metricNames=process_memory_swap&metricNames=process_net_write_bytes&metricNames=process_net_read_bytes&granularity=${
             chartDateRange.value
           }${chartDateRange.unit}`
       )
@@ -129,7 +132,7 @@ const ProcessDetailContainer = () => {
             type: 'datetime',
             categories: processCpuUserLoad.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval
@@ -157,7 +160,7 @@ const ProcessDetailContainer = () => {
             type: 'datetime',
             categories: processMemoryRss.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval
@@ -195,7 +198,7 @@ const ProcessDetailContainer = () => {
             type: 'datetime',
             categories: processNetWriteBytes.map(item =>
               dayjs(item.bucket)
-                .utc()
+                .local()
                 .format('YY-M-D HH:mm:ss')
             ),
             tickInterval: chartTickInterval
