@@ -17,14 +17,22 @@ const NodeListContainer = () => {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const columns: ColumnProps<ItableColumns>[] = [
+  const columns: ColumnProps<InodeListContainer>[] = [
     {
       title: 'Host',
       dataIndex: 'host',
       key: 'host',
       render: (value, _, index) =>
         data && <Link to={`/nodes/${data[index].id}`}>{value}</Link>,
-      align: 'center'
+      align: 'center',
+      defaultSortOrder: 'ascend',
+      sorter: (a, b) => {
+        const hostA = a.host
+        const hostB = b.host
+        if (hostA < hostB) return -1
+        if (hostA > hostB) return 1
+        return 0
+      }
     },
     {
       title: 'IP',

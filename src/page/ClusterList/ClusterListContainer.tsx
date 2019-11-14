@@ -29,7 +29,15 @@ const ClusterListContainer = () => {
         clustersData && (
           <Link to={`/clusters/${clustersData[index].id}`}>{value}</Link>
         ),
-      align: 'center'
+      align: 'center',
+      defaultSortOrder: 'ascend',
+      sorter: (a, b) => {
+        const nameA = a.name
+        const nameB = b.name
+        if (nameA < nameB) return -1
+        if (nameA > nameB) return 1
+        return 0
+      }
     },
     {
       title: 'Kubernetes',

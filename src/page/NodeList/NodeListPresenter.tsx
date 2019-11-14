@@ -8,7 +8,7 @@ import TitleContainer from '../../components/TitleContainer'
 interface Iprops {
   loading: boolean
   data: InodeListContainer[] | null
-  columns: ColumnProps<ItableColumns>[]
+  columns: ColumnProps<InodeListContainer>[]
 }
 
 const NodeListPresenter = ({ loading, data, columns }: Iprops) => {

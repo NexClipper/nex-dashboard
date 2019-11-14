@@ -26,6 +26,10 @@ interface Iprops {
 const SelectDate = ({ onChange }: Iprops) => {
   const options: Ioptions[] = [
     {
+      value: '15 minute',
+      text: 'Last 15 minutes'
+    },
+    {
       value: '1 hour',
       text: 'Last 1 hours'
     },

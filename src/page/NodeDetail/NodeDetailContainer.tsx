@@ -34,7 +34,15 @@ const nodeContainerColumns: ColumnProps<IsnapshotNodeContainerObjectData>[] = [
     title: 'Metric Name',
     dataIndex: 'metric_name',
     key: 'metric_name',
-    align: 'center'
+    align: 'center',
+    defaultSortOrder: 'ascend',
+    sorter: (a, b) => {
+      const metricNameA = a.metric_name
+      const metricNameB = b.metric_name
+      if (metricNameA < metricNameB) return -1
+      if (metricNameA > metricNameB) return 1
+      return 0
+    }
   },
   {
     title: 'Value',
@@ -61,7 +69,15 @@ const nodeProcessColumns: ColumnProps<IsnapshotNodeProcessObjectData>[] = [
     title: 'Metric Name',
     dataIndex: 'metric_name',
     key: 'metric_name',
-    align: 'center'
+    align: 'center',
+    defaultSortOrder: 'ascend',
+    sorter: (a, b) => {
+      const metricNameA = a.metric_name
+      const metricNameB = b.metric_name
+      if (metricNameA < metricNameB) return -1
+      if (metricNameA > metricNameB) return 1
+      return 0
+    }
   },
   {
     title: 'Value',

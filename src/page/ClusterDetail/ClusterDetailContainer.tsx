@@ -71,7 +71,15 @@ const ClusterDetailContainer = () => {
         nodeListData &&
         match && <Link to={`/nodes/${nodeListData[index].id}`}>{value}</Link>,
       width: 130,
-      align: 'center'
+      align: 'center',
+      defaultSortOrder: 'ascend',
+      sorter: (a, b) => {
+        const hostA = a.host.toUpperCase()
+        const hostB = b.host.toUpperCase()
+        if (hostA < hostB) return -1
+        if (hostA > hostB) return 1
+        return 0
+      }
     },
     {
       title: 'Ip',

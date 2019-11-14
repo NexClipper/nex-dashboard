@@ -28,7 +28,15 @@ const HomeContainer = () => {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      align: 'center'
+      align: 'center',
+      defaultSortOrder: 'ascend',
+      sorter: (a, b) => {
+        const nameA = a.name
+        const nameB = b.name
+        if (nameA < nameB) return -1
+        if (nameA > nameB) return 1
+        return 0
+      }
     },
     {
       title: 'Kubernetes',
@@ -136,7 +144,15 @@ const HomeContainer = () => {
       title: 'Ip',
       dataIndex: 'ip',
       key: 'ip',
-      align: 'center'
+      align: 'center',
+      defaultSortOrder: 'ascend',
+      sorter: (a, b) => {
+        const ipA = a.ip
+        const ipB = b.ip
+        if (ipA < ipB) return -1
+        if (ipA > ipB) return 1
+        return 0
+      }
     },
     {
       title: 'Online',
@@ -166,7 +182,15 @@ const HomeContainer = () => {
       title: 'Host',
       dataIndex: 'host',
       key: 'host',
-      align: 'center'
+      align: 'center',
+      defaultSortOrder: 'ascend',
+      sorter: (a, b) => {
+        const hostA = a.host
+        const hostB = b.host
+        if (hostA < hostB) return -1
+        if (hostA > hostB) return 1
+        return 0
+      }
     },
     {
       title: 'Ip',
