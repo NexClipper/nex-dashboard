@@ -1,10 +1,14 @@
 version: "3.7"
 
 services:
-  prod:
-    container_name: nex-dashbaord
+  nex-dashbaord-prod:
+    env_file: .env.production
+    environment:
+      - REACT_APP_API_URL_PROD
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        api_url: $REACT_APP_API_URL_PROD
     ports:
       - "80:80"
