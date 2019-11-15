@@ -6,7 +6,6 @@ import utc from 'dayjs/plugin/utc'
 import values from 'lodash-es/values'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../reducers'
-import { OpUnitType } from 'dayjs'
 import useInterval from '../../utils/useInterval'
 import {
   IsnapshotNodeContainerData,
