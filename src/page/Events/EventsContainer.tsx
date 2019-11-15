@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import useInterval from '../../utils/useInterval'
 import { IcidentsBasicData, getIncidentsBasic } from '../../apis/incidents'
-import EventsPresenter from './EventsPresenter'
 import { ColumnProps } from 'antd/es/table'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import EventsPresenter from './EventsPresenter'
+
+dayjs.extend(utc)
 
 const EventsContainer = () => {
   const [incidentsData, setIncidentsData] = useState<
@@ -52,13 +56,21 @@ const EventsContainer = () => {
       title: 'ReportedTs',
       dataIndex: 'ReportedTs',
       key: 'ReportedTs',
-      align: 'center'
+      align: 'center',
+      render: value =>
+        dayjs(value)
+          .local()
+          .format('YY-M-D HH:mm:ss')
     },
     {
       title: 'DetectedTs',
       dataIndex: 'DetectedTs',
       key: 'DetectedTs',
-      align: 'center'
+      align: 'center',
+      render: value =>
+        dayjs(value)
+          .local()
+          .format('YY-M-D HH:mm:ss.SSS')
     }
   ]
 
