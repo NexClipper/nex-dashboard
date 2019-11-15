@@ -19,7 +19,6 @@ import { getMetricsNodes, getMetricsPods } from '../../apis/metrics'
 import { setCluster } from '../../reducers/cluster'
 import { IbreadcrumbDropdownMenu } from '../../components/BreadcrumbDropdown'
 import { IchartDateRange } from '../../types/dateRange'
-import { logger } from '../../utils/logger'
 
 dayjs.extend(utc)
 
