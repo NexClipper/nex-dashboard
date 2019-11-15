@@ -1,0 +1,3 @@
+import PrometheusExportersContainer from './PrometheusExportersContainer'
+
+export default PrometheusExportersContainer
