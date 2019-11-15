@@ -114,9 +114,7 @@ const LineChart = ({ config }: HighchartProps) => {
       }
     },
     credits: {
-      style: {
-        color: '#F0F0F3'
-      }
+      enabled: false
     },
     drilldown: {
       activeAxisLabelStyle: {
@@ -220,7 +218,9 @@ const LineChart = ({ config }: HighchartProps) => {
             }
           }
         },
-        credits: {},
+        credits: {
+          enabled: false
+        },
         drilldown: {},
         navigation: {},
         series: config.series
