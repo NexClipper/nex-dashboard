@@ -70,6 +70,18 @@ interface IgetMetricsPods {
   status: string
 }
 
+export const getMetricsSummary = async (clusterId: number, query: string) => {
+  try {
+    const action = `/metrics/${clusterId}/summary?${query}`
+    const result: AxiosResponse<IgetMetricsNode> = await api.getData(action)
+
+    return result.data
+  } catch (error) {
+    logger('error.response', error)
+    throw error
+  }
+}
+
 export const getMetricsNodes = async (clusterId: number, query: string) => {
   try {
     const action = `/metrics/${clusterId}/nodes?${query}`

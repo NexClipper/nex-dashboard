@@ -15,7 +15,7 @@ import {
   getClusterNodes,
   getClusters
 } from '../../apis/clusters'
-import { getMetricsNodes, getMetricsPods } from '../../apis/metrics'
+import { getMetricsPods, getMetricsSummary } from '../../apis/metrics'
 import { setCluster } from '../../reducers/cluster'
 import { IbreadcrumbDropdownMenu } from '../../components/BreadcrumbDropdown'
 import { IchartDateRange } from '../../types/dateRange'
@@ -156,7 +156,7 @@ const ClusterDetailContainer = () => {
       setError(error)
     }
     try {
-      const metricNodeDataResponse = await getMetricsNodes(
+      const metricNodeDataResponse = await getMetricsSummary(
         Number(match && match.params.clusterId),
         `dateRange=${dayjs
           .utc()
