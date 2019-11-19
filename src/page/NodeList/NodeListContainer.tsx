@@ -22,8 +22,12 @@ const NodeListContainer = () => {
       title: 'Host',
       dataIndex: 'host',
       key: 'host',
-      render: (value, _, index) =>
-        data && <Link to={`/nodes/${data[index].id}`}>{value}</Link>,
+      render: value =>
+        data && (
+          <Link to={`/nodes/${data.filter(item => item.host === value)[0].id}`}>
+            {value}
+          </Link>
+        ),
       align: 'center',
       defaultSortOrder: 'ascend',
       sorter: (a, b) => {
