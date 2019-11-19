@@ -25,9 +25,15 @@ const ClusterListContainer = () => {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      render: (value, _, index) =>
+      render: value =>
         clustersData && (
-          <Link to={`/clusters/${clustersData[index].id}`}>{value}</Link>
+          <Link
+            to={`/clusters/${
+              clustersData.filter(item => item.name === value)[0].id
+            }`}
+          >
+            {value}
+          </Link>
         ),
       align: 'center',
       defaultSortOrder: 'ascend',
