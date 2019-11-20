@@ -114,6 +114,10 @@ const NodeDetailContainer = () => {
     memoryChartConfig,
     setMemoryChartConfig
   ] = useState<Highcharts.Options | null>(null)
+  const [
+    diskChartConfig,
+    setDiskChartConfig
+  ] = useState<Highcharts.Options | null>(null)
   const [nodeContainersData, setNodeContainersData] = useState<
     IsnapshotNodeContainerData[][] | null
   >(null)
@@ -161,7 +165,7 @@ const NodeDetailContainer = () => {
           .utc()
           .format(
             'YYYY-MM-DD HH:mm:ss'
-          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&granularity=${
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&metricNames=node_disk_total&metricNames=node_disk_free&metricNames=node_disk_used&granularity=${
           chartDateRange.value
         }${chartDateRange.unit}`
       )
@@ -180,6 +184,15 @@ const NodeDetailContainer = () => {
       )
       const nodeMemoryUsed = metricDataResponse.data.filter(
         item => item.metric_name === 'node_memory_used'
+      )
+      const nodeDiskTotal = metricDataResponse.data.filter(
+        item => item.metric_name === 'node_disk_total'
+      )
+      const nodeDiskFree = metricDataResponse.data.filter(
+        item => item.metric_name === 'node_disk_total'
+      )
+      const nodeDiskUsed = metricDataResponse.data.filter(
+        item => item.metric_name === 'node_disk_used'
       )
       if (nodeCpuLoadAvg1) {
         const CpuChartConfig: Highcharts.Options = {
@@ -237,6 +250,35 @@ const NodeDetailContainer = () => {
         setMemoryChartConfig(
           nodeMemoryTotal.length !== 0 ? MemoryChartConfig : null
         )
+        const DiskChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: nodeDiskTotal.map(item =>
+              dayjs(item.bucket)
+                .local()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'node_disk_total',
+              data: nodeDiskTotal.map(item => item.value)
+            },
+            {
+              type: 'line',
+              name: 'node_disk_free',
+              data: nodeDiskFree.map(item => item.value)
+            },
+            {
+              type: 'line',
+              name: 'node_disk_used',
+              data: nodeDiskUsed.map(item => item.value)
+            }
+          ]
+        }
+        setDiskChartConfig(nodeDiskTotal.length !== 0 ? DiskChartConfig : null)
       }
     } catch (error) {
       setError(error)
@@ -309,6 +351,7 @@ const NodeDetailContainer = () => {
       ChangeChartDateRange={ChangeChartDateRange}
       cpuChartConfig={cpuChartConfig}
       memoryChartConfig={memoryChartConfig}
+      diskChartConfig={diskChartConfig}
       nodeContainersData={nodeContainersData}
       nodeContainerColumns={nodeContainerColumns}
       nodeProcessesData={nodeProcessesData}
