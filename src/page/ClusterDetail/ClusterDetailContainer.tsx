@@ -15,7 +15,7 @@ import {
   getClusterNodes,
   getClusters
 } from '../../apis/clusters'
-import { getMetricsPods, getMetricsSummary } from '../../apis/metrics'
+import { getMetricsSummary } from '../../apis/metrics'
 import { setCluster } from '../../reducers/cluster'
 import { IbreadcrumbDropdownMenu } from '../../components/BreadcrumbDropdown'
 import { IchartDateRange } from '../../types/dateRange'
@@ -58,7 +58,7 @@ const ClusterDetailContainer = () => {
     value: 15,
     unit: 'minute'
   })
-  const [chartTickInterval, setChartTickInterval] = useState(90)
+  const [chartTickInterval, setChartTickInterval] = useState(5)
   const [dropdownList, setDropdownList] = useState<
     IbreadcrumbDropdownMenu[] | null
   >(null)
