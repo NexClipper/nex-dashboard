@@ -46,7 +46,7 @@ const ProcessDetailContainer = () => {
     value: 15,
     unit: 'minute'
   })
-  const [chartTickInterval, setChartTickInterval] = useState(5)
+  const [chartTickInterval, setChartTickInterval] = useState(1)
   const [dbQueryTime, setdbQueryTime] = useState<string | null>(null)
 
   const ChangeChartDateRange = (value: any) => {
@@ -54,19 +54,6 @@ const ProcessDetailContainer = () => {
       value: Number(value.split(' ')[0]),
       unit: value.split(' ')[1]
     })
-    switch (value.split(' ')[1]) {
-      case 'hour':
-        setChartTickInterval(5)
-        break
-      case 'day':
-        setChartTickInterval(1)
-        break
-      case 'month':
-        setChartTickInterval(1)
-        break
-      default:
-        setChartTickInterval(5)
-    }
   }
 
   const fetchData = useCallback(async () => {
@@ -97,9 +84,7 @@ const ProcessDetailContainer = () => {
           .format(
             'YYYY-MM-DD HH:mm:ss'
           )}&metricNames=process_cpu_user_load&metricNames=process_cpu_system_load&
-          metricNames=process_memory_percent&metricNames=process_memory_rss&metricNames=process_memory_data&metricNames=process_memory_stack&metricNames=process_memory_swap&metricNames=process_net_write_bytes&metricNames=process_net_read_bytes&granularity=${
-            chartDateRange.value
-          }${chartDateRange.unit}`
+          metricNames=process_memory_percent&metricNames=process_memory_rss&metricNames=process_memory_data&metricNames=process_memory_stack&metricNames=process_memory_swap&metricNames=process_net_write_bytes&metricNames=process_net_read_bytes`
       )
       setdbQueryTime(processMetricResponse.db_query_time)
       const processCpuUserLoad = processMetricResponse.data.filter(

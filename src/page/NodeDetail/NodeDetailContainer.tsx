@@ -138,19 +138,6 @@ const NodeDetailContainer = () => {
       value: Number(value.split(' ')[0]),
       unit: value.split(' ')[1]
     })
-    switch (value.split(' ')[1]) {
-      case 'hour':
-        setChartTickInterval(5)
-        break
-      case 'day':
-        setChartTickInterval(1)
-        break
-      case 'month':
-        setChartTickInterval(1)
-        break
-      default:
-        setChartTickInterval(5)
-    }
   }
 
   const fetchData = useCallback(async () => {
@@ -165,9 +152,7 @@ const NodeDetailContainer = () => {
           .utc()
           .format(
             'YYYY-MM-DD HH:mm:ss'
-          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&metricNames=node_disk_total&metricNames=node_disk_free&metricNames=node_disk_used&granularity=${
-          chartDateRange.value
-        }${chartDateRange.unit}`
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&metricNames=node_disk_total&metricNames=node_disk_free&metricNames=node_disk_used`
       )
       setdbQueryTime(metricDataResponse.db_query_time)
       const nodeCpuLoadAvg1 = metricDataResponse.data.filter(
