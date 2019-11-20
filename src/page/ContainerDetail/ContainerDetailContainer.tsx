@@ -50,19 +50,6 @@ const ContainerDetailContainer = () => {
       value: Number(value.split(' ')[0]),
       unit: value.split(' ')[1]
     })
-    switch (value.split(' ')[1]) {
-      case 'hour':
-        setChartTickInterval(5)
-        break
-      case 'day':
-        setChartTickInterval(1)
-        break
-      case 'month':
-        setChartTickInterval(1)
-        break
-      default:
-        setChartTickInterval(5)
-    }
   }
 
   const fetchData = useCallback(async () => {
@@ -94,9 +81,7 @@ const ContainerDetailContainer = () => {
           .utc()
           .format(
             'YYYY-MM-DD HH:mm:ss'
-          )}&metricNames=container_memory_rss&metricNames=container_memory_rss_total&metricNames=container_cpu_usage_system&metricNames=container_cpu_usage_user&metricNames=container_cpu_usage_total&granularity=${
-          chartDateRange.value
-        }${chartDateRange.unit}`
+          )}&metricNames=container_memory_rss&metricNames=container_memory_rss_total&metricNames=container_cpu_usage_system&metricNames=container_cpu_usage_user&metricNames=container_cpu_usage_total`
       )
       setdbQueryTime(containerMetricResponse.db_query_time)
       const containerMemoryRss = containerMetricResponse.data.filter(
