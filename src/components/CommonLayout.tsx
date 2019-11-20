@@ -66,7 +66,7 @@ const CommonLayout = ({ children }: Iprops) => {
     fetchData()
   }, [])
 
-  useInterval(() => (!error ? fetchData() : null), 3000)
+  useInterval(() => (!error ? fetchData() : null), 10000)
   return (
     <BrowserRouter>
       <FullLayout>

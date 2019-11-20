@@ -156,6 +156,22 @@ const ClusterDetailContainer = () => {
       setError(error)
     }
     try {
+      const {
+        data: {
+          data: { data: nodeListResponse }
+        }
+      } = await getClusterNodes(Number(match && match.params.clusterId))
+      setNodeListData(nodeListResponse)
+      const { data: clusterSummaryResponse } = await getSummaryCluster(
+        Number(match && match.params.clusterId)
+      )
+      let summaryData: IsummaryClustersData[] = []
+      summaryData = summaryData.concat(...values(clusterSummaryResponse))
+      setUsageData(summaryData.length !== 0 ? summaryData : null)
+    } catch (error) {
+      setError(error)
+    }
+    try {
       const metricNodeDataResponse = await getMetricsSummary(
         Number(match && match.params.clusterId),
         `dateRange=${dayjs
@@ -284,22 +300,6 @@ const ClusterDetailContainer = () => {
           metricNodeDataResponse.data.length !== 0 ? DiskChartConfig : null
         )
       }
-    } catch (error) {
-      setError(error)
-    }
-    try {
-      const {
-        data: {
-          data: { data: nodeListResponse }
-        }
-      } = await getClusterNodes(Number(match && match.params.clusterId))
-      setNodeListData(nodeListResponse)
-      const { data: clusterSummaryResponse } = await getSummaryCluster(
-        Number(match && match.params.clusterId)
-      )
-      let summaryData: IsummaryClustersData[] = []
-      summaryData = summaryData.concat(...values(clusterSummaryResponse))
-      setUsageData(summaryData.length !== 0 ? summaryData : null)
     } catch (error) {
       setError(error)
     } finally {
