@@ -45,8 +45,8 @@ const ClusterDetailContainer = () => {
     setMemoryChartConfig
   ] = useState<Highcharts.Options | null>(null)
   const [
-    podChartConfig,
-    setPodChartConfig
+    diskChartConfig,
+    setDiskChartConfig
   ] = useState<Highcharts.Options | null>(null)
   const [usageData, setUsageData] = useState<IsummaryClustersData[] | null>(
     null
@@ -165,7 +165,7 @@ const ClusterDetailContainer = () => {
           .utc()
           .format(
             'YYYY-MM-DD HH:mm:ss'
-          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&granularity=${
+          )}&&metricNames=node_memory_used&metricNames=node_memory_total&metricNames=node_cpu_load_avg_1&metricNames=node_cpu_load_avg_5&metricNames=node_cpu_load_avg_15&metricNames=node_disk_total&metricNames=node_disk_free&metricNames=node_disk_used&granularity=${
           chartDateRange.value
         }${chartDateRange.unit}`
       )
@@ -184,6 +184,15 @@ const ClusterDetailContainer = () => {
       )
       const nodeMemoryUsed = metricNodeDataResponse.data.filter(
         item => item.metric_name === 'node_memory_used'
+      )
+      const nodeDiskTotal = metricNodeDataResponse.data.filter(
+        item => item.metric_name === 'node_disk_total'
+      )
+      const nodeDiskFree = metricNodeDataResponse.data.filter(
+        item => item.metric_name === 'node_disk_total'
+      )
+      const nodeDiskUsed = metricNodeDataResponse.data.filter(
+        item => item.metric_name === 'node_disk_used'
       )
       if (nodeCpuLoadAvg1) {
         const CpuChartConfig: Highcharts.Options = {
@@ -243,6 +252,37 @@ const ClusterDetailContainer = () => {
         setMemoryChartConfig(
           metricNodeDataResponse.data.length !== 0 ? MemoryChartConfig : null
         )
+        const DiskChartConfig: Highcharts.Options = {
+          xAxis: {
+            type: 'datetime',
+            categories: nodeDiskTotal.map(item =>
+              dayjs(item.bucket)
+                .local()
+                .format('YY-M-D HH:mm:ss')
+            ),
+            tickInterval: chartTickInterval
+          },
+          series: [
+            {
+              type: 'line',
+              name: 'node_disk_total',
+              data: nodeDiskTotal.map(item => item.value)
+            },
+            {
+              type: 'line',
+              name: 'node_disk_free',
+              data: nodeDiskFree.map(item => item.value)
+            },
+            {
+              type: 'line',
+              name: 'node_disk_used',
+              data: nodeDiskUsed.map(item => item.value)
+            }
+          ]
+        }
+        setDiskChartConfig(
+          metricNodeDataResponse.data.length !== 0 ? DiskChartConfig : null
+        )
       }
     } catch (error) {
       setError(error)
@@ -260,56 +300,6 @@ const ClusterDetailContainer = () => {
       let summaryData: IsummaryClustersData[] = []
       summaryData = summaryData.concat(...values(clusterSummaryResponse))
       setUsageData(summaryData.length !== 0 ? summaryData : null)
-    } catch (error) {
-      setError(error)
-    }
-    try {
-      const { data: metricPodsDataResponse } = await getMetricsPods(
-        Number(match && match.params.clusterId),
-        `dateRange=${dayjs
-          .utc()
-          .subtract(chartDateRange.value, chartDateRange.unit)
-          .format('YYYY-MM-DD HH:mm:ss')}&dateRange=${dayjs
-          .utc()
-          .format(
-            'YYYY-MM-DD HH:mm:ss'
-          )}&metricNames=container_memory_rss&metricNames=container_cpu_usage_total&granularity=${
-          chartDateRange.value
-        }${chartDateRange.unit}`
-      )
-      const containerMemoryRss = metricPodsDataResponse.filter(
-        item => item.metric_name === 'container_memory_rss'
-      )
-      const containerCpuUsageTotal = metricPodsDataResponse.filter(
-        item => item.metric_name === 'container_cpu_usage_total'
-      )
-      const PodChartConfig: Highcharts.Options = {
-        xAxis: {
-          type: 'datetime',
-          categories: containerMemoryRss.map(item =>
-            dayjs(item.bucket)
-              .utc()
-              .local()
-              .format('YY-M-D HH:mm:ss')
-          ),
-          tickInterval: chartTickInterval * 5
-        },
-        series: [
-          {
-            type: 'line',
-            name: 'container_memory_rss',
-            data: containerMemoryRss.map(item => item.value)
-          },
-          {
-            type: 'line',
-            name: 'container_cpu_usage_total',
-            data: containerCpuUsageTotal.map(item => item.value)
-          }
-        ]
-      }
-      setPodChartConfig(
-        metricPodsDataResponse.length !== 0 ? PodChartConfig : null
-      )
     } catch (error) {
       setError(error)
     } finally {
@@ -334,7 +324,7 @@ const ClusterDetailContainer = () => {
       ChangeChartDateRange={ChangeChartDateRange}
       cpuChartConfig={cpuChartConfig}
       memoryChartConfig={memoryChartConfig}
-      podChartConfig={podChartConfig}
+      diskChartConfig={diskChartConfig}
       dbQueryTime={dbQueryTime}
     />
   )

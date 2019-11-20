@@ -65,7 +65,7 @@ interface Ipros {
   ChangeChartDateRange: (value: any) => void
   cpuChartConfig: Highcharts.Options | null
   memoryChartConfig: Highcharts.Options | null
-  podChartConfig: Highcharts.Options | null
+  diskChartConfig: Highcharts.Options | null
   dbQueryTime: string | null
 }
 
@@ -80,7 +80,7 @@ const ClusterDetailPresenter = ({
   ChangeChartDateRange,
   cpuChartConfig,
   memoryChartConfig,
-  podChartConfig,
+  diskChartConfig,
   dbQueryTime
 }: Ipros) => {
   return (
@@ -190,7 +190,7 @@ const ClusterDetailPresenter = ({
             </div>
           </ChartTitleContainer>
           <Row gutter={16}>
-            <Col span={podChartConfig ? 8 : 12}>
+            <Col span={8}>
               <ChartContainer title="CPU" bordered={false} loading={loading}>
                 {cpuChartConfig ? (
                   <LineChart config={cpuChartConfig} />
@@ -199,7 +199,7 @@ const ClusterDetailPresenter = ({
                 )}
               </ChartContainer>
             </Col>
-            <Col span={podChartConfig ? 8 : 12}>
+            <Col span={8}>
               <ChartContainer title="Memory" bordered={false} loading={loading}>
                 {memoryChartConfig ? (
                   <LineChart config={memoryChartConfig} />
@@ -208,13 +208,15 @@ const ClusterDetailPresenter = ({
                 )}
               </ChartContainer>
             </Col>
-            {podChartConfig && (
-              <Col span={8}>
-                <ChartContainer title="Pod" bordered={false} loading={loading}>
-                  <LineChart config={podChartConfig} />
-                </ChartContainer>
-              </Col>
-            )}
+            <Col span={8}>
+              <ChartContainer title="Disk" bordered={false} loading={loading}>
+                {diskChartConfig ? (
+                  <LineChart config={diskChartConfig} />
+                ) : (
+                  <Empty />
+                )}
+              </ChartContainer>
+            </Col>
           </Row>
         </>
       )}
