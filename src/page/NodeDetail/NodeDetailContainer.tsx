@@ -127,8 +127,8 @@ const NodeDetailContainer = () => {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
   const [chartDateRange, setChartDateRange] = useState<IchartDateRange>({
-    value: 1,
-    unit: 'hour'
+    value: 15,
+    unit: 'minute'
   })
   const [chartTickInterval, setChartTickInterval] = useState(5)
   const [dbQueryTime, setdbQueryTime] = useState<string | null>(null)
