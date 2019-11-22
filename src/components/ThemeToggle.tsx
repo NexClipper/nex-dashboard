@@ -1,7 +1,9 @@
 import React from 'react'
 import { Switch } from 'antd'
 import styled from 'styled-components'
-import { themeStroe } from '../store'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState } from '../reducers'
+import { toggleTheme } from '../reducers/theme'
 import * as Dom from '../utils/dom'
 
 const ThemeSwitchContainer = styled.div`
@@ -20,14 +22,16 @@ const ThemeSwitchContainer = styled.div`
 `
 
 function ThemeToggle() {
+  const dark = useSelector((state: RootState) => state.theme.dark)
+  const dispatch = useDispatch()
   const onChange = () => {
-    themeStroe.toggleTheme()
-    if (themeStroe.dark) {
-      Dom.addClassToBody('dark')
-      Dom.removeClassToBody('light')
-    } else {
+    dispatch(toggleTheme())
+    if (dark) {
       Dom.addClassToBody('light')
       Dom.removeClassToBody('dark')
+    } else {
+      Dom.addClassToBody('dark')
+      Dom.removeClassToBody('light')
     }
   }
   return (
@@ -36,7 +40,7 @@ function ThemeToggle() {
         <Switch
           checkedChildren="🌙"
           unCheckedChildren="☀️"
-          defaultChecked
+          checked={dark}
           onChange={onChange}
         />
       </ThemeSwitchContainer>
