@@ -5,10 +5,12 @@ import { ColumnProps } from 'antd/es/table'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import EventsPresenter from './EventsPresenter'
+import { clusterStroe } from '../../store'
 
 dayjs.extend(utc)
 
 const EventsContainer = () => {
+  clusterStroe.setCluster(1, '')
   const [incidentsData, setIncidentsData] = useState<
     IcidentsBasicData[] | null
   >(null)

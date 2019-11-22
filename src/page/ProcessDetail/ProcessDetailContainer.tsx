@@ -5,8 +5,6 @@ import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import values from 'lodash-es/values'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../reducers'
 import useInterval from '../../utils/useInterval'
 import {
   getSnapshotNodeProcess,
@@ -14,6 +12,7 @@ import {
 } from '../../apis/snapshot'
 import { getMetricsNodeProcess } from '../../apis/metrics'
 import { IchartDateRange } from '../../types/dateRange'
+import { clusterStroe } from '../../store'
 
 dayjs.extend(utc)
 
@@ -23,7 +22,7 @@ interface Iparams {
 }
 
 const ProcessDetailContainer = () => {
-  const selectedClusterId = useSelector((state: RootState) => state.cluster.id)
+  const selectedClusterId = clusterStroe.id
   const match = useRouteMatch<Iparams>('/nodes/:nodeId/process/:processId')
   const [snapshotData, setSnapshotData] = useState<
     IsnapshotNodeProcessData[] | null

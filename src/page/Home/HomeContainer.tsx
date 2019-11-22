@@ -1,20 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { ColumnProps } from 'antd/es/table'
 import { Tag } from 'antd'
-import { useDispatch } from 'react-redux'
 import values from 'lodash-es/values'
 import keys from 'lodash-es/keys'
-import { setCluster } from '../../reducers/cluster'
 import { getAgents, IagentsObjectData } from '../../apis/agents'
 import { getNodes, InodesObjectData } from '../../apis/nodes'
 import useInterval from '../../utils/useInterval'
 import { getClusters } from '../../apis/clusters'
 import { getSummaryClusters } from '../../apis/summary'
 import HomePresenter from './HomePresenter'
+import { clusterStroe } from '../../store'
 
 const HomeContainer = () => {
-  const dispatch = useDispatch()
-  dispatch(setCluster(1, ''))
+  clusterStroe.setCluster(1, '')
   const [agentsData, setAgentsData] = useState<IagentsObjectData | null>(null)
   const [nodesData, setNodesData] = useState<InodesObjectData | null>(null)
   const [clustersData, setClustersData] = useState<

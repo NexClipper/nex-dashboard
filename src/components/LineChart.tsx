@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import * as Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-import { useSelector } from 'react-redux'
-import { RootState } from '../reducers'
+import { themeStroe } from '../store'
 
 interface HighchartProps {
   config: Highcharts.Options
 }
 
 const LineChart = ({ config }: HighchartProps) => {
-  const dark = useSelector((state: RootState) => state.theme.dark)
   const [defaultTheme, setDefaultTheme] = useState<Highcharts.Options>({})
   const darkTheme: Highcharts.Options = {
     colors: [
@@ -135,7 +133,7 @@ const LineChart = ({ config }: HighchartProps) => {
   }
 
   useEffect(() => {
-    if (!dark) {
+    if (!themeStroe.dark) {
       setDefaultTheme({
         colors: [
           '#5f98cf',
@@ -273,7 +271,7 @@ const LineChart = ({ config }: HighchartProps) => {
       })
     }
     // eslint-disable-next-line
-  }, [dark, config])
+  }, [themeStroe.dark, config])
   return <HighchartsReact highcharts={Highcharts} options={defaultTheme} />
 }
 

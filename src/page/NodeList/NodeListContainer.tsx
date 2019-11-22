@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import values from 'lodash-es/values'
 import keys from 'lodash-es/keys'
-import { RootState } from '../../reducers'
 import { ColumnProps } from 'antd/es/table'
 import NodeListPresenter from './NodeListPresenter'
-import { getClusterNodes, getClusters } from '../../apis/clusters'
+import { getClusterNodes } from '../../apis/clusters'
 import useInterval from '../../utils/useInterval'
 import { getSummaryClusterNodes } from '../../apis/summary'
-import { logger } from '../../utils/logger'
+import { clusterStroe } from '../../store'
 
 const NodeListContainer = () => {
-  const selectedClusterId = useSelector((state: RootState) => state.cluster.id)
+  const selectedClusterId = clusterStroe.id
   const [data, setData] = useState<InodeListContainer[] | null>(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)

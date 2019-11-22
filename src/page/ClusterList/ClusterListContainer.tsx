@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 import values from 'lodash-es/values'
 import keys from 'lodash-es/keys'
 import { Tag } from 'antd'
-import { setCluster } from '../../reducers/cluster'
 import { ColumnProps } from 'antd/es/table'
 import useInterval from '../../utils/useInterval'
 import { getClusters } from '../../apis/clusters'
 import { getSummaryClusters } from '../../apis/summary'
 import ClusterListPresenter from './ClusterListPresenter'
+import { clusterStroe } from '../../store'
 
 const ClusterListContainer = () => {
-  const dispatch = useDispatch()
-  dispatch(setCluster(1, ''))
+  clusterStroe.setCluster(1, '')
   const [clustersData, setClustersData] = useState<
     IclusterListContainer[] | null
   >(null)

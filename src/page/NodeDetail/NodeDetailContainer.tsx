@@ -2,12 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useRouteMatch } from 'react-router-dom'
 import * as Highcharts from 'highcharts'
 import dayjs from 'dayjs'
-import { useSelector } from 'react-redux'
 import NodeDetailPresenter from './NodeDetailPresenter'
 import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
 import values from 'lodash-es/values'
-import { RootState } from '../../reducers'
 import {
   IsnapshotNodeObjectData,
   getSnapshotNode,
@@ -21,6 +19,7 @@ import {
 import { getMetricsNode } from '../../apis/metrics'
 import useInterval from '../../utils/useInterval'
 import { IchartDateRange } from '../../types/dateRange'
+import { clusterStroe } from '../../store'
 
 dayjs.extend(utc)
 
@@ -100,7 +99,7 @@ const nodeProcessColumns: ColumnProps<IsnapshotNodeProcessObjectData>[] = [
 ]
 
 const NodeDetailContainer = () => {
-  const selectedClusterId = useSelector((state: RootState) => state.cluster.id)
+  const selectedClusterId = clusterStroe.id
   const match = useRouteMatch<Iparams>('/nodes/:nodeId')
   const [
     snapshotData,

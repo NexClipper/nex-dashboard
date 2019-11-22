@@ -9,7 +9,6 @@ const instance: AxiosInstance = Axios.create({
       ? `${process.env.REACT_APP_API_URL_DEV}/api/v1`
       : `${process.env.REACT_APP_API_URL_PROD}/api/v1`,
   params: {},
-  timeout: 3000,
   headers: { 'Access-Control-Allow-Origin': '*' }
 })
 

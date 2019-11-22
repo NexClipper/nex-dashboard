@@ -1,7 +1,6 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
-import { setCluster } from '../../reducers/cluster'
 import PrometheusExportersPresenter from './PrometheusExportersPresenter'
+import { clusterStroe } from '../../store'
 
 const PrometheusExportersContainer = () => {
   const data: IprometheusExportersData[] = [
@@ -84,8 +83,7 @@ const PrometheusExportersContainer = () => {
       link: 'https://github.com/prometheus/blackbox_exporter'
     }
   ]
-  const dispatch = useDispatch()
-  dispatch(setCluster(1, ''))
+  clusterStroe.setCluster(1, '')
   return <PrometheusExportersPresenter data={data} />
 }
 
