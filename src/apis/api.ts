@@ -1,15 +1,11 @@
 import Axios, { AxiosInstance } from 'axios'
 
-// const isLocal = process.env.REACT_APP_LOCAL === 'local'
-
 const instance: AxiosInstance = Axios.create({
-  //   baseURL: 'http://192.168.2.110:32012/api/',
   baseURL:
     process.env.NODE_ENV === 'development'
       ? `${process.env.REACT_APP_API_URL_DEV}/api/v1`
       : `${process.env.REACT_APP_API_URL_PROD}/api/v1`,
   params: {},
-  timeout: 3000,
   headers: { 'Access-Control-Allow-Origin': '*' }
 })
 
