@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import * as Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import { useSelector } from 'react-redux'
-import { RootState } from '../reducers'
+import { RootState } from '../modules'
 
 interface HighchartProps {
   config: Highcharts.Options

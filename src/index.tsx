@@ -4,11 +4,12 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import { createStore } from 'redux'
-import rootReducer from './reducers'
+import { createStore, applyMiddleware } from 'redux'
+import rootReducer, { rootSaga } from './modules'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { composeWithDevTools } from 'redux-devtools-extension'
+import createSagaMiddleware from 'redux-saga'
 
 const persistConfig = {
   key: 'root',
@@ -17,16 +18,23 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
+const sagaMiddleware = createSagaMiddleware()
+
 const configureStore = () => {
   const store =
     process.env.NODE_ENV === 'development'
-      ? createStore(persistedReducer, composeWithDevTools())
-      : createStore(persistedReducer)
+      ? createStore(
+          persistedReducer,
+          composeWithDevTools(applyMiddleware(sagaMiddleware))
+        )
+      : createStore(persistedReducer, applyMiddleware(sagaMiddleware))
   const persistor = persistStore(store)
   return { store, persistor }
 }
 
 const { store, persistor } = configureStore()
+
+sagaMiddleware.run(rootSaga)
 
 ReactDOM.render(
   <Provider store={store}>

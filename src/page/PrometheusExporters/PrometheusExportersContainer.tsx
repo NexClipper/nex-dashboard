@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { setCluster } from '../../reducers/cluster'
+import { setCluster } from '../../modules/cluster'
 import PrometheusExportersPresenter from './PrometheusExportersPresenter'
 
 const PrometheusExportersContainer = () => {

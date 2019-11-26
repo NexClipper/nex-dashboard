@@ -7,7 +7,7 @@ import NodeDetailPresenter from './NodeDetailPresenter'
 import utc from 'dayjs/plugin/utc'
 import { ColumnProps } from 'antd/es/table'
 import values from 'lodash-es/values'
-import { RootState } from '../../reducers'
+import { RootState } from '../../modules'
 import {
   IsnapshotNodeObjectData,
   getSnapshotNode,

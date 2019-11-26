@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Link, useRouteMatch, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../../reducers'
+import { RootState } from '../../modules'
 import { ColumnProps } from 'antd/es/table'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -16,7 +16,7 @@ import {
   getClusters
 } from '../../apis/clusters'
 import { getMetricsSummary } from '../../apis/metrics'
-import { setCluster } from '../../reducers/cluster'
+import { setCluster } from '../../modules/cluster'
 import { IbreadcrumbDropdownMenu } from '../../components/BreadcrumbDropdown'
 import { IchartDateRange } from '../../types/dateRange'
 
