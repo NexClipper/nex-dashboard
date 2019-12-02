@@ -44,7 +44,7 @@
     "typescript": "^3.7.2"
   },
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "PORT=18000 react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
