@@ -24,7 +24,7 @@ if (prod) {
     })
   );
 } else {
-  app.use(morgan("div"));
+  app.use(morgan("dev"));
   app.use(
     cors({
       origin: true,
