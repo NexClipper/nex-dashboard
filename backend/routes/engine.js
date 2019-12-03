@@ -2,10 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 const engineApi = axios.create({
-  baseURL:
-    process.env.NODE_ENV === "development"
-      ? `${process.env.ENGINE_DEV_URL}/api/v1`
-      : `${process.env.ENGINE_PROD_URL}/api/v1`
+  baseURL: `${process.env.ENGINE_URL}/api/v1`
 });
 
 //Agents
