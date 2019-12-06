@@ -4,9 +4,10 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
 const dotenv = require("dotenv");
-const passport = require("passport");
+// const passport = require("passport");
 const hpp = require("hpp");
 const helmet = require("helmet");
+const engineAPIRouter = require("./routes/engine");
 
 const prod = process.env.NODE_ENV === "production";
 dotenv.config();
@@ -19,11 +20,12 @@ if (prod) {
   app.use(
     cors({
       // origin: /nexdashboard\.com$/,
+      origin: true,
       credentials: true
     })
   );
 } else {
-  app.use(morgan("div"));
+  app.use(morgan("dev"));
   app.use(
     cors({
       origin: true,
@@ -52,6 +54,8 @@ app.use(
 app.get("/", (req, res) => {
   res.send("running nex-dashboard backend sever");
 });
+
+app.use("/api/engine", engineAPIRouter);
 
 app.listen(prod ? process.env.PORT : 3065, () => {
   console.log(`server is running on ${prod ? process.env.PORT : 3065}`);

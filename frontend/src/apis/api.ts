@@ -3,8 +3,8 @@ import Axios, { AxiosInstance } from 'axios'
 const instance: AxiosInstance = Axios.create({
   baseURL:
     process.env.NODE_ENV === 'development'
-      ? `${process.env.REACT_APP_API_URL_DEV}/api/v1`
-      : `${process.env.REACT_APP_API_URL_PROD}/api/v1`,
+      ? `${process.env.REACT_APP_API_URL_DEV}/`
+      : `${process.env.REACT_APP_API_URL_PROD}/`,
   params: {},
   headers: { 'Access-Control-Allow-Origin': '*' }
 })

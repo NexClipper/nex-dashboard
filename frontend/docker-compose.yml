@@ -1,15 +1,11 @@
-version: "3.7"
+version: '3.3'
 
 services:
   nex-dashboard:
     image: nexclipper/nex-dashboard:0.3.0
     env_file: .env.production
-    environment:
-      - REACT_APP_API_URL_PROD
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        api_url: $REACT_APP_API_URL_PROD
     ports:
-      - "80:80"
+      - '80:80'
