@@ -1,7 +1,8 @@
-# How to run (production-docker)
+# How to run (production)
 
-1. Make docker image : `docker build --tag nexclipper/nex-dashboard-backend:0.3.0 .`
-2. Run docker container : `docker run --name nex-dashboard-backend -p 8080:8080 nexclipper/nex-dashboard-backend:0.3.0`
+1. Install node.js LTS. (https://nodejs.org/en/download/package-manager/)
+2. Project install : `npm i`
+3. Project run : `npm run start`
 
 # How to run (development)
 
