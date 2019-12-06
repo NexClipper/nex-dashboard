@@ -4,7 +4,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
 const dotenv = require("dotenv");
-const passport = require("passport");
+// const passport = require("passport");
 const hpp = require("hpp");
 const helmet = require("helmet");
 const engineAPIRouter = require("./routes/engine");
@@ -20,6 +20,7 @@ if (prod) {
   app.use(
     cors({
       // origin: /nexdashboard\.com$/,
+      origin: true,
       credentials: true
     })
   );

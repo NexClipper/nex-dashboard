@@ -6,8 +6,6 @@ COPY package.json /app/package.json
 RUN npm install --silent
 RUN npm install react-scripts -g --silent
 COPY . /app
-ARG api_url
-RUN find .env.production -type f -exec sed -i 's/REACT_APP_API_URL_PROD=/REACT_APP_API_URL_PROD=${api_url}/g' {} \;
 RUN npm run build
 
 # production environment
